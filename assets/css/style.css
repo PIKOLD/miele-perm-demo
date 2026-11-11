@@ -374,7 +374,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   .offer table { width: 100%; border-collapse: collapse; }
   .offer__tbl th, .offer__tbl td { border-bottom: .5pt solid #999; padding: 6pt 6pt; text-align: left; vertical-align: top; }
   .offer__tbl th { font-size: 8.5pt; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1pt solid #000; }
-  .offer__tbl td:nth-child(n+3), .offer__tbl th:nth-child(n+3) { text-align: right; white-space: nowrap; }
+  .offer__tbl td:nth-child(n+4), .offer__tbl th:nth-child(n+4) { text-align: right; white-space: nowrap; }
   .offer__tbl small { display: block; font-size: 8.5pt; color: #555; margin-top: 2pt; }
   .offer__tbl s { color: #777; font-size: 8.5pt; }
   .offer__tbl tr { break-inside: avoid; }
@@ -387,4 +387,57 @@ button, input, textarea, select { font: inherit; color: inherit; }
   .offer__contacts th, .offer__contacts td { text-align: left; padding: 3pt 0; font-weight: 400; vertical-align: top; }
   .offer__contacts th { width: 32%; color: #555; }
   .offer__legal { margin-top: 12pt; font-size: 8.5pt; color: #555; break-inside: avoid; }
+}
+
+/* ---------- Правки 11.11, вечер: папки каталога, комплекты, логотип ---------- */
+[hidden] { display: none !important; }
+.hdr .logo { align-self: stretch; }
+.hdr .logo__img { height: 68px; }
+.cat__back { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; margin-bottom: 4px; padding: 0; border: 0; background: none; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+.cat__back::before { content: "←"; font-size: 16px; letter-spacing: 0; }
+.cat__back:hover { color: var(--ink); }
+.folders { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.folder { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); text-decoration: none; padding-bottom: 18px; transition: border-color .2s var(--ease); }
+.folder:hover { border-color: var(--ink); }
+.folder__pic { aspect-ratio: 4 / 3; background: var(--soft); display: flex; align-items: center; justify-content: center; gap: 6%; padding: 9% 12%; overflow: hidden; }
+.folder__pic img { width: 100%; height: 100%; min-width: 0; object-fit: contain; mix-blend-mode: multiply; transition: transform .5s var(--ease); }
+.folder:hover .folder__pic img { transform: scale(1.04); }
+.folder--duo .folder__pic img { width: 47%; }
+.folder__pic img.folder__logo { width: 38%; height: auto; mix-blend-mode: normal; }
+.folder--sale .folder__pic { background: var(--red); }
+.folder__pct { color: #fff; font-size: clamp(56px, 7vw, 96px); font-weight: 600; line-height: 1; }
+.folder__name { padding: 16px 18px 0; font-size: 17px; font-weight: 600; line-height: 1.3; letter-spacing: -.01em; }
+.folder__n { padding: 4px 18px 0; font-size: 13px; color: var(--muted); }
+.folder--sale .folder__name { color: var(--red); }
+
+.grid--kits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.kit__pics { display: flex; align-items: center; gap: 4%; aspect-ratio: 16 / 9; background: var(--soft); padding: 6% 7%; }
+.kit__pics a { flex: 1; min-width: 0; height: 100%; display: flex; }
+.kit__pics img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.kit__list { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 6px; font-size: 15px; }
+.kit__list li { display: flex; justify-content: space-between; gap: 16px; }
+.kit__list a { text-decoration: none; border-bottom: 1px solid var(--line); }
+.kit__list a:hover { border-color: var(--ink); }
+.kit__list span { white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+.kit__lbl { font-size: 14px; color: var(--muted); }
+.salon__btns { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); }
+.salon__btns .btn { width: 100%; padding: 0 12px; }
+
+@media (max-width: 1020px) {
+  .hdr .logo__img { height: 60px; }
+  .folders { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .folders { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .folder__name { padding: 12px 12px 0; font-size: 15px; }
+  .folder__n { padding: 2px 12px 0; }
+  .folder { padding-bottom: 14px; }
+  .grid--kits { grid-template-columns: 1fr; }
+  .kit__list li { flex-direction: column; gap: 0; }
+  .salon__btns { grid-template-columns: 1fr 1fr; }
+}
+@media print {
+  .offer__tbl th:first-child, .offer__tbl td:first-child { width: 16pt; }
+  .offer__pic { width: 56pt; padding-right: 0 !important; }
+  .offer__pic img { display: block; width: 50pt; height: 50pt; object-fit: contain; }
 }

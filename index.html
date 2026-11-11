@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/style.css?v=3">
 </head>
 <body data-page="home">
 <div id="hdr"></div>
@@ -38,8 +38,8 @@
   <section class="sec" id="catalog">
     <div class="wrap">
       <div class="cat__head">
-        <div><p class="eyebrow">Каталог</p><h2>Техника в шоуруме</h2></div>
-        <div class="cat__tools">
+        <div><button type="button" class="cat__back" id="cat-back" hidden>Все разделы</button><h2 id="cat-title">Каталог</h2></div>
+        <div class="cat__tools" id="cat-tools" hidden>
           <label class="sort"><span>Сортировка</span>
             <select id="sort">
               <option value="default">По умолчанию</option>
@@ -52,8 +52,8 @@
           <label class="only"><input type="checkbox" id="only"> Только в наличии <span id="count" style="color:var(--muted)"></span></label>
         </div>
       </div>
-      <div class="filters" id="filters" role="group" aria-label="Категории"></div>
-      <div class="grid" id="grid" aria-live="polite"></div>
+      <div class="folders" id="folders"></div>
+      <div class="grid" id="grid" aria-live="polite" hidden></div>
     </div>
   </section>
 
@@ -62,7 +62,7 @@
       <div class="sets__pic"><img src="assets/img/products/wtv601-2.webp" alt="Стиральная и сушильная машины Miele, установленные в колонну" loading="lazy" width="1000" height="900"></div>
       <div>
         <p class="eyebrow">Комплекты</p>
-        <h2>Уход за бельём на площади одной машины</h2>
+        <h2>Уход за бельём на площади менее 1&nbsp;м²</h2>
         <p class="lead" style="color:#3d3a37">Сушильная машина ставится на стиральную машину через монтажный комплект. Приборы одной серии работают в паре: сушильная машина сама подбирает программу по данным стиральной машины.</p>
         <div id="setlist" style="margin-top:32px"></div>
       </div>
@@ -102,7 +102,7 @@
         <dl>
           <div><dt>Адрес</dt><dd data-cfg="address">Пермь, ул. Сибирская, 61</dd></div>
           <div><dt>Режим работы</dt><dd data-cfg="hours">Пн–Чт 11:00–19:00, Пт 11:00–18:00</dd></div>
-          <div><dt>Телефон</dt><dd><a data-cfg="tel" href="tel:+73422411494">+7 (342) 241-14-94</a><br><a data-cfg="tel2" href="tel:+79519369478">+7 951 936-94-78</a></dd></div>
+          <div><dt>Телефон</dt><dd><a data-cfg="tel" href="tel:+73422411494">+7(342)2-411-494</a><br><a data-cfg="tel2" href="tel:+79519369478">+7(951)9-369-478</a></dd></div>
         </dl>
         <div class="salon__btns">
           <a class="btn btn--white" data-cfg="gis" href="#" target="_blank" rel="noopener">Маршрут в 2ГИС</a>
@@ -128,7 +128,7 @@
 </main>
 
 <div id="ftr"></div>
-<script src="assets/js/store.js"></script>
-<script src="assets/js/app.js"></script>
+<script src="assets/js/store.js?v=3"></script>
+<script src="assets/js/app.js?v=3"></script>
 </body>
 </html>

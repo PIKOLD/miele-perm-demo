@@ -6,7 +6,7 @@
   var tel = digits(cfg.phone), tel2 = cfg.phone2 ? digits(cfg.phone2) : '';
   var wa = function (text) { return 'https://wa.me/' + cfg.whatsapp + (text ? '?text=' + encodeURIComponent(text) : ''); };
   var tg = S.tgLink();
-  var SALE = 'sale';
+  var SALE = 'sale', SETS = 'sets';
   var visible = function () { return S.products().filter(function (p) { return p.visible !== false; }); };
   var lead = cfg.leadTime ? ' ' + cfg.leadTime : '';
 
@@ -32,14 +32,14 @@
   /* ---------- Шапка, подвал, cookie ---------- */
   function layout() {
     var home = $('body').dataset.page === 'home' ? '' : 'index.html';
-    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], [home + '#sets', 'Комплекты', ''], [home + '#service', 'Сервис', ''], [home + '#showroom', 'Шоурум', '']];
-    var nav = links.map(function (l) { return '<a href="' + l[0] + '"' + (l[2] ? ' data-cat="' + l[2] + '"' : '') + '>' + l[1] + '</a>'; }).join('');
+    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], ['index.html?cat=' + SETS + '#catalog', 'Комплекты', SETS], [home + '#service', 'Сервис', null], [home + '#showroom', 'Шоурум', null]];
+    var nav = links.map(function (l) { return '<a href="' + l[0] + '"' + (l[2] !== null ? ' data-cat="' + l[2] + '"' : '') + '>' + l[1] + '</a>'; }).join('');
     var bag = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
     $('#hdr').innerHTML =
       '<a class="skip" href="#main">Перейти к содержимому</a>' +
       '<header class="hdr"><div class="wrap hdr__in">' +
         '<div><button class="burger" aria-expanded="false" aria-controls="mnav" aria-label="Меню"><span></span></button><nav class="nav" aria-label="Основная навигация">' + nav + '</nav></div>' +
-        '<a class="logo" href="index.html" aria-label="Miele Пермь — на главную"><img class="logo__img" src="assets/img/miele-logo.svg" alt="Miele" width="104" height="40"><span class="logo__city">Пермь</span></a>' +
+        '<a class="logo" href="index.html" aria-label="Miele Пермь — на главную"><img class="logo__img" src="assets/img/miele-logo.svg" alt="Miele" width="104" height="40"></a>' +
         '<div class="hdr__right"><a class="hdr__tel" href="tel:' + tel + '">' + esc(cfg.phone) + '</a>' +
           '<a class="hdr__icon" href="tel:' + tel + '" aria-label="Позвонить: ' + esc(cfg.phone) + '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></a>' +
           '<a class="hdr__cart" href="cart.html" aria-label="Корзина">' + bag + '<span class="hdr__n" data-cart-n hidden></span></a>' +
@@ -50,8 +50,8 @@
 
     $('#ftr').innerHTML =
       '<footer class="ftr"><div class="wrap"><div class="ftr__grid">' +
-        '<div><a class="logo" href="index.html"><img class="logo__img" src="assets/img/miele-logo.svg" alt="Miele" width="104" height="40"><span class="logo__city">Пермь</span></a><p class="ftr__about">Фирменный шоурум бытовой техники Miele в Перми. Подбор, доставка, установка и сервис.</p></div>' +
-        '<div><h3>Каталог</h3><ul><li><a href="index.html?cat=' + SALE + '#catalog" data-cat="' + SALE + '">Акции</a></li>' + S.cats().map(function (c) { return '<li><a href="index.html?cat=' + encodeURIComponent(c) + '#catalog" data-cat="' + esc(c) + '">' + esc(c) + '</a></li>'; }).join('') + '</ul></div>' +
+        '<div><a class="logo" href="index.html"><img class="logo__img" src="assets/img/miele-logo.svg" alt="Miele" width="104" height="40"></a><p class="ftr__about">Фирменный шоурум бытовой техники Miele в Перми. Подбор, доставка, установка и сервис.</p></div>' +
+        '<div><h3>Каталог</h3><ul><li><a href="index.html?cat=' + SALE + '#catalog" data-cat="' + SALE + '">Акции</a></li><li><a href="index.html?cat=' + SETS + '#catalog" data-cat="' + SETS + '">Комплекты</a></li>' + S.cats().map(function (c) { return '<li><a href="index.html?cat=' + encodeURIComponent(c) + '#catalog" data-cat="' + esc(c) + '">' + esc(c) + '</a></li>'; }).join('') + '</ul></div>' +
         '<div><h3>Покупателям</h3><ul><li><a href="cart.html">Корзина</a></li><li><a href="' + home + '#service">Доставка и установка</a></li><li><a href="' + home + '#showroom">Как нас найти</a></li><li><a href="privacy.html">Политика обработки персональных данных</a></li><li><a href="consent.html">Согласие на обработку данных</a></li><li><a href="privacy.html#cookies">Файлы cookie</a></li></ul></div>' +
         '<div><h3>Контакты</h3><ul><li><a href="tel:' + tel + '">' + esc(cfg.phone) + '</a></li>' + (tel2 ? '<li><a href="tel:' + tel2 + '">' + esc(cfg.phone2) + '</a></li>' : '') +
           '<li><a href="' + wa() + '" target="_blank" rel="noopener">WhatsApp</a></li>' + (tg ? '<li><a href="' + esc(tg) + '" target="_blank" rel="noopener">Telegram</a></li>' : '') +
@@ -75,11 +75,23 @@
     cartCount();
   }
 
-  /* ---------- Каталог ---------- */
+  /* ---------- Каталог: папки разделов, внутри папки — товары ---------- */
+  function setItems(set) { return set.ids.map(S.product).filter(function (p) { return p && p.visible !== false; }); }
+  function addSet(i) {
+    setItems(cfg.sets[i]).forEach(function (p) { if (S.status(p).key !== 'out') S.cartAdd(p.id); });
+    cartCount();
+  }
   function catalog() {
     var grid = $('#grid'); if (!grid) return;
-    var list = visible(), cats = S.cats(), cat = new URLSearchParams(location.search).get('cat') || '', only = false, sort = 'default';
+    var list = visible(), cats = S.cats(), only = false, sort = 'default';
+    var folders = $('#folders'), tools = $('#cat-tools'), title = $('#cat-title'), back = $('#cat-back');
     var num = function (p) { return typeof p.price === 'number'; };
+    var kits = cfg.sets.map(function (s, i) { return { set: s, i: i, items: setItems(s) }; }).filter(function (k) { return k.items.length >= 2; });
+    var valid = function (c) { return c === SALE || (c === SETS && kits.length > 0) || cats.indexOf(c) >= 0; };
+    var fromUrl = function () { var c = new URLSearchParams(location.search).get('cat') || ''; return valid(c) ? c : ''; };
+    var cat = fromUrl();
+    var NAMES = {}; NAMES[SALE] = 'Акции'; NAMES[SETS] = 'Комплекты';
+    var inCat = function (c) { return list.filter(function (p) { return c === SALE ? S.onSale(p) : p.category === c; }); };
     var SORT = {
       stock: function (a, b) { return S.status(b).level - S.status(a).level || (b.stock || 0) - (a.stock || 0); },
       'price-asc': function (a, b) { return num(a) && num(b) ? a.price - b.price : num(b) - num(a); },
@@ -89,40 +101,85 @@
     try { sort = sessionStorage.getItem('mp.sort') || 'default'; } catch (e) {}
     if (!SORT[sort]) sort = 'default';
     $('#sort').value = sort;
-    if (cat !== SALE && cats.indexOf(cat) < 0) cat = '';
-    var filters = $('#filters');
-    var chip = function (c, label, cls) { return '<button type="button" class="chip' + (cls || '') + '" data-cat="' + esc(c) + '" aria-pressed="' + (c === cat) + '">' + esc(label) + '</button>'; };
+
+    /* Порядок папок: акции, разделы, комплекты — сразу после стиральных и сушильных машин */
+    function order() {
+      var out = cats.slice(), at = Math.max(out.indexOf('Стиральные машины'), out.indexOf('Сушильные машины')) + 1;
+      if (kits.length) out.splice(at, 0, SETS);
+      return [SALE].concat(out);
+    }
+    function folder(c) {
+      var n = c === SETS ? kits.length : inCat(c).length, pic, cls = '';
+      var count = c === SETS ? n + ' ' + S.plural(n, 'комплект', 'комплекта', 'комплектов')
+        : n ? n + ' ' + S.plural(n, 'товар', 'товара', 'товаров') : (c === SALE ? 'Сейчас нет' : 'Под заказ');
+      if (c === SALE) { pic = '<span class="folder__pct" aria-hidden="true">%</span>'; cls = ' folder--sale'; }
+      else if (c === SETS) {
+        cls = ' folder--duo';
+        pic = kits[0].items.slice(0, 2).map(function (p) { return '<img src="' + esc((p.images || [])[0] || '') + '" alt="" loading="lazy">'; }).join('');
+      } else {
+        var src = (cfg.catImages || {})[c] || ((inCat(c)[0] || {}).images || [])[0];
+        pic = src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : '<img class="folder__logo" src="assets/img/miele-logo.svg" alt="">';
+      }
+      return '<a class="folder' + cls + '" href="index.html?cat=' + encodeURIComponent(c) + '#catalog" data-cat="' + esc(c) + '"><span class="folder__pic">' + pic + '</span>' +
+        '<span class="folder__name">' + esc(NAMES[c] || c) + '</span><span class="folder__n">' + count + '</span></a>';
+    }
+    function kitCard(k) {
+      var known = k.items.every(num), sum = k.items.reduce(function (a, p) { return a + (p.price || 0); }, 0);
+      return '<div class="card kit"><div class="kit__pics">' + k.items.map(function (p) {
+          return '<a href="product.html?id=' + encodeURIComponent(p.id) + '" tabindex="-1" aria-hidden="true"><img src="' + esc((p.images || [])[0] || '') + '" alt="" loading="lazy"></a>';
+        }).join('') + '</div>' +
+        '<div class="card__body"><span class="card__cat">' + esc(k.set.note) + '</span><span class="card__title">' + esc(k.set.title) + '</span>' +
+        '<ul class="kit__list">' + k.items.map(function (p) {
+          return '<li><a href="product.html?id=' + encodeURIComponent(p.id) + '">' + esc(p.title) + '</a><span>' + (num(p) ? S.price(p.price) : 'по запросу') + '</span></li>';
+        }).join('') + '</ul>' +
+        '<div class="card__foot"><span class="kit__lbl">Комплект</span><span class="price' + (known ? '' : ' price--ask') + '">' + (known ? S.price(sum) : 'Цена по запросу') + '</span></div></div>' +
+        '<button type="button" class="card__add" data-set="' + k.i + '">Добавить комплект в корзину</button></div>';
+    }
     function draw() {
-      filters.innerHTML = chip('', 'Все товары') + chip(SALE, 'Акции', ' chip--sale') + cats.map(function (c) { return chip(c, c); }).join('');
-      var inCat = list.filter(function (p) { return !cat || (cat === SALE ? S.onSale(p) : p.category === cat); });
-      var shown = inCat.filter(function (p) { return !only || S.status(p).level > 0; });
+      var root = !cat;
+      folders.hidden = !root; grid.hidden = root; back.hidden = root; tools.hidden = root || cat === SETS;
+      title.textContent = root ? 'Каталог' : NAMES[cat] || cat;
+      if (root) { folders.innerHTML = order().map(folder).join(''); return; }
+      grid.classList.toggle('grid--kits', cat === SETS);
+      if (cat === SETS) { grid.innerHTML = kits.map(kitCard).join(''); return; }
+      var all = inCat(cat);
+      var shown = all.filter(function (p) { return !only || S.status(p).level > 0; });
       if (SORT[sort]) shown = shown.map(function (p, i) { return [p, i]; }).sort(function (a, b) { return SORT[sort](a[0], b[0]) || a[1] - b[1]; }).map(function (x) { return x[0]; });
       $('#count').textContent = shown.length + ' ' + S.plural(shown.length, 'товар', 'товара', 'товаров');
-      var none = !inCat.length
+      var none = !all.length
         ? (cat === SALE ? 'Сейчас акционных предложений нет. О новых акциях расскажут консультанты шоурума.' : 'В этом разделе товары скоро появятся на сайте. Нужную модель привезём под заказ' + lead + ' — позвоните или напишите нам.')
-        : 'По этим условиям сейчас ничего нет в наличии. Нужную модель привезём под заказ' + lead + '.';
+        : 'В этом разделе сейчас ничего нет в наличии. Нужную модель привезём под заказ' + lead + '.';
       grid.innerHTML = shown.length ? shown.map(function (p) {
         return '<div class="card"><a class="card__main" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
           '<div class="card__pic">' + saleBadge(p) + '<img src="' + esc((p.images || [])[0] || '') + '" alt="' + esc(p.title) + '" loading="lazy" width="600" height="600"></div>' +
           '<div class="card__body"><span class="card__cat">' + esc(p.category) + '</span><span class="card__title">' + esc(p.title) + '</span>' +
           '<div class="card__foot">' + stockHtml(p) + priceHtml(p) + '</div></div></a>' +
           (S.status(p).key !== 'out' ? '<button type="button" class="card__add" data-add="' + esc(p.id) + '">' + addLabel(p.id) + '</button>' : '') + '</div>';
-      }).join('') : '<div class="empty"><p>' + esc(none) + '</p><button type="button" class="btn btn--line" id="reset">Показать все товары</button></div>';
+      }).join('') : '<div class="empty"><p>' + esc(none) + '</p><button type="button" class="btn btn--line" id="reset">Все разделы</button></div>';
     }
-    filters.addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (b) { cat = b.dataset.cat; draw(); } });
+    /* Открыть папку (или вернуться к списку папок). Кнопка «Назад» в браузере возвращает к папкам */
+    function go(c, push) {
+      cat = valid(c) ? c : ''; only = false; $('#only').checked = false;
+      if (push) { try { history.pushState(null, '', (cat ? '?cat=' + encodeURIComponent(cat) : location.pathname) + '#catalog'); } catch (e) {} }
+      draw();
+      if (push) $('#catalog').scrollIntoView();
+    }
     $('#only').addEventListener('change', function (e) { only = e.target.checked; draw(); });
     $('#sort').addEventListener('change', function (e) { sort = e.target.value; try { sessionStorage.setItem('mp.sort', sort); } catch (er) {} draw(); });
+    back.addEventListener('click', function () { go('', true); });
     grid.addEventListener('click', function (e) {
-      if (e.target.id === 'reset') { cat = ''; only = false; $('#only').checked = false; return draw(); }
+      if (e.target.id === 'reset') return go('', true);
+      var s = e.target.closest('[data-set]');
+      if (s) { addSet(+s.dataset.set); s.textContent = 'Комплект в корзине'; s.classList.add('on'); return; }
       var b = e.target.closest('[data-add]'); if (!b) return;
       S.cartAdd(b.dataset.add); b.textContent = addLabel(b.dataset.add); b.classList.add('on'); cartCount();
     });
-    /* Ссылки на разделы из меню и подвала на главной переключают вкладку без перезагрузки */
+    /* Ссылки на разделы из меню и подвала на главной открывают папку без перезагрузки */
     document.addEventListener('click', function (e) {
-      var a = e.target.closest('a[data-cat]'); if (!a) return;
-      e.preventDefault(); cat = a.dataset.cat; only = false; $('#only').checked = false; draw();
-      $('#catalog').scrollIntoView();
+      var a = e.target.closest('a[data-cat]'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      e.preventDefault(); go(a.dataset.cat, true);
     });
+    window.addEventListener('popstate', function () { cat = fromUrl(); draw(); });
     draw();
   }
 
@@ -143,8 +200,7 @@
     box.innerHTML = html;
     box.addEventListener('click', function (e) {
       var b = e.target.closest('[data-set]'); if (!b) return;
-      cfg.sets[+b.dataset.set].ids.forEach(function (id) { var p = S.product(id); if (p && p.visible !== false) S.cartAdd(id); });
-      cartCount();
+      addSet(+b.dataset.set);
       b.outerHTML = '<a class="set__add on" href="cart.html">Комплект в корзине — перейти</a>';
     });
   }
@@ -275,9 +331,9 @@
       offer.innerHTML =
         '<div class="offer__top"><img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co"><b>Шоурум Miele, Пермь</b><span>' + esc(cfg.address) + '</span><span>' + esc(cfg.phone) + (cfg.phone2 ? ', ' + esc(cfg.phone2) : '') + '</span><span>' + esc(cfg.hours) + '</span></div></div>' +
         '<h1>Коммерческое предложение</h1><p class="offer__date">от ' + today + '</p>' +
-        '<table class="offer__tbl"><thead><tr><th>№</th><th>Наименование</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
+        '<table class="offer__tbl"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
-          return '<tr><td>' + (i + 1) + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td><td>' + (r.sum === null ? 'по запросу' : money(r.sum)) + '</td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td><td>' + (r.sum === null ? 'по запросу' : money(r.sum)) + '</td></tr>';
         }).join('') + '</tbody></table>' +
         '<table class="offer__sum"><tbody><tr><th>Сумма</th><td>' + money(c.sum) + '</td></tr>' +
           (c.pct ? '<tr><th>Скидка за объём заказа ' + c.pct + '%</th><td>−' + money(c.discount) + '</td></tr>' : '') +
@@ -285,7 +341,7 @@
         (c.ask ? '<p class="offer__p">Позиции с ценой по запросу в сумму не включены — стоимость уточнит консультант.</p>' : '') +
         '<div class="offer__contacts"><h2>Контакты шоурума</h2><table><tbody>' +
           '<tr><th>Телефон</th><td>' + esc(cfg.phone) + (cfg.phone2 ? ', ' + esc(cfg.phone2) : '') + '</td></tr>' +
-          '<tr><th>WhatsApp</th><td>' + esc(String(cfg.whatsapp).replace(/^7(\d{3})(\d{3})(\d{2})(\d{2})$/, '+7 $1 $2-$3-$4')) + '</td></tr>' +
+          '<tr><th>WhatsApp</th><td>' + esc(String(cfg.whatsapp).replace(/^7(\d{3})(\d)(\d{3})(\d{3})$/, '+7($1)$2-$3-$4')) + '</td></tr>' +
           (tg ? '<tr><th>Telegram</th><td>' + esc(tg.replace('https://', '')) + '</td></tr>' : '') +
           '<tr><th>Адрес</th><td>' + esc(cfg.address) + '</td></tr>' +
           '<tr><th>Режим работы</th><td>' + esc(cfg.hours) + '</td></tr></tbody></table></div>' +
