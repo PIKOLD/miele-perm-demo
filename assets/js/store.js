@@ -99,7 +99,7 @@
     highDefault: 5,           // порог «много» для новых товаров
     leadTime: 'от 5 дней',    // срок для товаров «под заказ»
     phone: '+7(342)2-411-494',
-    phone2: '+7(951)9-369-478',
+    phone2: '+7(951)936-94-78',
     whatsapp: '79519369478',
     telegram: '79519369478',  // номер (только цифры) или имя пользователя без @
     address: 'Пермь, ул. Сибирская, 61',
@@ -134,7 +134,7 @@
       var s = read(SKEY, {}), out = clone(DEFAULTS);
       /* Телефоны в старом формате записи заменяются на новый */
       if (s.phone === '+7 (342) 241-14-94') delete s.phone;
-      if (s.phone2 === '+7 951 936-94-78') delete s.phone2;
+      if (s.phone2 === '+7 951 936-94-78' || s.phone2 === '+7(951)9-369-478') delete s.phone2;
       Object.keys(s).forEach(function (k) { out[k] = s[k]; });
       return out;
     },

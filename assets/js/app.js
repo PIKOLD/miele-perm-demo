@@ -341,7 +341,7 @@
         (c.ask ? '<p class="offer__p">Позиции с ценой по запросу в сумму не включены — стоимость уточнит консультант.</p>' : '') +
         '<div class="offer__contacts"><h2>Контакты шоурума</h2><table><tbody>' +
           '<tr><th>Телефон</th><td>' + esc(cfg.phone) + (cfg.phone2 ? ', ' + esc(cfg.phone2) : '') + '</td></tr>' +
-          '<tr><th>WhatsApp</th><td>' + esc(String(cfg.whatsapp).replace(/^7(\d{3})(\d)(\d{3})(\d{3})$/, '+7($1)$2-$3-$4')) + '</td></tr>' +
+          '<tr><th>WhatsApp</th><td>' + esc(String(cfg.whatsapp).replace(/^7(\d{3})(\d{3})(\d{2})(\d{2})$/, '+7($1)$2-$3-$4')) + '</td></tr>' +
           (tg ? '<tr><th>Telegram</th><td>' + esc(tg.replace('https://', '')) + '</td></tr>' : '') +
           '<tr><th>Адрес</th><td>' + esc(cfg.address) + '</td></tr>' +
           '<tr><th>Режим работы</th><td>' + esc(cfg.hours) + '</td></tr></tbody></table></div>' +
