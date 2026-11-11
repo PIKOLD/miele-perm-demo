@@ -32,7 +32,7 @@
   /* ---------- Шапка, подвал, cookie ---------- */
   function layout() {
     var home = $('body').dataset.page === 'home' ? '' : 'index.html';
-    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], ['index.html?cat=' + SETS + '#catalog', 'Комплекты', SETS], [home + '#service', 'Сервис', null], [home + '#showroom', 'Шоурум', null]];
+    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], [home + '#service', 'Сервис', null], [home + '#showroom', 'Шоурум', null]];
     var nav = links.map(function (l) { return '<a href="' + l[0] + '"' + (l[2] !== null ? ' data-cat="' + l[2] + '"' : '') + '>' + l[1] + '</a>'; }).join('');
     var bag = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
     $('#hdr').innerHTML =
