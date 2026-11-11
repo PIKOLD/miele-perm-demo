@@ -36,7 +36,7 @@
     },
     {
       id: 'wtv601', title: 'Монтажный комплект WTV 601 для колонны W2/T2', model: 'WTV 601', sku: '',
-      category: 'Аксессуары и бытовая химия', country: 'Германия', price: 14900, oldPrice: 17900, stock: 8, low: 2, high: 5,
+      category: 'Аксессуары', country: 'Германия', price: 14900, oldPrice: 17900, stock: 8, low: 2, high: 5,
       images: [IMG + 'wtv601-1.webp', IMG + 'wtv601-2.webp', IMG + 'wtv601-3.webp'],
       description: 'Соединительный комплект для установки сушильной машины на стиральную в колонну. Подходит для серии Nova Edition (W2/T2). Колонна занимает площадь одной машины и надёжно фиксирует оба прибора.',
       features: ['Для стиральных машин и сушильных машин Nova Edition', 'Высота комплекта — 2,5 см', 'Надёжная фиксация приборов в колонне'],
@@ -60,7 +60,7 @@
     },
     {
       id: 'wtv502', title: 'Монтажный комплект WTV 502 для колонны W1/T1', model: 'WTV 502', sku: '',
-      category: 'Аксессуары и бытовая химия', country: 'Германия', price: null, stock: 6, low: 2, high: 5,
+      category: 'Аксессуары', country: 'Германия', price: null, stock: 6, low: 2, high: 5,
       images: [IMG + 'wtv502-1.webp', IMG + 'wtv502-2.webp'],
       description: 'Соединительный комплект для установки сушильной машины T1 на стиральную машину W1 в колонну. Цвет — белый лотос, в тон приборам White Edition.',
       features: ['Для стиральных машин W1 и сушильных машин T1 White Edition', 'Высота комплекта — 2,5 см', 'Цвет — белый лотос'],
@@ -76,7 +76,7 @@
     },
     {
       id: 'km8462', title: 'Индукционная панель KM 8462 FL', model: 'KM 8462 FL', sku: '12911380',
-      category: 'Варочные панели', country: 'Германия', price: 145000, stock: 0, low: 1, high: 3,
+      category: 'Варочные поверхности', country: 'Германия', price: 145000, stock: 0, low: 1, high: 3,
       images: [IMG + 'km8462-1.webp', IMG + 'km8462-2.webp', IMG + 'km8462-3.webp'],
       description: 'Индукционная панель шириной 62 см с гибкой зоной PowerFlex под крупную посуду. Встраивается сверху или заподлицо со столешницей. Распознаёт посуду и подаёт энергию только под дно.',
       features: ['Зона PowerFlex для большой посуды', 'Booster — быстрый нагрев', 'Stop & Go — пауза одним касанием', 'Автоматика закипания', 'Поддержание тепла', 'Монтаж сверху или заподлицо'],
@@ -105,9 +105,9 @@
     address: 'Пермь, ул. Сибирская, 61',
     hours: 'Пн–Чт 11:00–19:00, Пт 11:00–18:00',
     /* Разделы каталога: показываются вкладками, даже если товаров в разделе пока нет */
-    cats: ['Стиральные машины', 'Сушильные машины', 'Гладильные системы', 'Духовые шкафы', 'Варочные панели', 'Микроволновые печи', 'Вытяжки', 'Посудомоечные машины', 'Кофемашины', 'Пылесосы', 'Аксессуары и бытовая химия', 'Сувенирная продукция'],
+    cats: ['Стиральные машины', 'Сушильные машины', 'Варочные поверхности', 'Духовые шкафы', 'Микроволновые печи', 'Вытяжки', 'Посудомоечные машины', 'Кофемашины', 'Пылесосы', 'Гладильные системы', 'Бытовая химия', 'Аксессуары', 'Сувенирная продукция', 'Распродажа выставочных образцов'],
     /* Картинки папок каталога. Если для раздела картинки нет, берётся фото первого товара раздела */
-    catImages: { 'Гладильные системы': 'assets/img/cats/ironing.webp', 'Микроволновые печи': 'assets/img/cats/microwave.webp', 'Вытяжки': 'assets/img/cats/hood.webp', 'Кофемашины': 'assets/img/cats/coffee.webp', 'Пылесосы': 'assets/img/cats/vacuum.webp', 'Аксессуары и бытовая химия': 'assets/img/cats/chem.webp' },
+    catImages: { 'Гладильные системы': 'assets/img/cats/ironing.webp', 'Микроволновые печи': 'assets/img/cats/microwave.webp', 'Вытяжки': 'assets/img/cats/hood.webp', 'Кофемашины': 'assets/img/cats/coffee.webp', 'Пылесосы': 'assets/img/cats/vacuum.webp', 'Бытовая химия': 'assets/img/cats/chem.webp', 'Распродажа выставочных образцов': 'assets/img/mood/m4.webp' },
     /* Скидка за объём заказа в корзине: от суммы — процент */
     discounts: [{ from: 700000, pct: 3 }, { from: 1000000, pct: 5 }],
     gis: 'https://2gis.ru/perm/firm/70000001026549959',
@@ -127,13 +127,18 @@
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
   var Store = {
-    products: function () { return read(PKEY, null) || clone(SEED); },
+    /* Разделы, переименованные 11.11: у сохранённых товаров старое название заменяется на новое */
+    products: function () {
+      var RENAMED = { 'Аксессуары и бытовая химия': 'Аксессуары', 'Варочные панели': 'Варочные поверхности' };
+      return (read(PKEY, null) || clone(SEED)).map(function (p) { if (RENAMED[p.category]) p.category = RENAMED[p.category]; return p; });
+    },
     saveProducts: function (list) { return write(PKEY, list); },
     product: function (id) { return Store.products().filter(function (p) { return p.id === id; })[0] || null; },
     settings: function () {
       var s = read(SKEY, {}), out = clone(DEFAULTS);
       /* Телефоны в старом формате записи заменяются на новый */
       if (s.phone === '+7 (342) 241-14-94') delete s.phone;
+      if (s.cats && s.cats.indexOf('Аксессуары и бытовая химия') >= 0) { delete s.cats; delete s.catImages; }
       if (s.phone2 === '+7 951 936-94-78' || s.phone2 === '+7(951)9-369-478') delete s.phone2;
       Object.keys(s).forEach(function (k) { out[k] = s[k]; });
       return out;

@@ -441,3 +441,6 @@ button, input, textarea, select { font: inherit; color: inherit; }
   .offer__pic { width: 56pt; padding-right: 0 !important; }
   .offer__pic img { display: block; width: 50pt; height: 50pt; object-fit: contain; }
 }
+
+.folder--cover .folder__pic { padding: 0; }
+.folder--cover .folder__pic img { object-fit: cover; mix-blend-mode: normal; }

@@ -32,7 +32,7 @@
   /* ---------- Шапка, подвал, cookie ---------- */
   function layout() {
     var home = $('body').dataset.page === 'home' ? '' : 'index.html';
-    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], [home + '#service', 'Сервис', null], [home + '#showroom', 'Шоурум', null]];
+    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], [home + '#showroom', 'Шоурум', null], [home + '#service', 'Сервис', null]];
     var nav = links.map(function (l) { return '<a href="' + l[0] + '"' + (l[2] !== null ? ' data-cat="' + l[2] + '"' : '') + '>' + l[1] + '</a>'; }).join('');
     var bag = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
     $('#hdr').innerHTML =
@@ -91,6 +91,7 @@
     var fromUrl = function () { var c = new URLSearchParams(location.search).get('cat') || ''; return valid(c) ? c : ''; };
     var cat = fromUrl();
     var NAMES = {}; NAMES[SALE] = 'Акции'; NAMES[SETS] = 'Комплекты';
+    var SHOW = /выставочн/i;
     var inCat = function (c) { return list.filter(function (p) { return c === SALE ? S.onSale(p) : p.category === c; }); };
     var SORT = {
       stock: function (a, b) { return S.status(b).level - S.status(a).level || (b.stock || 0) - (a.stock || 0); },
@@ -111,14 +112,15 @@
     function folder(c) {
       var n = c === SETS ? kits.length : inCat(c).length, pic, cls = '';
       var count = c === SETS ? n + ' ' + S.plural(n, 'комплект', 'комплекта', 'комплектов')
-        : n ? n + ' ' + S.plural(n, 'товар', 'товара', 'товаров') : (c === SALE ? 'Сейчас нет' : 'Под заказ');
+        : n ? n + ' ' + S.plural(n, 'товар', 'товара', 'товаров') : (c === SALE || SHOW.test(c) ? 'Сейчас нет' : 'Под заказ');
       if (c === SALE) { pic = '<span class="folder__pct" aria-hidden="true">%</span>'; cls = ' folder--sale'; }
       else if (c === SETS) {
         cls = ' folder--duo';
-        pic = kits[0].items.slice(0, 2).map(function (p) { return '<img src="' + esc((p.images || [])[0] || '') + '" alt="" loading="lazy">'; }).join('');
+        pic = kits[0].items.slice(0, 2).map(function (p) { return '<img src="' + esc((p.images || [])[0] || '') + '" alt="">'; }).join('');
       } else {
         var src = (cfg.catImages || {})[c] || ((inCat(c)[0] || {}).images || [])[0];
-        pic = src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : '<img class="folder__logo" src="assets/img/miele-logo.svg" alt="">';
+        pic = src ? '<img src="' + esc(src) + '" alt="">' : '<img class="folder__logo" src="assets/img/miele-logo.svg" alt="">';
+        if (src && src.indexOf('/mood/') >= 0) cls = ' folder--cover';
       }
       return '<a class="folder' + cls + '" href="index.html?cat=' + encodeURIComponent(c) + '#catalog" data-cat="' + esc(c) + '"><span class="folder__pic">' + pic + '</span>' +
         '<span class="folder__name">' + esc(NAMES[c] || c) + '</span><span class="folder__n">' + count + '</span></a>';
@@ -147,7 +149,7 @@
       if (SORT[sort]) shown = shown.map(function (p, i) { return [p, i]; }).sort(function (a, b) { return SORT[sort](a[0], b[0]) || a[1] - b[1]; }).map(function (x) { return x[0]; });
       $('#count').textContent = shown.length + ' ' + S.plural(shown.length, 'товар', 'товара', 'товаров');
       var none = !all.length
-        ? (cat === SALE ? 'Сейчас акционных предложений нет. О новых акциях расскажут консультанты шоурума.' : 'В этом разделе товары скоро появятся на сайте. Нужную модель привезём под заказ' + lead + ' — позвоните или напишите нам.')
+        ? (cat === SALE ? 'Сейчас акционных предложений нет. О новых акциях расскажут консультанты шоурума.' : SHOW.test(cat) ? 'Сейчас выставочных образцов в продаже нет. О новых предложениях расскажут консультанты шоурума.' : 'В этом разделе товары скоро появятся на сайте. Нужную модель привезём под заказ' + lead + ' — позвоните или напишите нам.')
         : 'В этом разделе сейчас ничего нет в наличии. Нужную модель привезём под заказ' + lead + '.';
       grid.innerHTML = shown.length ? shown.map(function (p) {
         return '<div class="card"><a class="card__main" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
