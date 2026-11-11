@@ -176,3 +176,5 @@ dialog::backdrop { background: rgba(0, 0, 0, .45); }
 }
 @media (max-width: 520px) { .pwrow { flex-direction: column; } }
 .login__box .btn { margin-top: 8px; text-align: center; }
+
+.tbl td.c-price s { color: var(--muted); font-weight: 400; font-size: 13px; }

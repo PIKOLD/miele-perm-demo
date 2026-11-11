@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Кабинет салона — Miele Пермь</title>
+<title>Кабинет шоурума — Miele Пермь</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="stylesheet" href="assets/css/style.css">
@@ -22,7 +22,7 @@
 <div class="login" id="gate" hidden>
   <form class="login__box f" novalidate>
     <span class="logo"><img class="logo__img" src="assets/img/miele-logo.svg" alt="Miele" width="104" height="40"></span>
-    <h1>Кабинет салона</h1>
+    <h1>Кабинет шоурума</h1>
     <p>Введите пароль, чтобы включить кабинет на этом устройстве. Это нужно один раз.</p>
     <div id="pw-wrap"><label for="pw">Пароль</label><input id="pw" type="password" autocomplete="current-password"><p class="errm">Пароль не подошёл. Проверьте раскладку и попробуйте ещё раз.</p></div>
     <button class="btn btn--wide" type="submit">Включить кабинет</button>
@@ -76,11 +76,26 @@
             <div><label for="s-high">Порог «много» для новых товаров, шт.</label><input id="s-high" name="highDefault" type="number" min="2" step="1"></div>
           </div>
           <label class="chk"><input type="checkbox" name="showCount"><span>Показывать покупателям точное количество, когда осталось мало («Осталось мало · 2 шт.»)</span></label>
-          <div><label for="s-lead">Срок поставки под заказ</label><input id="s-lead" name="leadTime" type="text"><p class="hint">Показывается у товаров с остатком 0. Например: от 14 дней.</p></div>
-          <div><h2 style="margin-top:8px">Контакты салона</h2></div>
+          <div><label for="s-lead">Срок поставки под заказ</label><input id="s-lead" name="leadTime" type="text"><p class="hint">Показывается у товаров с остатком 0. Например: от 5 дней.</p></div>
+          <div><h2 style="margin-top:8px">Скидка за объём заказа в корзине</h2><p>Если сумма корзины не меньше порога, покупатель видит скидку. Оставьте поля пустыми, чтобы отключить ступень.</p></div>
+          <div class="row">
+            <div><label for="s-d1f">Первая ступень: от суммы, ₽</label><input id="s-d1f" name="d1from" type="number" min="0" step="1000" inputmode="numeric"></div>
+            <div><label for="s-d1p">Скидка, %</label><input id="s-d1p" name="d1pct" type="number" min="0" max="90" step="0.5" inputmode="decimal"></div>
+          </div>
+          <div class="row">
+            <div><label for="s-d2f">Вторая ступень: от суммы, ₽</label><input id="s-d2f" name="d2from" type="number" min="0" step="1000" inputmode="numeric"></div>
+            <div><label for="s-d2p">Скидка, %</label><input id="s-d2p" name="d2pct" type="number" min="0" max="90" step="0.5" inputmode="decimal"></div>
+          </div>
+          <div><h2 style="margin-top:8px">Разделы каталога</h2></div>
+          <div><label for="s-cats">Вкладки каталога — каждый раздел с новой строки</label><textarea id="s-cats" name="cats" rows="8"></textarea><p class="hint">Раздел показывается на сайте, даже если товаров в нём пока нет. Вкладка «Акции» есть всегда: в неё попадают товары, у которых заполнена старая цена.</p></div>
+          <div><h2 style="margin-top:8px">Контакты шоурума</h2></div>
           <div class="row">
             <div><label for="s-phone">Телефон</label><input id="s-phone" name="phone" type="tel"></div>
+            <div><label for="s-phone2">Второй телефон</label><input id="s-phone2" name="phone2" type="tel"></div>
+          </div>
+          <div class="row">
             <div><label for="s-wa">WhatsApp, только цифры</label><input id="s-wa" name="whatsapp" type="text" inputmode="numeric"></div>
+            <div><label for="s-tg">Telegram: номер или имя без @</label><input id="s-tg" name="telegram" type="text"></div>
           </div>
           <div><label for="s-addr">Адрес</label><input id="s-addr" name="address" type="text"></div>
           <div><label for="s-hours">Режим работы</label><input id="s-hours" name="hours" type="text"></div>
@@ -130,9 +145,12 @@
       </div>
       <div class="row" style="margin-top:16px">
         <div id="w-cat"><label for="e-cat">Категория</label><input id="e-cat" name="category" type="text" list="cats"><datalist id="cats"></datalist><p class="errm">Выберите или введите категорию</p></div>
-        <div><label for="e-country">Страна производства</label><input id="e-country" name="country" type="text"></div>
+        <div><label for="e-country">Страна-производитель</label><input id="e-country" name="country" type="text"></div>
       </div>
-      <div style="margin-top:16px"><label for="e-price">Цена, ₽</label><input id="e-price" name="price" type="number" min="0" step="100" inputmode="numeric"><p class="hint">Оставьте пустым — на сайте будет «Цена по запросу».</p></div>
+      <div class="row" style="margin-top:16px">
+        <div><label for="e-price">Цена, ₽</label><input id="e-price" name="price" type="number" min="0" step="100" inputmode="numeric"><p class="hint">Оставьте пустым — на сайте будет «Цена по запросу».</p></div>
+        <div id="w-old"><label for="e-old">Старая цена, ₽ — для акции</label><input id="e-old" name="oldPrice" type="number" min="0" step="100" inputmode="numeric"><p class="hint">Если заполнить, старая цена на сайте будет зачёркнута, а товар попадёт во вкладку «Акции».</p><p class="errm">Старая цена должна быть больше текущей</p></div>
+      </div>
 
       <fieldset class="fs"><legend>Наличие</legend>
         <div class="row3">

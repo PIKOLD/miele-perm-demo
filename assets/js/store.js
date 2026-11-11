@@ -2,7 +2,7 @@
    На рабочем сайте эти же функции (load/save/addLead) переключаются на сервер — остальной код не меняется. */
 (function () {
   'use strict';
-  var PKEY = 'mp.products.v2', SKEY = 'mp.settings.v2', LKEY = 'mp.leads.v2';
+  var PKEY = 'mp.products.v3', SKEY = 'mp.settings.v3', LKEY = 'mp.leads.v2', CKEY = 'mp.cart';
   var IMG = 'assets/img/products/';
   var KKEY = 'mp.key';
   /* Хеш ключа доступа к кабинету (SHA-256). Сам ключ есть только в ссылке, которую передают владельцу. */
@@ -36,10 +36,10 @@
     },
     {
       id: 'wtv601', title: 'Монтажный комплект WTV 601 для колонны W2/T2', model: 'WTV 601', sku: '',
-      category: 'Аксессуары', country: 'Германия', price: 14900, stock: 8, low: 2, high: 5,
+      category: 'Аксессуары и бытовая химия', country: 'Германия', price: 14900, oldPrice: 17900, stock: 8, low: 2, high: 5,
       images: [IMG + 'wtv601-1.webp', IMG + 'wtv601-2.webp', IMG + 'wtv601-3.webp'],
       description: 'Соединительный комплект для установки сушильной машины на стиральную в колонну. Подходит для серии Nova Edition (W2/T2). Колонна занимает площадь одной машины и надёжно фиксирует оба прибора.',
-      features: ['Для стиральных и сушильных машин Nova Edition', 'Высота комплекта — 2,5 см', 'Надёжная фиксация приборов в колонне'],
+      features: ['Для стиральных машин и сушильных машин Nova Edition', 'Высота комплекта — 2,5 см', 'Надёжная фиксация приборов в колонне'],
       specs: [['Совместимость', 'W2 / T2 Nova Edition'], ['Высота', '2,5 см'], ['Назначение', 'установка в колонну']]
     },
     {
@@ -60,10 +60,10 @@
     },
     {
       id: 'wtv502', title: 'Монтажный комплект WTV 502 для колонны W1/T1', model: 'WTV 502', sku: '',
-      category: 'Аксессуары', country: 'Германия', price: null, stock: 6, low: 2, high: 5,
+      category: 'Аксессуары и бытовая химия', country: 'Германия', price: null, stock: 6, low: 2, high: 5,
       images: [IMG + 'wtv502-1.webp', IMG + 'wtv502-2.webp'],
       description: 'Соединительный комплект для установки сушильной машины T1 на стиральную машину W1 в колонну. Цвет — белый лотос, в тон приборам White Edition.',
-      features: ['Для стиральных W1 и сушильных T1 White Edition', 'Высота комплекта — 2,5 см', 'Цвет — белый лотос'],
+      features: ['Для стиральных машин W1 и сушильных машин T1 White Edition', 'Высота комплекта — 2,5 см', 'Цвет — белый лотос'],
       specs: [['Совместимость', 'W1 / T1 White Edition'], ['Высота', '2,5 см'], ['Цвет', 'белый лотос']]
     },
     {
@@ -97,11 +97,17 @@
     showCount: true,          // показывать покупателям «2 шт.», когда осталось мало
     lowDefault: 2,            // порог «мало» для новых товаров
     highDefault: 5,           // порог «много» для новых товаров
-    leadTime: 'от 14 дней',   // срок для товаров «под заказ»
+    leadTime: 'от 5 дней',    // срок для товаров «под заказ»
     phone: '+7 (342) 241-14-94',
+    phone2: '+7 951 936-94-78',
     whatsapp: '79519369478',
-    address: 'Пермь, ул. Сибирская, 61, 1 этаж',
-    hours: 'Пн–Пт 11:00–19:00',
+    telegram: '79519369478',  // номер (только цифры) или имя пользователя без @
+    address: 'Пермь, ул. Сибирская, 61',
+    hours: 'Пн–Чт 11:00–19:00, Пт 11:00–18:00',
+    /* Разделы каталога: показываются вкладками, даже если товаров в разделе пока нет */
+    cats: ['Стиральные машины', 'Сушильные машины', 'Гладильные системы', 'Духовые шкафы', 'Варочные панели', 'Микроволновые печи', 'Вытяжки', 'Посудомоечные машины', 'Кофемашины', 'Пылесосы', 'Аксессуары и бытовая химия', 'Сувенирная продукция'],
+    /* Скидка за объём заказа в корзине: от суммы — процент */
+    discounts: [{ from: 700000, pct: 3 }, { from: 1000000, pct: 5 }],
     gis: 'https://2gis.ru/perm/firm/70000001026549959',
     ymaps: 'https://yandex.ru/maps/org/miele/121722485798/',
     sets: [
@@ -147,6 +153,35 @@
     },
     activate: function (key) { return Store.check(key).then(function (ok) { if (ok) { try { localStorage.setItem(KKEY, key); } catch (e) {} } return ok; }); },
     deactivate: function () { try { localStorage.removeItem(KKEY); localStorage.removeItem(UNKEY); } catch (e) {} },
+    /* Разделы каталога: список из настроек + разделы, которые есть у товаров, но не внесены в список */
+    cats: function () {
+      var out = (Store.settings().cats || []).slice();
+      Store.products().forEach(function (p) { if (p.category && out.indexOf(p.category) < 0) out.push(p.category); });
+      return out;
+    },
+    onSale: function (p) { return typeof p.price === 'number' && typeof p.oldPrice === 'number' && p.oldPrice > p.price; },
+    tgLink: function () { var t = String(Store.settings().telegram || '').replace(/^@|\s/g, ''); return t ? 'https://t.me/' + (/^\d+$/.test(t) ? '+' : '') + t : ''; },
+    /* Корзина покупателя: { id товара: количество } */
+    cart: function () { var c = read(CKEY, {}); return c && typeof c === 'object' ? c : {}; },
+    saveCart: function (c) { return write(CKEY, c); },
+    cartSet: function (id, qty) { var c = Store.cart(); qty = Math.min(99, Math.max(0, parseInt(qty, 10) || 0)); if (qty) c[id] = qty; else delete c[id]; Store.saveCart(c); return qty; },
+    cartAdd: function (id) { return Store.cartSet(id, (Store.cart()[id] || 0) + 1); },
+    cartCount: function () { return Store.cartCalc().count; },
+    /* Состав и сумма корзины со скидкой за объём */
+    cartCalc: function () {
+      var c = Store.cart(), rows = [], sum = 0, count = 0, ask = 0;
+      Store.products().forEach(function (p) {
+        var q = c[p.id]; if (!q || p.visible === false) return;
+        var known = typeof p.price === 'number';
+        rows.push({ p: p, qty: q, sum: known ? p.price * q : null });
+        count += q; if (known) sum += p.price * q; else ask += q;
+      });
+      var tiers = (Store.settings().discounts || []).filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
+      var pct = 0, next = null;
+      tiers.forEach(function (t) { if (sum >= t.from) pct = t.pct; else if (!next) next = { pct: t.pct, need: t.from - sum }; });
+      var discount = Math.round(sum * pct / 100);
+      return { rows: rows, count: count, ask: ask, sum: sum, pct: pct, discount: discount, total: sum - discount, next: next, tiers: tiers };
+    },
     addLead: function (lead) {
       var l = Store.leads();
       lead.id = 'l' + Date.now().toString(36);

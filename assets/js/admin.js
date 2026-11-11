@@ -7,13 +7,13 @@
   var login = $('#login'), app = $('#app'), gate = $('#gate');
   function show(ok) {
     login.hidden = ok; app.hidden = !ok; gate.hidden = true;
-    document.title = ok ? 'Кабинет салона — Miele Пермь' : 'Страница не найдена';
+    document.title = ok ? 'Кабинет шоурума — Miele Пермь' : 'Страница не найдена';
     if (ok) { renderAll(); openTab(location.hash === '#leads' ? 'leads' : 'products'); }
   }
   var link = location.hash.match(/^#k=([A-Za-z0-9_-]{20,})$/);
   (link ? S.activate(link[1]) : S.check(S.key())).then(function (ok) {
     if (link) history.replaceState(null, '', location.pathname);
-    if (ok && !S.unlocked()) { gate.hidden = false; document.title = 'Кабинет салона — Miele Пермь'; return $('#pw').focus(); }
+    if (ok && !S.unlocked()) { gate.hidden = false; document.title = 'Кабинет шоурума — Miele Пермь'; return $('#pw').focus(); }
     show(ok);
   });
   $('form', gate).addEventListener('submit', function (e) {
@@ -88,7 +88,7 @@
           '<td><div class="thumb">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</div></td>' +
           '<td class="c-name"><div class="pname">' + esc(p.title) + '<small>' + esc(p.model || '') + '</small></div></td>' +
           '<td class="c-cat">' + esc(p.category) + '</td>' +
-          '<td class="c-price num">' + S.price(p.price) + '</td>' +
+          '<td class="c-price num">' + (S.onSale(p) ? '<s>' + S.price(p.oldPrice) + '</s><br>' : '') + S.price(p.price) + '</td>' +
           '<td class="c-stock"><div class="step"><button type="button" data-d="-1" aria-label="Уменьшить остаток">−</button><input type="number" min="0" step="1" inputmode="numeric" value="' + (parseInt(p.stock, 10) || 0) + '" aria-label="Остаток: ' + esc(p.title) + '"><button type="button" data-d="1" aria-label="Увеличить остаток">+</button></div></td>' +
           '<td class="c-lvl"><span class="lvl">' + bars(st) + '<small>мало ≤ ' + (p.low || 1) + ' · много ≥ ' + (p.high || 2) + '</small></span></td>' +
           '<td class="c-vis"><label class="sw"><input type="checkbox" data-vis' + (p.visible !== false ? ' checked' : '') + ' aria-label="Показывать на сайте: ' + esc(p.title) + '"><span></span></label></td>' +
@@ -142,14 +142,13 @@
     $('#ed-title').textContent = id ? 'Изменить товар' : 'Новый товар';
     var el = ef.elements;
     el.title.value = p.title; el.model.value = p.model || ''; el.sku.value = p.sku || ''; el.category.value = p.category || ''; el.country.value = p.country || '';
-    el.price.value = typeof p.price === 'number' ? p.price : '';
+    el.price.value = typeof p.price === 'number' ? p.price : ''; el.oldPrice.value = typeof p.oldPrice === 'number' ? p.oldPrice : '';
     el.stock.value = parseInt(p.stock, 10) || 0; el.low.value = p.low || cfg.lowDefault; el.high.value = p.high || cfg.highDefault;
     el.orderable.checked = p.orderable !== false; el.visible.checked = p.visible !== false;
     el.description.value = p.description || '';
     el.features.value = (p.features || []).join('\n');
     el.specs.value = (p.specs || []).map(function (s) { return s[0] + ': ' + s[1]; }).join('\n');
-    var cats = []; S.products().forEach(function (x) { if (cats.indexOf(x.category) < 0) cats.push(x.category); });
-    $('#cats').innerHTML = cats.map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
+    $('#cats').innerHTML = S.cats().map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
     $$('.bad', ef).forEach(function (n) { n.classList.remove('bad'); });
     drawPics(); drawNow(); ed.showModal(); $('.editor__b', ed).scrollTop = 0; el.title.focus();
   }
@@ -157,6 +156,7 @@
   ef.elements.orderable.addEventListener('change', drawNow);
   ef.elements.title.addEventListener('input', function () { if (this.value.trim()) $('#w-title').classList.remove('bad'); });
   ef.elements.category.addEventListener('input', function () { if (this.value.trim()) $('#w-cat').classList.remove('bad'); });
+  ef.elements.oldPrice.addEventListener('input', function () { $('#w-old').classList.remove('bad'); });
   $$('[data-close]', ed).forEach(function (b) { b.addEventListener('click', function () { ed.close(); }); });
   $('#e-pics').addEventListener('click', function (e) { var b = e.target.closest('[data-rm]'); if (b) { pics.splice(+b.dataset.rm, 1); drawPics(); } });
   $('#e-upload').addEventListener('click', function () { $('#e-file').click(); });
@@ -181,10 +181,14 @@
     $('#w-title').classList.toggle('bad', !title); $('#w-cat').classList.toggle('bad', !cat);
     if (!title) return el.title.focus();
     if (!cat) return el.category.focus();
+    var price = el.price.value === '' ? null : Math.max(0, Math.round(+el.price.value)), old = el.oldPrice.value === '' ? null : Math.max(0, Math.round(+el.oldPrice.value));
+    var badOld = old !== null && (price === null || old <= price);
+    $('#w-old').classList.toggle('bad', badOld);
+    if (badOld) return el.oldPrice.focus();
     var low = Math.max(1, parseInt(el.low.value, 10) || 1);
     var data = {
       title: title, model: el.model.value.trim(), sku: el.sku.value.trim(), category: cat, country: el.country.value.trim(),
-      price: el.price.value === '' ? null : Math.max(0, Math.round(+el.price.value)),
+      price: price, oldPrice: old,
       stock: Math.max(0, parseInt(el.stock.value, 10) || 0), low: low, high: Math.max(low + 1, parseInt(el.high.value, 10) || low + 1),
       orderable: el.orderable.checked, visible: el.visible.checked, images: pics.slice(),
       description: el.description.value.trim(),
@@ -205,7 +209,8 @@
     $('#leads').innerHTML = l.length ? '<div class="leads">' + l.map(function (x) {
       var d = new Date(x.ts), when = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) + ', ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
       return '<div class="ld' + (x.done ? ' done' : '') + '" data-id="' + esc(x.id) + '"><div class="ld__who">' + esc(x.name) + '<a href="tel:+' + esc(x.phone.replace(/\D/g, '')) + '">' + esc(x.phone) + '</a></div>' +
-        '<div class="ld__meta">' + esc(when) + (x.product ? ' · ' + esc(x.product) : ' · общий вопрос') + (x.done ? ' · обработана' : '') + '</div>' +
+        '<div class="ld__meta">' + esc(when) + (x.product ? ' · ' + esc(x.product) : x.order ? ' · заказ из корзины' : ' · общий вопрос') + (x.done ? ' · обработана' : '') + '</div>' +
+        (x.order ? '<div class="ld__txt">' + esc(x.order) + '</div>' : '') +
         (x.comment ? '<div class="ld__txt">' + esc(x.comment) + '</div>' : '') +
         '<div class="ld__acts"><button class="abtn" type="button" data-done>' + (x.done ? 'Вернуть в работу' : 'Отметить обработанной') + '</button><button class="abtn abtn--ghost" type="button" data-rm>Удалить</button></div></div>';
     }).join('') + '</div>' : '<div class="none"><p>Заявок пока нет. Отправьте пробную с сайта — она появится здесь.</p><a class="abtn" href="index.html#ask" target="_blank">Открыть форму на сайте</a></div>';
@@ -223,7 +228,10 @@
   var sf = $('#set-form');
   function renderSettings() {
     var c = S.settings(), el = sf.elements;
-    ['lowDefault', 'highDefault', 'leadTime', 'phone', 'whatsapp', 'address', 'hours'].forEach(function (k) { el[k].value = c[k]; });
+    ['lowDefault', 'highDefault', 'leadTime', 'phone', 'phone2', 'whatsapp', 'telegram', 'address', 'hours'].forEach(function (k) { el[k].value = c[k] || ''; });
+    var d = c.discounts || [];
+    el.d1from.value = d[0] ? d[0].from : ''; el.d1pct.value = d[0] ? d[0].pct : ''; el.d2from.value = d[1] ? d[1].from : ''; el.d2pct.value = d[1] ? d[1].pct : '';
+    el.cats.value = (c.cats || []).join('\n');
     el.showCount.checked = !!c.showCount;
   }
   sf.addEventListener('submit', function (e) {
@@ -232,7 +240,11 @@
     c.lowDefault = Math.max(1, parseInt(el.lowDefault.value, 10) || 1);
     c.highDefault = Math.max(c.lowDefault + 1, parseInt(el.highDefault.value, 10) || c.lowDefault + 1);
     c.showCount = el.showCount.checked;
-    ['leadTime', 'phone', 'address', 'hours'].forEach(function (k) { c[k] = el[k].value.trim(); });
+    ['leadTime', 'phone', 'phone2', 'address', 'hours'].forEach(function (k) { c[k] = el[k].value.trim(); });
+    c.telegram = el.telegram.value.trim().replace(/^(https?:\/\/)?t\.me\//, '').replace(/^[@+]/, '');
+    c.discounts = [[el.d1from, el.d1pct], [el.d2from, el.d2pct]].map(function (x) { return { from: Math.round(+x[0].value) || 0, pct: Math.min(90, +x[1].value || 0) }; })
+      .filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
+    c.cats = el.cats.value.split('\n').map(function (s) { return s.trim(); }).filter(function (s, i, a) { return s && a.indexOf(s) === i; });
     c.whatsapp = el.whatsapp.value.replace(/\D/g, '');
     S.saveSettings(c); renderSettings(); toast('Настройки сохранены');
   });
