@@ -91,10 +91,12 @@
       specs: [['Вместимость', '14 комплектов'], ['Класс энергоэффективности', 'B'], ['Шум', '43 дБ(А)'], ['Расход воды (Eco)', '8,4 л'], ['Ширина', '60 см, полностью встраиваемая'], ['Размеры (В×Ш×Г)', '80,5 × 59,8 × 55 см']]
     }
   ];
-  SEED.forEach(function (p) { p.visible = true; p.orderable = true; });
+  /* showroom — образец выставлен в зале шоурума (галочка «Есть в шоуруме» в кабинете) */
+  SEED.forEach(function (p) { p.visible = true; p.orderable = true; p.showroom = p.stock > 0; });
 
   var DEFAULTS = {
-    showCount: true,          // показывать покупателям «2 шт.», когда осталось мало
+    rev: 2,                   // версия порядка разделов (2 — «Гладильные системы» перед «Пылесосами»)
+    showCount: true,         // показывать покупателям «2 шт.», когда осталось мало
     lowDefault: 2,            // порог «мало» для новых товаров
     highDefault: 5,           // порог «много» для новых товаров
     leadTime: 'от 5 дней',    // срок для товаров «под заказ»
@@ -105,9 +107,9 @@
     address: 'Пермь, ул. Сибирская, 61',
     hours: 'Пн–Чт 11:00–19:00, Пт 11:00–18:00',
     /* Разделы каталога: показываются вкладками, даже если товаров в разделе пока нет */
-    cats: ['Стиральные машины', 'Сушильные машины', 'Варочные поверхности', 'Духовые шкафы', 'Микроволновые печи', 'Вытяжки', 'Посудомоечные машины', 'Кофемашины', 'Пылесосы', 'Гладильные системы', 'Бытовая химия', 'Аксессуары', 'Сувенирная продукция', 'Распродажа выставочных образцов'],
+    cats: ['Стиральные машины', 'Сушильные машины', 'Варочные поверхности', 'Духовые шкафы', 'Микроволновые печи', 'Вытяжки', 'Посудомоечные машины', 'Кофемашины', 'Гладильные системы', 'Пылесосы', 'Бытовая химия', 'Аксессуары', 'Сувенирная продукция', 'Распродажа выставочных образцов'],
     /* Картинки папок каталога. Если для раздела картинки нет, берётся фото первого товара раздела */
-    catImages: { 'Гладильные системы': 'assets/img/cats/ironing.webp', 'Микроволновые печи': 'assets/img/cats/microwave.webp', 'Вытяжки': 'assets/img/cats/hood.webp', 'Кофемашины': 'assets/img/cats/coffee.webp', 'Пылесосы': 'assets/img/cats/vacuum.webp', 'Бытовая химия': 'assets/img/cats/chem.webp', 'Распродажа выставочных образцов': 'assets/img/mood/m4.webp' },
+    catImages: { 'Гладильные системы': 'assets/img/cats/ironing.webp', 'Микроволновые печи': 'assets/img/cats/microwave.webp', 'Вытяжки': 'assets/img/cats/hood.webp', 'Кофемашины': 'assets/img/cats/coffee.webp', 'Пылесосы': 'assets/img/cats/vacuum.webp', 'Бытовая химия': 'assets/img/cats/chem.webp', 'Сувенирная продукция': 'assets/img/cats/souvenir.webp', 'Распродажа выставочных образцов': 'assets/img/mood/m4.webp' },
     /* Скидка за объём заказа в корзине: от суммы — процент */
     discounts: [{ from: 700000, pct: 3 }, { from: 1000000, pct: 5 }],
     gis: 'https://2gis.ru/perm/firm/70000001026549959',
@@ -130,7 +132,12 @@
     /* Разделы, переименованные 11.11: у сохранённых товаров старое название заменяется на новое */
     products: function () {
       var RENAMED = { 'Аксессуары и бытовая химия': 'Аксессуары', 'Варочные панели': 'Варочные поверхности' };
-      return (read(PKEY, null) || clone(SEED)).map(function (p) { if (RENAMED[p.category]) p.category = RENAMED[p.category]; return p; });
+      return (read(PKEY, null) || clone(SEED)).map(function (p) {
+        if (RENAMED[p.category]) p.category = RENAMED[p.category];
+        /* У товаров, сохранённых до появления галочки «Есть в шоуруме», она ставится по остатку */
+        if (typeof p.showroom !== 'boolean') p.showroom = (parseInt(p.stock, 10) || 0) > 0;
+        return p;
+      });
     },
     saveProducts: function (list) { return write(PKEY, list); },
     product: function (id) { return Store.products().filter(function (p) { return p.id === id; })[0] || null; },
@@ -140,7 +147,16 @@
       if (s.phone === '+7 (342) 241-14-94') delete s.phone;
       if (s.cats && s.cats.indexOf('Аксессуары и бытовая химия') >= 0) { delete s.cats; delete s.catImages; }
       if (s.phone2 === '+7 951 936-94-78' || s.phone2 === '+7(951)9-369-478') delete s.phone2;
+      /* Порядок разделов, сохранённый до 12.11: «Гладильные системы» встают перед «Пылесосами» */
+      if (!(s.rev >= 2) && s.cats) {
+        var a = s.cats.indexOf('Пылесосы');
+        if (a >= 0 && s.cats[a + 1] === 'Гладильные системы') { s.cats[a] = 'Гладильные системы'; s.cats[a + 1] = 'Пылесосы'; }
+      }
       Object.keys(s).forEach(function (k) { out[k] = s[k]; });
+      out.rev = DEFAULTS.rev;
+      /* Картинки папок: к сохранённым добавляются новые из стандартного набора */
+      out.catImages = clone(DEFAULTS.catImages);
+      Object.keys(s.catImages || {}).forEach(function (k) { out.catImages[k] = s.catImages[k]; });
       return out;
     },
     saveSettings: function (s) { return write(SKEY, s); },

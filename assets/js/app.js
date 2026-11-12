@@ -23,6 +23,8 @@
     return '<span class="price' + (ask ? ' price--ask' : '') + '">' + S.price(p.price) + '</span>';
   }
   function saleBadge(p) { return S.onSale(p) ? '<span class="sale">−' + Math.max(1, Math.round((1 - p.price / p.oldPrice) * 100)) + '%</span>' : ''; }
+  /* Метка «Есть в шоуруме»: образец выставлен в зале (галочка в кабинете) */
+  function showTag(p) { return p.showroom ? '<span class="inshow">Есть в шоуруме</span>' : ''; }
   function addLabel(id) { var n = S.cart()[id]; return n ? 'В корзине · ' + n + ' шт.' : 'В корзину'; }
   function cartCount() {
     var n = S.cartCount();
@@ -155,7 +157,7 @@
         return '<div class="card"><a class="card__main" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
           '<div class="card__pic">' + saleBadge(p) + '<img src="' + esc((p.images || [])[0] || '') + '" alt="' + esc(p.title) + '" loading="lazy" width="600" height="600"></div>' +
           '<div class="card__body"><span class="card__cat">' + esc(p.category) + '</span><span class="card__title">' + esc(p.title) + '</span>' +
-          '<div class="card__foot">' + stockHtml(p) + priceHtml(p) + '</div></div></a>' +
+          showTag(p) + '<div class="card__foot">' + stockHtml(p) + priceHtml(p) + '</div></div></a>' +
           (S.status(p).key !== 'out' ? '<button type="button" class="card__add" data-add="' + esc(p.id) + '">' + addLabel(p.id) + '</button>' : '') + '</div>';
       }).join('') : '<div class="empty"><p>' + esc(none) + '</p><button type="button" class="btn btn--line" id="reset">Все разделы</button></div>';
     }
@@ -267,11 +269,12 @@
       '<div class="pd"><div class="gal"><div class="gal__main">' + saleBadge(p) + '<img id="gal-main" src="' + esc(imgs[0]) + '" alt="' + esc(p.title) + '" width="900" height="900"></div>' +
         (imgs.length > 1 ? '<div class="gal__th">' + imgs.map(function (src, i) { return '<button type="button" data-i="' + i + '" aria-current="' + (i === 0) + '" aria-label="Фото ' + (i + 1) + '"><img src="' + esc(src) + '" alt="" loading="lazy"></button>'; }).join('') + '</div>' : '') + '</div>' +
       '<div class="pd__info"><p class="eyebrow">' + esc(p.category) + '</p><h1>' + esc(p.title) + '</h1><p class="pd__meta">' + esc(meta) + '</p>' +
-        '<div class="pd__buy">' + priceHtml(p) + stockHtml(p) +
+        '<div class="pd__buy">' + priceHtml(p) + stockHtml(p) + showTag(p) +
           '<div class="pd__btns">' + (st.key !== 'out' ? '<button type="button" class="btn" id="pd-add">' + addLabel(p.id) + '</button>' : '') + '<a class="btn btn--line" href="#ask">' + (st.level > 0 ? 'Оставить заявку' : 'Заказать') + '</a></div>' +
           '<p class="pd__go"' + (S.cart()[p.id] ? '' : ' hidden') + '><a href="cart.html">Перейти в корзину</a></p>' +
           '<p class="pd__msg">Написать: <a target="_blank" rel="noopener" href="' + wa(ask) + '">WhatsApp</a>' + (tg ? '<a target="_blank" rel="noopener" href="' + esc(tg) + '">Telegram</a>' : '') + '</p>' +
-          '<p class="pd__hint">' + (st.level > 0 ? 'Товар можно посмотреть в шоуруме: ' + esc(cfg.address) + '.' : 'Привезём под заказ' + esc(lead) + '. Точный срок назовёт консультант.') + '</p></div>' +
+          '<p class="pd__hint">' + [p.showroom ? 'Товар можно посмотреть в шоуруме: ' + esc(cfg.address) + '.' : st.level > 0 ? 'Товар в наличии. Адрес шоурума: ' + esc(cfg.address) + '.' : '',
+            st.level > 0 ? '' : 'Привезём под заказ' + esc(lead) + '. Точный срок назовёт консультант.'].filter(Boolean).join(' ') + '</p></div>' +
         (p.features && p.features.length ? '<ul class="feat">' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>' : '') +
       '</div></div></div>' +
       '<section class="sec sec--soft"><div class="wrap pd__more"><div><h2>Описание</h2><p>' + esc(p.description) + '</p></div>' +
