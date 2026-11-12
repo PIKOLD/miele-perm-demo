@@ -88,7 +88,7 @@
     var list = visible(), cats = S.cats(), only = false, sort = 'default';
     var folders = $('#folders'), tools = $('#cat-tools'), title = $('#cat-title'), back = $('#cat-back');
     var num = function (p) { return typeof p.price === 'number'; };
-    var kits = cfg.sets.map(function (s, i) { return { set: s, i: i, items: setItems(s) }; }).filter(function (k) { return k.items.length >= 2; });
+    var kits = S.kits();
     var valid = function (c) { return c === SALE || (c === SETS && kits.length > 0) || cats.indexOf(c) >= 0; };
     var fromUrl = function () { var c = new URLSearchParams(location.search).get('cat') || ''; return valid(c) ? c : ''; };
     var cat = fromUrl();
@@ -128,15 +128,17 @@
         '<span class="folder__name">' + esc(NAMES[c] || c) + '</span><span class="folder__n">' + count + '</span></a>';
     }
     function kitCard(k) {
-      var known = k.items.every(num), sum = k.items.reduce(function (a, p) { return a + (p.price || 0); }, 0);
+      var price = k.sum === null ? '<span class="price price--ask">Цена по запросу</span>'
+        : k.off ? '<span class="price price--sale"><s><span class="sr">По отдельности </span>' + S.price(k.full) + '</s><b><span class="sr">Комплектом </span>' + S.price(k.sum) + '</b></span>'
+        : '<span class="price">' + S.price(k.sum) + '</span>';
       return '<div class="card kit"><div class="kit__pics">' + k.items.map(function (p) {
           return '<a href="product.html?id=' + encodeURIComponent(p.id) + '" tabindex="-1" aria-hidden="true"><img src="' + esc((p.images || [])[0] || '') + '" alt="" loading="lazy"></a>';
         }).join('') + '</div>' +
         '<div class="card__body"><span class="card__cat">' + esc(k.set.note) + '</span><span class="card__title">' + esc(k.set.title) + '</span>' +
-        '<ul class="kit__list">' + k.items.map(function (p) {
-          return '<li><a href="product.html?id=' + encodeURIComponent(p.id) + '">' + esc(p.title) + '</a><span>' + (num(p) ? S.price(p.price) : 'по запросу') + '</span></li>';
+        '<ul class="kit__list">' + k.items.map(function (p, n) {
+          return '<li><a href="product.html?id=' + encodeURIComponent(p.id) + '">' + esc(p.title) + '</a><span>' + (k.prices[n] === null ? 'по запросу' : S.price(k.prices[n])) + '</span></li>';
         }).join('') + '</ul>' +
-        '<div class="card__foot"><span class="kit__lbl">Комплект</span><span class="price' + (known ? '' : ' price--ask') + '">' + (known ? S.price(sum) : 'Цена по запросу') + '</span></div></div>' +
+        '<div class="card__foot"><span class="kit__lbl">Комплект</span>' + price + '</div></div>' +
         '<button type="button" class="card__add" data-set="' + k.i + '">Добавить комплект в корзину</button></div>';
     }
     function draw() {
@@ -302,7 +304,7 @@
     function orderText() {
       var c = S.cartCalc();
       return c.rows.map(function (r) { return r.p.title + ' × ' + r.qty + (r.sum === null ? ' (цена по запросу)' : ' — ' + money(r.sum)); }).join('; ') +
-        '. Итого: ' + money(c.total) + (c.pct ? ' (скидка за объём ' + c.pct + '%)' : '');
+        '. Итого: ' + money(c.total) + (c.setOff ? ' (цена комплекта: −' + money(c.setOff) + ')' : '') + (c.pct ? ' (скидка за объём ' + c.pct + '%)' : '');
     }
     function draw() {
       var c = S.cartCalc();
@@ -322,7 +324,8 @@
           '<button type="button" class="ci__rm" data-rm aria-label="Убрать из корзины: ' + esc(p.title) + '">×</button></div>';
       }).join('') + '</div>' +
       '<aside class="sum"><h2>Ваш заказ</h2><dl>' +
-        '<div><dt>Товары, ' + c.count + ' шт.</dt><dd>' + money(c.sum) + '</dd></div>' +
+        '<div><dt>Товары, ' + c.count + ' шт.</dt><dd>' + money(c.goods) + '</dd></div>' +
+        c.kits.map(function (k) { return '<div class="sum__disc"><dt>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</dt><dd>−' + money(k.off) + '</dd></div>'; }).join('') +
         (c.pct ? '<div class="sum__disc"><dt>Скидка за объём ' + c.pct + '%</dt><dd>−' + money(c.discount) + '</dd></div>' : '') +
         '<div class="sum__total"><dt>Итого</dt><dd>' + money(c.total) + '</dd></div></dl>' +
         (c.ask ? '<p class="sum__note">Товары с ценой по запросу (' + c.ask + ' шт.) в сумму не входят — цену назовёт консультант.</p>' : '') +
@@ -340,7 +343,8 @@
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
           return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td><td>' + (r.sum === null ? 'по запросу' : money(r.sum)) + '</td></tr>';
         }).join('') + '</tbody></table>' +
-        '<table class="offer__sum"><tbody><tr><th>Сумма</th><td>' + money(c.sum) + '</td></tr>' +
+        '<table class="offer__sum"><tbody><tr><th>Сумма</th><td>' + money(c.goods) + '</td></tr>' +
+          c.kits.map(function (k) { return '<tr><th>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</th><td>−' + money(k.off) + '</td></tr>'; }).join('') +
           (c.pct ? '<tr><th>Скидка за объём заказа ' + c.pct + '%</th><td>−' + money(c.discount) + '</td></tr>' : '') +
           '<tr class="offer__total"><th>Итого</th><td>' + money(c.total) + '</td></tr></tbody></table>' +
         (c.ask ? '<p class="offer__p">Позиции с ценой по запросу в сумму не включены — стоимость уточнит консультант.</p>' : '') +

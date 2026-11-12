@@ -60,7 +60,7 @@
     },
     {
       id: 'wtv502', title: 'Монтажный комплект WTV 502 для колонны W1/T1', model: 'WTV 502', sku: '',
-      category: 'Аксессуары', country: 'Германия', price: null, stock: 6, low: 2, high: 5,
+      category: 'Аксессуары', country: 'Германия', price: 14900, stock: 6, low: 2, high: 5,
       images: [IMG + 'wtv502-1.webp', IMG + 'wtv502-2.webp'],
       description: 'Соединительный комплект для установки сушильной машины T1 на стиральную машину W1 в колонну. Цвет — белый лотос, в тон приборам White Edition.',
       features: ['Для стиральных машин W1 и сушильных машин T1 White Edition', 'Высота комплекта — 2,5 см', 'Цвет — белый лотос'],
@@ -281,9 +281,341 @@
   ];
   var SEED_ORDER = ["wea125", "wwb360", "wwg880", "wwi860", "wq1000", "tea525", "twc640", "twh780", "twl780", "tq1000", "wtv601", "wtv502", "b4847", "h2465", "h2861b", "h2861", "h7260", "dgc7860", "m6012", "m2230", "m7244", "km6540", "km7361fr", "km7361fl", "km8462", "km7867", "kmda7876", "g5481", "g5790", "g5050", "g5863", "g7191", "das4630", "das4930", "dah1650", "da6698", "susf0", "suzf0", "sumf0", "hx1red", "hx1total", "hx3aqua", "km7464", "dgc7440", "kwt7112", "cva7845"];
   /*SEED_ADD:END*/
-  /* Каталог = исходные товары + список клиента от 12.11, в порядке его списка */
-  var SEED_NEW = SEED_ADD.map(function (p) { return p.id; });
-  SEED = (function () { var by = {}; SEED.concat(SEED_ADD).forEach(function (p) { by[p.id] = p; }); return SEED_ORDER.map(function (id) { return by[id]; }).filter(Boolean); })();
+  /*SEED_SMALL:BEGIN — аксессуары, бытовая химия и сувениры из списка клиента от 12.11. Блок собирает research/build_small.py, руками не править */
+  var SEED_SMALL = [
+    { id: "wtv501", title: "Монтажный комплект WTV 501 для колонны W1/T1", model: "WTV 501", sku: '', category: "Аксессуары", country: '', price: 14900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'wtv501-1.webp'],
+      description: "Соединительный комплект для установки сушильной машины T1 на стиральную машину W1 в колонну. Колонна занимает площадь одной машины и надёжно фиксирует оба прибора. Цвет — белый лотос.",
+      features: [],
+      specs: [["Совместимость", "W1 / T1"], ["Цвет", "белый лотос"]] },
+    { id: "wts610", title: "Цоколь с выдвижным ящиком WTS 610", model: "WTS 610", sku: '', category: "Аксессуары", country: '', price: 85000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'wts610-1.webp', IMG + 'wts610-2.webp'],
+      description: "Цоколь с выдвижным ящиком под стиральную или сушильную машину. Прибор стоит выше, и загружать бельё удобнее; в ящике хранятся средства для стирки и мелочи.",
+      features: [],
+      specs: [] },
+    { id: "trk655", title: "Корзина для сушки обуви TRK 655", model: "TRK 655", sku: '', category: "Аксессуары", country: '', price: 14900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'trk655-1.webp', IMG + 'trk655-2.webp'],
+      description: "Корзина для сушильной машины: в ней сушат то, что не должно вращаться в барабане, — кроссовки, детские сапоги, мягкие игрушки, небольшие шерстяные вещи.",
+      features: [],
+      specs: [] },
+    { id: "baggn", title: "Пылесборные мешки GN HyClean 3D Efficiency", model: "GN", sku: '', category: "Аксессуары", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'baggn-1.webp', IMG + 'baggn-2.webp'],
+      description: "Фирменные мешки-пылесборники типа GN (синий фиксатор) для пылесосов Miele с мешком. Тип мешка указан на крышке отсека пылесборника.",
+      features: [],
+      specs: [["Тип", "GN, синий фиксатор"]] },
+    { id: "bagtu", title: "Пылесборные мешки TU HyClean 3D Efficiency", model: "TU", sku: '', category: "Аксессуары", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'bagtu-1.webp', IMG + 'bagtu-2.webp'],
+      description: "Фирменные мешки-пылесборники типа TU (бирюзовый фиксатор) для пылесосов Miele серии Guard.",
+      features: [],
+      specs: [["Тип", "TU, бирюзовый фиксатор"], ["Совместимость", "Guard L1, Guard S1"]] },
+    { id: "bagfjm", title: "Пылесборные мешки FJM HyClean 3D Efficiency", model: "FJM", sku: '', category: "Аксессуары", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'bagfjm-1.webp', IMG + 'bagfjm-2.webp'],
+      description: "Фирменные мешки-пылесборники типа FJM (красный фиксатор) для компактных пылесосов Miele с мешком. Тип мешка указан на крышке отсека пылесборника.",
+      features: [],
+      specs: [["Тип", "FJM, красный фиксатор"]] },
+    { id: "kmts5704", title: "Комплект посуды All Steel KMTS 5704-3, 4 предмета", model: "KMTS 5704-3", sku: '', category: "Аксессуары", country: '', price: 89900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'kmts5704-1.webp', IMG + 'kmts5704-2.webp'],
+      description: "Комплект посуды All Steel с логотипом Miele: четыре предмета из нержавеющей стали, крышки с боковым выпуском пара.",
+      features: [],
+      specs: [["Предметов", "4"], ["Материал", "нержавеющая сталь"]] },
+    { id: "kmpd2800", title: "Крышка для сковороды KMPD 2800-3, 28 см", model: "KMPD 2800-3", sku: '', category: "Аксессуары", country: '', price: 9900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'kmpd2800-1.webp', IMG + 'kmpd2800-2.webp'],
+      description: "Стеклянная крышка диаметром 28 см для сковороды Miele: за приготовлением можно следить, не поднимая крышку.",
+      features: [],
+      specs: [["Диаметр", "28 см"], ["Материал", "стекло"]] },
+    { id: "sfaa30", title: "Фильтр Active AirClean SF-AA 30", model: "SF-AA 30", sku: '', category: "Аксессуары", country: '', price: 3200, stock: 5, low: 2, high: 8,
+      images: [IMG + 'sfaa30-1.webp', IMG + 'sfaa30-2.webp'],
+      description: "Фильтр выходящего воздуха с активированным углём для пылесосов Miele: задерживает запахи. Номер 30 или 50 обозначает форму фильтра — нужный указан в инструкции к пылесосу.",
+      features: [],
+      specs: [] },
+    { id: "sfaa50", title: "Фильтр Active AirClean SF-AA 50", model: "SF-AA 50", sku: '', category: "Аксессуары", country: '', price: 3200, stock: 5, low: 2, high: 8,
+      images: [IMG + 'sfaa50-1.webp', IMG + 'sfaa50-2.webp'],
+      description: "Фильтр выходящего воздуха с активированным углём для пылесосов Miele: задерживает запахи. Номер 30 или 50 обозначает форму фильтра — нужный указан в инструкции к пылесосу.",
+      features: [],
+      specs: [] },
+    { id: "sfha30", title: "Фильтр HEPA AirClean SF-HA 30", model: "SF-HA 30", sku: '', category: "Аксессуары", country: '', price: 4500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'sfha30-1.webp', IMG + 'sfha30-2.webp'],
+      description: "HEPA-фильтр выходящего воздуха для пылесосов Miele: задерживает мелкую пыль и аллергены. Номер 30 или 50 обозначает форму фильтра — нужный указан в инструкции к пылесосу.",
+      features: [],
+      specs: [["Класс фильтрации", "HEPA 13"]] },
+    { id: "sfha50", title: "Фильтр HEPA AirClean SF-HA 50", model: "SF-HA 50", sku: '', category: "Аксессуары", country: '', price: 4500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'sfha50-1.webp', IMG + 'sfha50-2.webp'],
+      description: "HEPA-фильтр выходящего воздуха для пылесосов Miele: задерживает мелкую пыль и аллергены. Номер 30 или 50 обозначает форму фильтра — нужный указан в инструкции к пылесосу.",
+      features: [],
+      specs: [["Класс фильтрации", "HEPA 13"]] },
+    { id: "hxfsf", title: "Фильтр тонкой очистки HX-FSF для Triflex HX1", model: "HX-FSF", sku: '', category: "Аксессуары", country: '', price: 6900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'hxfsf-1.webp', IMG + 'hxfsf-2.webp'],
+      description: "Фильтр тонкой очистки для беспроводного пылесоса Triflex HX1: задерживает мельчайшие частицы пыли в выходящем воздухе.",
+      features: [],
+      specs: [["Совместимость", "Triflex HX1"]] },
+    { id: "hxfsf2", title: "Фильтр тонкой очистки HX-FSF-2 для Triflex HX2", model: "HX-FSF-2", sku: '', category: "Аксессуары", country: '', price: 6900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'hxfsf2-1.webp', IMG + 'hxfsf2-2.webp'],
+      description: "Фильтр тонкой очистки для беспроводного пылесоса Triflex HX2: задерживает мельчайшие частицы пыли в выходящем воздухе.",
+      features: [],
+      specs: [["Совместимость", "Triflex HX2"]] },
+    { id: "t1filter", title: "Фильтр тонкой очистки в цоколь для сушильных машин T1", model: "", sku: '', category: "Аксессуары", country: '', price: 8500, stock: 5, low: 2, high: 8,
+      images: [IMG + 't1filter-1.webp', IMG + 't1filter-2.webp'],
+      description: "Цокольный фильтр с логотипом Miele для сушильных машин T1 с тепловым насосом: защищает теплообменник от ворса. Фильтр из вспененного материала можно мыть.",
+      features: [],
+      specs: [["Совместимость", "сушильные машины T1"]] },
+    { id: "hxhc", title: "Валик для твёрдых полов Hardfloor Care Tool для Triflex HX1", model: "HX-HC", sku: '', category: "Аксессуары", country: '', price: 8500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'hxhc-1.webp', IMG + 'hxhc-2.webp'],
+      description: "Мягкий валик для электрощётки пылесоса Triflex HX1. Собирает мелкую пыль с паркета, ламината и плитки — для дома, где твёрдых полов больше, чем ковров.",
+      features: [],
+      specs: [["Совместимость", "Triflex HX1"]] },
+    { id: "hxroll", title: "Щётка-валик для Triflex HX1", model: "", sku: '', category: "Аксессуары", country: '', price: 8900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'hxroll-1.webp', IMG + 'hxroll-2.webp'],
+      description: "Сменный щёточный валик для электрощётки пылесоса Triflex HX1.",
+      features: [],
+      specs: [["Совместимость", "Triflex HX1"]] },
+    { id: "cloth", title: "Салфетка из микрофибры", model: "GP MI X 0011 W", sku: '', category: "Аксессуары", country: '', price: 1700, stock: 5, low: 2, high: 8,
+      images: [IMG + 'cloth-1.webp', IMG + 'cloth-2.webp'],
+      description: "Универсальная салфетка из микрофибры для ухода за техникой: стекло, нержавеющая сталь, панели управления.",
+      features: [],
+      specs: [["В упаковке", "1 шт."]] },
+    { id: "twindosbox", title: "Многоразовый контейнер TwinDos", model: "", sku: '', category: "Аксессуары", country: '', price: 5900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'twindosbox-1.webp', IMG + 'twindosbox-2.webp'],
+      description: "Контейнер для системы автоматического дозирования TwinDos: в него заливают своё жидкое моющее средство или кондиционер, и стиральная машина дозирует его сама.",
+      features: [],
+      specs: [] },
+    { id: "sneakerbag", title: "Сумка для стирки обуви SneakerWash", model: "SneakerWash", sku: '', category: "Аксессуары", country: '', price: 11500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'sneakerbag-1.webp', IMG + 'sneakerbag-2.webp'],
+      description: "Сумка для стирки кроссовок и кед в стиральной машине. Используется вместе с моющим средством SneakerTabs.",
+      features: [],
+      specs: [] },
+    { id: "ggrpk", title: "Сковорода-гриль GGRPK для индукционной варочной поверхности", model: "GGRPK", sku: '', category: "Аксессуары", country: '', price: 49900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ggrpk-1.webp', IMG + 'ggrpk-2.webp'],
+      description: "Гурмэ-пластина для гриля: ставится на индукционную варочную поверхность Miele. Рифлёное дно оставляет на мясе, рыбе и овощах характерные полоски.",
+      features: [],
+      specs: [] },
+    { id: "hbs60", title: "Камень для выпечки Гурмэ HBS 60", model: "HBS 60", sku: '', category: "Аксессуары", country: '', price: 29900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'hbs60-1.webp', IMG + 'hbs60-2.webp'],
+      description: "Камень для выпечки в духовом шкафу: пицца, хлеб и пироги получаются с хрустящей корочкой. В комплекте деревянная лопатка.",
+      features: [],
+      specs: [] },
+    { id: "boxes", title: "Набор контейнеров для приготовления и хранения продуктов, 3 шт.", model: "", sku: '', category: "Аксессуары", country: '', price: 10000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'boxes-1.webp', IMG + 'boxes-2.webp'],
+      description: "Три стеклянных контейнера с крышками объёмом 0,4 л, 1 л и 1,6 л: в них можно готовить и хранить продукты.",
+      features: [],
+      specs: [["Объём", "0,4 л, 1 л и 1,6 л"]] },
+    { id: "up1", title: "Картридж для стирки UltraPhase 1", model: "UltraPhase 1", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'up1-1.webp', IMG + 'up1-2.webp'],
+      description: "Первый компонент двухкомпонентного жидкого средства для стиральных машин с автоматическим дозированием TwinDos. Подходит для цветного, белого и деликатного белья.",
+      features: [],
+      specs: [["Объём", "1,4 л"]] },
+    { id: "up1a", title: "Картридж для стирки UltraPhase 1 All in Two", model: "UltraPhase 1 All in Two", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'up1a-1.webp', IMG + 'up1a-2.webp'],
+      description: "Жидкое моющее средство для стиральных машин серии W2 с автоматическим дозированием TwinDos. Подходит для всех тканей, включая шерсть и шёлк.",
+      features: [],
+      specs: [["Объём", "1,4 л"]] },
+    { id: "up2", title: "Картридж для стирки UltraPhase 2 (универсальный)", model: "UltraPhase 2", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'up2-1.webp', IMG + 'up2-2.webp'],
+      description: "Второй компонент двухкомпонентного средства для стиральных машин с автоматическим дозированием TwinDos. Подходит к любому UltraPhase 1.",
+      features: [],
+      specs: [["Объём", "1,4 л"]] },
+    { id: "tdc", title: "Средство для очистки системы TwinDos Care", model: "TwinDos Care", sku: '', category: "Бытовая химия", country: '', price: 3000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'tdc-1.webp', IMG + 'tdc-2.webp'],
+      description: "Средство для промывки системы автоматического дозирования TwinDos. Применяется перед сменой моющего средства.",
+      features: [],
+      specs: [] },
+    { id: "fragrance", title: "Ароматизатор для сушильных машин", model: "", sku: '', category: "Бытовая химия", country: '', price: 3000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'fragrance-1.webp', IMG + 'fragrance-2.webp', IMG + 'fragrance-3.webp'],
+      description: "Флакон с ароматом для сушильных машин Miele: бельё после сушки приятно пахнет. Ароматы — Aqua, Cocoon, Nature и другие; наличие уточняйте в шоуруме.",
+      features: [],
+      specs: [["Объём", "12,5 мл"]] },
+    { id: "ultrasoft", title: "Кондиционер для белья UltraSoft", model: "UltraSoft", sku: '', category: "Бытовая химия", country: '', price: 2700, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ultrasoft-1.webp', IMG + 'ultrasoft-2.webp'],
+      description: "Кондиционер для белья: вещи становятся мягче, меньше мнутся и получают свежий аромат Aqua.",
+      features: [],
+      specs: [["Объём", "1,5 л"]] },
+    { id: "ultracolor", title: "Средство для стирки цветного белья UltraColor", model: "UltraColor", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ultracolor-1.webp'],
+      description: "Жидкое средство для стирки цветных и чёрных вещей.",
+      features: [],
+      specs: [["Объём", "1,5 л"]] },
+    { id: "ucfb", title: "Средство для стирки цветного белья UltraColor FloralBoost", model: "UltraColor FloralBoost", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ucfb-1.webp', IMG + 'ucfb-2.webp'],
+      description: "Жидкое средство для стирки цветного белья с цветочным ароматом. Ограниченная серия.",
+      features: [],
+      specs: [["Объём", "1,5 л"]] },
+    { id: "ultradark", title: "Средство для стирки тёмных и чёрных вещей UltraDark", model: "UltraDark", sku: '', category: "Бытовая химия", country: '', price: 4000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ultradark-1.webp', IMG + 'ultradark-2.webp'],
+      description: "Жидкое средство для стирки тёмных и чёрных вещей: помогает сохранить цвет.",
+      features: [],
+      specs: [["Объём", "1,5 л"]] },
+    { id: "woolcare", title: "Средство для стирки деликатных тканей и изделий из шерсти WoolCare", model: "WoolCare", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'woolcare-1.webp', IMG + 'woolcare-2.webp'],
+      description: "Жидкое средство для шерсти, шёлка и других деликатных тканей.",
+      features: [],
+      specs: [["Объём", "1,5 л"]] },
+    { id: "outdoor", title: "Средство для стирки верхней одежды Caps Outdoor", model: "Caps Outdoor", sku: '', category: "Бытовая химия", country: '', price: 2500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'outdoor-1.webp', IMG + 'outdoor-2.webp'],
+      description: "Капсулы со специальным средством для функциональной верхней одежды. Капсула вставляется в отсек стиральной машины Miele.",
+      features: [],
+      specs: [["В упаковке", "6 капсул"]] },
+    { id: "impra", title: "Средство для спортивной и непромокаемой одежды ImpraProtect", model: "ImpraProtect", sku: '', category: "Бытовая химия", country: '', price: 2500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'impra-1.webp', IMG + 'impra-2.webp'],
+      description: "Специальное средство для спортивной одежды и вещей с защитой от дождя.",
+      features: [],
+      specs: [["Объём", "250 мл"]] },
+    { id: "downcare", title: "Средство для стирки пуховых изделий Caps DownCare", model: "Caps DownCare", sku: '', category: "Бытовая химия", country: '', price: 2500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'downcare-1.webp', IMG + 'downcare-2.webp'],
+      description: "Капсулы со специальным средством для пуховых вещей. Капсула вставляется в отсек стиральной машины Miele.",
+      features: [],
+      specs: [["В упаковке", "6 капсул"]] },
+    { id: "ultrawhite", title: "Средство для стирки белого белья UltraWhite", model: "UltraWhite", sku: '', category: "Бытовая химия", country: '', price: 4500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ultrawhite-1.webp', IMG + 'ultrawhite-2.webp'],
+      description: "Стиральный порошок для белого белья и цветных вещей со стойкой окраской.",
+      features: [],
+      specs: [["Вес", "2,7 кг"]] },
+    { id: "sneakertabs", title: "Моющее средство для обуви SneakerTabs", model: "SneakerTabs", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'sneakertabs-1.webp', IMG + 'sneakertabs-2.webp'],
+      description: "Таблетки для стирки кроссовок и кед в стиральной машине. Используются вместе с сумкой SneakerWash.",
+      features: [],
+      specs: [] },
+    { id: "powerdisk", title: "Картридж PowerDisk", model: "PowerDisk All in 1", sku: '', category: "Бытовая химия", country: '', price: 2200, stock: 5, low: 2, high: 8,
+      images: [IMG + 'powerdisk-1.webp'],
+      description: "Картридж с порошковым моющим средством для посудомоечных машин с автоматическим дозированием AutoDos: машина сама отмеряет нужное количество на каждый цикл.",
+      features: [],
+      specs: [["Вес", "400 г"]] },
+    { id: "tabs", title: "Таблетки для мытья посуды в посудомоечных машинах, 60 шт.", model: "UltraTabs All in 1", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'tabs-1.webp', IMG + 'tabs-2.webp'],
+      description: "Таблетки «всё в одном» для посудомоечных машин Miele. Плёнка растворяется в воде — разворачивать таблетку не нужно.",
+      features: [],
+      specs: [["В упаковке", "60 шт."]] },
+    { id: "dp14", title: "Порошок для посудомоечных машин DishPowder в бутыли, 1,425 кг", model: "DishPowder", sku: '', category: "Бытовая химия", country: '', price: 4200, stock: 5, low: 2, high: 8,
+      images: [IMG + 'dp14-1.webp', IMG + 'dp14-2.webp'],
+      description: "Порошковое моющее средство для посудомоечных машин Miele в бутыли. Дозировку можно подобрать под загрузку и степень загрязнения.",
+      features: [],
+      specs: [["Вес", "1,425 кг"]] },
+    { id: "dp1", title: "Порошок для посудомоечных машин DishPowder, 1 кг", model: "DishPowder", sku: '', category: "Бытовая химия", country: '', price: 2700, stock: 5, low: 2, high: 8,
+      images: [IMG + 'dp1-1.webp', IMG + 'dp1-2.webp'],
+      description: "Порошковое моющее средство для посудомоечных машин Miele. Дозировку можно подобрать под загрузку и степень загрязнения.",
+      features: [],
+      specs: [["Вес", "1 кг"]] },
+    { id: "salt", title: "Соль для посудомоечных машин", model: "", sku: '', category: "Бытовая химия", country: '', price: 1500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'salt-1.webp', IMG + 'salt-2.webp'],
+      description: "Регенерирующая соль для посудомоечных машин: защищает прибор и посуду от известкового налёта.",
+      features: [],
+      specs: [["Вес", "1,5 кг"]] },
+    { id: "rinse", title: "Ополаскиватель для посудомоечных машин", model: "", sku: '', category: "Бытовая химия", country: '', price: 1500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'rinse-1.webp', IMG + 'rinse-2.webp'],
+      description: "Ополаскиватель для посудомоечных машин Miele: посуда лучше сохнет и остаётся без разводов.",
+      features: [],
+      specs: [["Объём", "500 мл"]] },
+    { id: "cofftabs", title: "Таблетки для очистки от кофейных масел для кофемашин, 10 шт.", model: "", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'cofftabs-1.webp', IMG + 'cofftabs-2.webp'],
+      description: "Таблетки для очистки кофемашин Miele от кофейных масел.",
+      features: [],
+      specs: [["В упаковке", "10 шт."]] },
+    { id: "desctabs", title: "Таблетки для удаления накипи для кофемашин, пароварок и гладильных систем", model: "", sku: '', category: "Бытовая химия", country: '', price: 3500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'desctabs-1.webp', IMG + 'desctabs-2.webp'],
+      description: "Таблетки для удаления накипи в кофемашинах, пароварках и гладильных системах Miele.",
+      features: [],
+      specs: [] },
+    { id: "milk", title: "Средство для чистки трубки подачи молока (для кофемашин), 30 пакетиков", model: "", sku: '', category: "Бытовая химия", country: '', price: 2000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'milk-1.webp', IMG + 'milk-2.webp'],
+      description: "Средство для чистки молочной системы кофемашин Miele.",
+      features: [],
+      specs: [["В упаковке", "30 пакетиков"]] },
+    { id: "descaler", title: "Средство для удаления накипи в стиральных и посудомоечных машинах", model: "", sku: '', category: "Бытовая химия", country: '', price: 3000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'descaler-1.webp', IMG + 'descaler-2.webp'],
+      description: "Средство для удаления известковых отложений в стиральных и посудомоечных машинах: бережёт нагревательные элементы.",
+      features: [],
+      specs: [["Вес", "250 г"]] },
+    { id: "intense", title: "Средство для чистки посудомоечных и стиральных машин IntenseClean", model: "IntenseClean", sku: '', category: "Бытовая химия", country: '', price: 3000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'intense-1.webp', IMG + 'intense-2.webp'],
+      description: "Средство для гигиенической чистки посудомоечных и стиральных машин изнутри.",
+      features: [],
+      specs: [["Вес", "200 г"]] },
+    { id: "dishclean", title: "Средство для ухода за посудомоечными машинами DishClean", model: "DishClean", sku: '', category: "Бытовая химия", country: '', price: 3000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'dishclean-1.webp', IMG + 'dishclean-2.webp'],
+      description: "Средство для ухода за посудомоечной машиной: поддерживает её исправную работу.",
+      features: [],
+      specs: [["Вес", "160 г"]] },
+    { id: "ovenclean", title: "Средство для чистки духовых шкафов", model: "OvenClean", sku: '', category: "Бытовая химия", country: '', price: 3000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ovenclean-1.webp', IMG + 'ovenclean-2.webp'],
+      description: "Спрей для чистки духовых шкафов: помогает без усилий удалить пригоревший жир.",
+      features: [],
+      specs: [["Объём", "500 мл"]] },
+    { id: "dgclean", title: "Средство для чистки комби-пароварок", model: "DGClean", sku: '', category: "Бытовая химия", country: '', price: 3000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'dgclean-1.webp', IMG + 'dgclean-2.webp'],
+      description: "Спрей для чистки комби-пароварок: хорошо держится на стенках и легко удаляет загрязнения.",
+      features: [],
+      specs: [["Объём", "250 мл"]] },
+    { id: "ceran", title: "Средство для чистки стеклокерамики и нержавеющей стали", model: "", sku: '', category: "Бытовая химия", country: '', price: 2500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ceran-1.webp', IMG + 'ceran-2.webp'],
+      description: "Средство для чистки стеклокерамических варочных поверхностей и нержавеющей стали.",
+      features: [],
+      specs: [["Объём", "250 мл"]] },
+    { id: "steelcare", title: "Средство для ухода за нержавеющей сталью SteelCare", model: "SteelCare", sku: '', category: "Бытовая химия", country: '', price: 2500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'steelcare-1.webp', IMG + 'steelcare-2.webp'],
+      description: "Средство для ухода за поверхностями из нержавеющей стали: оставляет ровный матовый блеск.",
+      features: [],
+      specs: [["Объём", "250 мл"]] },
+    { id: "autocleaner", title: "Картридж для очистки от кофейных масел AutoCleaner", model: "AutoCleaner", sku: '', category: "Бытовая химия", country: '', price: 12000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'autocleaner-1.webp', IMG + 'autocleaner-2.webp'],
+      description: "Картридж для автоматической очистки кофемашин Miele от кофейных масел.",
+      features: [],
+      specs: [] },
+    { id: "desccart", title: "Картридж для очистки от накипи в кофемашинах", model: "", sku: '', category: "Бытовая химия", country: '', price: 12000, stock: 5, low: 2, high: 8,
+      images: [IMG + 'desccart-1.webp', IMG + 'desccart-2.webp'],
+      description: "Картридж для автоматического удаления накипи в кофемашинах Miele.",
+      features: [],
+      specs: [] },
+    { id: "floorclean", title: "Средство для мытья пола FloorClean", model: "FloorClean", sku: '', category: "Бытовая химия", country: '', price: 3900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'floorclean-1.webp', IMG + 'floorclean-2.webp'],
+      description: "Универсальный концентрат для мытья всех водостойких напольных покрытий.",
+      features: [],
+      specs: [] },
+    { id: "ovenset", title: "Рукавица и прихватка для духовки с логотипом Miele", model: "", sku: '', category: "Сувенирная продукция", country: '', price: 1500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'ovenset-1.webp', IMG + 'ovenset-2.webp'],
+      description: "Набор для духовки: рукавица и прихватка с тканым логотипом Miele.",
+      features: [],
+      specs: [] },
+    { id: "apron", title: "Кухонный фартук с логотипом Miele", model: "", sku: '', category: "Сувенирная продукция", country: '', price: 2900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'apron-1.webp', IMG + 'apron-2.webp'],
+      description: "Серый кухонный фартук с нагрудником и вышитым логотипом Miele.",
+      features: [],
+      specs: [] },
+    { id: "mug", title: "Фарфоровая кружка Valencia с логотипом Miele, 320 мл", model: "", sku: '', category: "Сувенирная продукция", country: '', price: 3600, stock: 5, low: 2, high: 8,
+      images: [IMG + 'mug-1.webp', IMG + 'mug-2.webp'],
+      description: "Фарфоровая кружка с гравированным логотипом Miele.",
+      features: [],
+      specs: [["Объём", "320 мл"], ["Материал", "фарфор"]] },
+    { id: "cups", title: "Чашки с блюдцем для капучино с логотипом Miele, 2 шт.", model: "", sku: '', category: "Сувенирная продукция", country: '', price: 6900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'cups-1.webp', IMG + 'cups-2.webp'],
+      description: "Две чашки для капучино с блюдцами и гравированным логотипом Miele.",
+      features: [],
+      specs: [["В наборе", "2 чашки с блюдцами"], ["Объём", "190 мл"]] },
+    { id: "bottle", title: "Стеклянная бутылка Miele, 600 мл", model: "", sku: '', category: "Сувенирная продукция", country: '', price: 4500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'bottle-1.webp', IMG + 'bottle-2.webp'],
+      description: "Стеклянная бутылка для воды с рисунком и логотипом Miele.",
+      features: [],
+      specs: [["Объём", "600 мл"], ["Материал", "стекло"]] },
+    { id: "kidapron", title: "Детский фартук с логотипом Miele", model: "", sku: '', category: "Сувенирная продукция", country: '', price: 2900, stock: 5, low: 2, high: 8,
+      images: [IMG + 'kidapron-1.webp'],
+      description: "Красочный детский фартук с логотипом Miele — для маленьких помощников на кухне.",
+      features: [],
+      specs: [] },
+    { id: "grater", title: "Ручная тёрка с логотипом Miele", model: "", sku: '', category: "Сувенирная продукция", country: '', price: 8500, stock: 5, low: 2, high: 8,
+      images: [IMG + 'grater-1.webp', IMG + 'grater-2.webp'],
+      description: "Ручная тёрка Microplane с логотипом Miele. Прорезиненная ножка не даёт тёрке скользить.",
+      features: [],
+      specs: [] }
+  ];
+  var SMALL_ORDER = ["wtv501", "wtv502", "wtv601", "wts610", "trk655", "baggn", "bagtu", "bagfjm", "kmts5704", "kmpd2800", "sfaa30", "sfaa50", "sfha30", "sfha50", "hxfsf", "hxfsf2", "t1filter", "hxhc", "hxroll", "cloth", "twindosbox", "sneakerbag", "ggrpk", "hbs60", "boxes", "up1", "up1a", "up2", "tdc", "fragrance", "ultrasoft", "ultracolor", "ucfb", "ultradark", "woolcare", "outdoor", "impra", "downcare", "ultrawhite", "sneakertabs", "powerdisk", "tabs", "dp14", "dp1", "salt", "rinse", "cofftabs", "desctabs", "milk", "descaler", "intense", "dishclean", "ovenclean", "dgclean", "ceran", "steelcare", "autocleaner", "desccart", "floorclean", "ovenset", "apron", "mug", "cups", "bottle", "kidapron", "grater"];
+  /*SEED_SMALL:END*/
+  /* Каталог = исходные товары + список клиента от 12.11, в порядке его списка.
+     Версии стандартного каталога: 2 — техника, 3 — аксессуары, бытовая химия и сувениры */
+  var SEED_REVS = {};
+  SEED_ADD.forEach(function (p) { SEED_REVS[p.id] = 2; });
+  SEED_SMALL.forEach(function (p) { SEED_REVS[p.id] = 3; });
+  SEED = (function () {
+    var by = {}; SEED.concat(SEED_ADD, SEED_SMALL).forEach(function (p) { by[p.id] = p; });
+    var order = SEED_ORDER.filter(function (id) { return SMALL_ORDER.indexOf(id) < 0; }).concat(SMALL_ORDER);
+    return order.map(function (id) { return by[id]; }).filter(Boolean);
+  })();
   /* showroom — образец выставлен в зале шоурума (галочка «Есть в шоуруме» в кабинете) */
   SEED.forEach(function (p) { p.visible = true; p.orderable = true; p.showroom = p.stock > 0; });
 
@@ -308,8 +640,12 @@
     gis: 'https://2gis.ru/perm/firm/70000001026549959',
     ymaps: 'https://yandex.ru/maps/org/miele/121722485798/',
     sets: [
-      { title: 'Колонна Nova Edition', note: 'Серия W2/T2', ids: ['wq1000', 'tq1000', 'wtv601'] },
-      { title: 'Колонна White Edition', note: 'Серия W1/T1', ids: ['wwg880', 'twh780', 'wtv502'] }
+      /* prices — цены приборов в составе комплекта (список клиента от 12.11), в том же порядке, что ids */
+      { title: 'Колонна WQ 1000 + TQ 1000', note: 'Nova Edition, серия W2/T2', ids: ['wq1000', 'tq1000', 'wtv601'], prices: [309000, 309000, 12000] },
+      { title: 'Колонна WWI 860 + TWL 780', note: 'White Edition, серия W1/T1', ids: ['wwi860', 'twl780', 'wtv502'], prices: [280000, 283000, 12000] },
+      { title: 'Колонна WWG 880 + TWH 780', note: 'White Edition, серия W1/T1', ids: ['wwg880', 'twh780', 'wtv502'], prices: [214000, 214000, 12000] },
+      { title: 'Колонна WWB 360 + TWC 640', note: 'White Edition, серия W1/T1', ids: ['wwb360', 'twc640', 'wtv502'], prices: [174000, 174000, 12000] },
+      { title: 'Колонна WEA 125 + TEA 525', note: 'Chrome Edition, серия W1/T1', ids: ['wea125', 'tea525', 'wtv501'], prices: [154000, 164000, 12000] }
     ]
   };
 
@@ -323,9 +659,10 @@
 
   /* Версия стандартного каталога. Если у владельца каталог уже сохранён в браузере, новые товары версии
      добавляются к нему один раз; его собственные правки и удалённые им товары не трогаются. */
-  var SEEDREV = 2, RKEY = 'mp.seedrev';
-  var PRICE_FIX = { wwg880: [null, 220000], twh780: [null, 220000], h2861: [205000, 185000] };   // цена меняется, только если её не правили
-  function mergeSeed(saved) {
+  var SEEDREV = 3, RKEY = 'mp.seedrev';
+  /* товар: [версия, прежняя цена, новая цена] — цена меняется, только если её не правили */
+  var PRICE_FIX = { wwg880: [2, null, 220000], twh780: [2, null, 220000], h2861: [2, 205000, 185000], wtv502: [3, null, 14900] };
+  function mergeSeed(saved, from) {
     var have = {}, std = {};
     saved.forEach(function (p) { have[p.id] = p; });
     SEED.forEach(function (p) { std[p.id] = 1; });
@@ -333,9 +670,9 @@
     SEED.forEach(function (p) {
       var q = have[p.id], fix = PRICE_FIX[p.id];
       if (q) {
-        if (fix && (q.price === fix[0] || (fix[0] === null && typeof q.price !== 'number')) && typeof q.oldPrice !== 'number') q.price = fix[1];
+        if (fix && fix[0] > from && (q.price === fix[1] || (fix[1] === null && typeof q.price !== 'number')) && typeof q.oldPrice !== 'number') q.price = fix[2];
         out.push(q);
-      } else if (SEED_NEW.indexOf(p.id) >= 0) out.push(clone(p));
+      } else if (SEED_REVS[p.id] > from) out.push(clone(p));
     });
     return out;
   }
@@ -344,8 +681,8 @@
     /* Разделы, переименованные 11.11: у сохранённых товаров старое название заменяется на новое */
     products: function () {
       var RENAMED = { 'Аксессуары и бытовая химия': 'Аксессуары', 'Варочные панели': 'Варочные поверхности' };
-      var saved = read(PKEY, null);
-      if (saved && !(read(RKEY, 1) >= SEEDREV)) { saved = mergeSeed(saved); write(PKEY, saved); write(RKEY, SEEDREV); }
+      var saved = read(PKEY, null), from = +read(RKEY, 1) || 1;
+      if (saved && from < SEEDREV) { saved = mergeSeed(saved, from); write(PKEY, saved); write(RKEY, SEEDREV); }
       return (saved || clone(SEED)).map(function (p) {
         if (RENAMED[p.category]) p.category = RENAMED[p.category];
         /* У товаров, сохранённых до появления галочки «Есть в шоуруме», она ставится по остатку */
@@ -368,6 +705,7 @@
       }
       Object.keys(s).forEach(function (k) { out[k] = s[k]; });
       out.rev = DEFAULTS.rev;
+      out.sets = clone(DEFAULTS.sets);   // состав и цены комплектов задаются в коде
       /* Картинки папок: к сохранённым добавляются новые из стандартного набора */
       out.catImages = clone(DEFAULTS.catImages);
       Object.keys(s.catImages || {}).forEach(function (k) { out.catImages[k] = s.catImages[k]; });
@@ -401,6 +739,25 @@
     },
     onSale: function (p) { return typeof p.price === 'number' && typeof p.oldPrice === 'number' && p.oldPrice > p.price; },
     tgLink: function () { var t = String(Store.settings().telegram || '').replace(/^@|\s/g, ''); return t ? 'https://t.me/' + (/^\d+$/.test(t) ? '+' : '') + t : ''; },
+    /* Комплекты колонн. У прибора в комплекте своя цена (sets[].prices); если в каталоге он стоит дешевле, берётся цена каталога.
+       sum — цена комплекта, full — цена тех же приборов по отдельности, off — выгода */
+    kits: function () {
+      var by = {};
+      Store.products().forEach(function (p) { by[p.id] = p; });
+      return Store.settings().sets.map(function (s, i) {
+        var items = [], prices = [];
+        s.ids.forEach(function (id, k) {
+          var p = by[id]; if (!p || p.visible === false) return;
+          var own = typeof p.price === 'number' ? p.price : null, sp = (s.prices || [])[k];
+          items.push(p); prices.push(typeof sp === 'number' ? (own === null ? sp : Math.min(sp, own)) : own);
+        });
+        if (items.length < 2) return null;
+        var known = prices.every(function (v) { return v !== null; }), each = items.every(function (p) { return typeof p.price === 'number'; });
+        var sum = known ? prices.reduce(function (a, v) { return a + v; }, 0) : null;
+        var full = each ? items.reduce(function (a, p) { return a + p.price; }, 0) : null;
+        return { i: i, set: s, items: items, prices: prices, sum: sum, full: full, off: sum !== null && full !== null ? Math.max(0, full - sum) : 0 };
+      }).filter(Boolean);
+    },
     /* Корзина покупателя: { id товара: количество } */
     cart: function () { var c = read(CKEY, {}); return c && typeof c === 'object' ? c : {}; },
     saveCart: function (c) { return write(CKEY, c); },
@@ -416,11 +773,22 @@
         rows.push({ p: p, qty: q, sum: known ? p.price * q : null });
         count += q; if (known) sum += p.price * q; else ask += q;
       });
+      /* Если в корзине собран комплект целиком, приборы считаются по цене комплекта */
+      var left = {}, kits = [], setOff = 0, goods = sum;
+      rows.forEach(function (r) { left[r.p.id] = r.qty; });
+      Store.kits().forEach(function (k) {
+        if (!k.off || k.items.length < k.set.ids.length) return;
+        var n = Math.min.apply(null, k.items.map(function (p) { return left[p.id] || 0; }));
+        if (!n) return;
+        k.items.forEach(function (p) { left[p.id] -= n; });
+        kits.push({ title: k.set.title, n: n, off: k.off * n }); setOff += k.off * n;
+      });
+      sum -= setOff;
       var tiers = (Store.settings().discounts || []).filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
       var pct = 0, next = null;
       tiers.forEach(function (t) { if (sum >= t.from) pct = t.pct; else if (!next) next = { pct: t.pct, need: t.from - sum }; });
       var discount = Math.round(sum * pct / 100);
-      return { rows: rows, count: count, ask: ask, sum: sum, pct: pct, discount: discount, total: sum - discount, next: next, tiers: tiers };
+      return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: sum - discount, next: next, tiers: tiers };
     },
     addLead: function (lead) {
       var l = Store.leads();
