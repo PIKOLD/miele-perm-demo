@@ -255,7 +255,7 @@
     var c = S.settings(), el = sf.elements;
     ['lowDefault', 'highDefault', 'leadTime', 'phone', 'phone2', 'whatsapp', 'telegram', 'address', 'hours'].forEach(function (k) { el[k].value = c[k] || ''; });
     var d = c.discounts || [];
-    el.d1from.value = d[0] ? d[0].from : ''; el.d1pct.value = d[0] ? d[0].pct : ''; el.d2from.value = d[1] ? d[1].from : ''; el.d2pct.value = d[1] ? d[1].pct : '';
+    [1, 2, 3].forEach(function (n) { el['d' + n + 'from'].value = d[n - 1] ? d[n - 1].from : ''; el['d' + n + 'pct'].value = d[n - 1] ? d[n - 1].pct : ''; });
     el.cats.value = (c.cats || []).join('\n');
     el.showCount.checked = !!c.showCount;
   }
@@ -267,7 +267,7 @@
     c.showCount = el.showCount.checked;
     ['leadTime', 'phone', 'phone2', 'address', 'hours'].forEach(function (k) { c[k] = el[k].value.trim(); });
     c.telegram = el.telegram.value.trim().replace(/^(https?:\/\/)?t\.me\//, '').replace(/^[@+]/, '');
-    c.discounts = [[el.d1from, el.d1pct], [el.d2from, el.d2pct]].map(function (x) { return { from: Math.round(+x[0].value) || 0, pct: Math.min(90, +x[1].value || 0) }; })
+    c.discounts = [[el.d1from, el.d1pct], [el.d2from, el.d2pct], [el.d3from, el.d3pct]].map(function (x) { return { from: Math.round(+x[0].value) || 0, pct: Math.min(90, +x[1].value || 0) }; })
       .filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
     c.cats = el.cats.value.split('\n').map(function (s) { return s.trim(); }).filter(function (s, i, a) { return s && a.indexOf(s) === i; });
     c.whatsapp = el.whatsapp.value.replace(/\D/g, '');

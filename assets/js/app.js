@@ -351,19 +351,23 @@
       '</aside></div>';
 
       var today = new Date().toLocaleDateString('ru-RU');
-      offer.innerHTML =
-        '<div class="offer__top"><img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co"><b>Шоурум Miele, Пермь</b><span>' + esc(cfg.address) + '</span>' + offerPhones() + '<span>' + esc(cfg.hours) + '</span></div></div>' +
+      /* Поля страницы заданы пустыми строками таблицы (шапка и подвал повторяются на каждом листе): у самой страницы поля нулевые,
+         поэтому браузер не печатает свои колонтитулы с датой и адресом сайта */
+      var cut = c.kits.length || c.pct;
+      offer.innerHTML = '<table class="offer__page"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>' +
+        '<div class="offer__top"><img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co"><span><b>Шоурум Miele</b> · ' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span>' + offerPhones() + '<span>' + esc(cfg.hours) + '</span></div></div>' +
         '<h1>Коммерческое предложение</h1><p class="offer__date">от ' + today + '</p>' +
         '<table class="offer__tbl"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
           return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td><td>' + (r.sum === null ? 'по запросу' : money(r.sum)) + '</td></tr>';
         }).join('') + '</tbody></table>' +
-        '<table class="offer__sum"><tbody><tr><th>Сумма</th><td>' + money(c.goods) + '</td></tr>' +
+        '<table class="offer__sum"><tbody>' + (cut ? '<tr><th>Итого</th><td>' + money(c.goods) + '</td></tr>' : '') +
           c.kits.map(function (k) { return '<tr><th>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</th><td>−' + money(k.off) + '</td></tr>'; }).join('') +
           (c.pct ? '<tr><th>Скидка за объём заказа ' + c.pct + '%</th><td>−' + money(c.discount) + '</td></tr>' : '') +
-          '<tr class="offer__total"><th>Итого</th><td>' + money(c.total) + '</td></tr></tbody></table>' +
+          '<tr class="offer__total"><th>' + (cut ? 'Итого со скидкой' : 'Итого') + '</th><td>' + money(c.total) + '</td></tr></tbody></table>' +
         (c.ask ? '<p class="offer__p">Позиции с ценой по запросу в сумму не включены — стоимость уточнит консультант.</p>' : '') +
-        '<p class="offer__legal">Предложение сформировано на сайте ' + today + ', носит информационный характер и не является публичной офертой (ст. 437 ГК РФ). Цены и наличие действительны на дату формирования — уточняйте у консультантов шоурума.</p>';
+        '<p class="offer__legal">Предложение сформировано на сайте ' + today + ', носит информационный характер и не является публичной офертой (ст. 437 ГК РФ). Цены и наличие действительны на дату формирования — уточняйте у консультантов шоурума.</p>' +
+        '</td></tr></tbody></table>';
     }
     body.addEventListener('click', function (e) {
       if (e.target.id === 'print') {

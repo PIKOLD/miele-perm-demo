@@ -6,8 +6,8 @@
 <title>Кабинет шоурума — Miele Пермь</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css?v=13">
-<link rel="stylesheet" href="assets/css/admin.css?v=13">
+<link rel="stylesheet" href="assets/css/style.css?v=14">
+<link rel="stylesheet" href="assets/css/admin.css?v=14">
 </head>
 <body class="adm">
 
@@ -85,6 +85,10 @@
           <div class="row">
             <div><label for="s-d2f">Вторая ступень: от суммы, ₽</label><input id="s-d2f" name="d2from" type="number" min="0" step="1000" inputmode="numeric"></div>
             <div><label for="s-d2p">Скидка, %</label><input id="s-d2p" name="d2pct" type="number" min="0" max="90" step="0.5" inputmode="decimal"></div>
+          </div>
+          <div class="row">
+            <div><label for="s-d3f">Третья ступень: от суммы, ₽</label><input id="s-d3f" name="d3from" type="number" min="0" step="1000" inputmode="numeric"></div>
+            <div><label for="s-d3p">Скидка, %</label><input id="s-d3p" name="d3pct" type="number" min="0" max="90" step="0.5" inputmode="decimal"></div>
           </div>
           <div><h2 style="margin-top:8px">Разделы каталога</h2></div>
           <div><label for="s-cats">Вкладки каталога — каждый раздел с новой строки</label><textarea id="s-cats" name="cats" rows="8"></textarea><p class="hint">Раздел показывается на сайте, даже если товаров в нём пока нет. Вкладка «Акции» есть всегда: в неё попадают товары, у которых заполнена старая цена.</p></div>
@@ -186,7 +190,7 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="assets/js/store.js?v=13"></script>
-<script src="assets/js/admin.js?v=13"></script>
+<script src="assets/js/store.js?v=14"></script>
+<script src="assets/js/admin.js?v=14"></script>
 </body>
 </html>
