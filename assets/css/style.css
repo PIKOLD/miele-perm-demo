@@ -370,6 +370,9 @@ button, input, textarea, select { font: inherit; color: inherit; }
   .offer__top img { height: 44pt; width: auto; }
   .offer__co { display: grid; gap: 2pt; text-align: right; font-size: 9.5pt; }
   .offer__co b { font-size: 11pt; }
+  .offer__m { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0 10pt; }
+  .offer__m > span { display: inline-flex; align-items: center; gap: 3pt; white-space: nowrap; }
+  .offer__m svg { width: 10pt; height: 10pt; flex: none; }
   .offer h1 { font-size: 20pt; margin: 16pt 0 2pt; letter-spacing: -.01em; }
   .offer__date { color: #444; margin-bottom: 10pt; }
   .offer table { width: 100%; border-collapse: collapse; }

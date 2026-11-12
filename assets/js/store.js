@@ -45,7 +45,7 @@
     {
       id: 'wwg880', title: 'Стиральная машина WWG 880 WCS White Edition', model: 'WWG 880 WCS', sku: '',
       category: 'Стиральные машины', country: 'Польша', price: 220000, stock: 1, low: 2, high: 5,
-      images: [IMG + 'wwg880-1.webp', IMG + 'wwg880-2.webp'],
+      images: [IMG + 'wwg880-1.webp?2', IMG + 'wwg880-2.webp?2', IMG + 'wwg880-3.webp?2'],
       description: 'Машина серии W1 с автоматическим дозированием TwinDos и паровой обработкой. PowerWash экономит воду и энергию на небольших загрузках, а бельё можно добавить уже после старта программы.',
       features: ['TwinDos — автоматическое дозирование', 'PowerWash — эффективная стирка малых загрузок', 'SteamCare — меньше складок после стирки', 'AddLoad — дозагрузка белья после старта', 'CapDosing — капсулы для особых тканей', 'Защита от протечек Watercontrol'],
       specs: [['Загрузка', '9 кг'], ['Отжим', 'до 1400 об/мин'], ['Класс энергоэффективности', 'A'], ['Управление', 'DirectSensor'], ['Размеры (В×Ш×Г)', '85 × 59,6 × 64,3 см'], ['Цвет', 'белый лотос']]
@@ -53,7 +53,7 @@
     {
       id: 'twh780', title: 'Сушильная машина TWH 780 WP White Edition', model: 'TWH 780 WP', sku: '',
       category: 'Сушильные машины', country: 'Чехия', price: 220000, stock: 3, low: 2, high: 5,
-      images: [IMG + 'twh780-1.webp', IMG + 'twh780-2.webp', IMG + 'twh780-3.webp'],
+      images: [IMG + 'twh780-1.webp?2', IMG + 'twh780-2.webp?2', IMG + 'twh780-3.webp?2'],
       description: 'Сушильная машина серии T1 с тепловым насосом — пара к WWG 880. Бережно сушит при низкой температуре, а реверс барабана и защита от сминания оставляют бельё ровным.',
       features: ['PerfectDry — точная сушка с учётом жёсткости воды', 'EcoSpeed — короче цикл, меньше расход', 'DryCare 40 — деликатная сушка при 40 °C', 'HygieneDry — гигиеническая сушка', 'Wash2Dry — программа подбирается по стирке', 'Защита от сминания'],
       specs: [['Загрузка', '9 кг'], ['Тип сушки', 'тепловой насос'], ['Управление', 'DirectSensor'], ['Размеры (В×Ш×Г)', '85 × 59,6 × 64,3 см'], ['Вес', '55 кг'], ['Цвет', 'белый лотос']]
@@ -94,32 +94,32 @@
   /*SEED_ADD:BEGIN — ассортимент из списка клиента от 12.11. Блок собирает research/build_products.py, руками не править */
   var SEED_ADD = [
     { id: "wea125", title: "Стиральная машина WEA 125 WCS Chrome Edition", model: "WEA 125 WCS", sku: "", category: "Стиральные машины", country: "Польша", price: 155000, stock: 2, low: 1, high: 3,
-      images: [IMG + "wea125-1.webp", IMG + "wea125-2.webp"],
+      images: [IMG + "wea125-1.webp?2", IMG + "wea125-2.webp?2", IMG + "wea125-3.webp?2"],
       description: "Стиральная машина серии W1 Chrome Edition с загрузкой 8 кг. Сотовый барабан бережно обращается с тканями, а бельё можно добавить уже после старта программы.",
       features: ["CapDosing — капсулы для стирки", "AddLoad — функция дозагрузки белья", "AutoClean — отсек для моющих средств"],
       specs: [["Загрузка", "8 кг"], ["Отжим", "до 1400 об/мин"], ["Программ стирки", "12"], ["Управление", "EasyControl"], ["Защита от протечек", "Watercontrol System"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 63,6 см"], ["Цвет", "белый лотос"]] },
     { id: "wwb360", title: "Стиральная машина WWB 360 WCS White Edition", model: "WWB 360 WCS", sku: "", category: "Стиральные машины", country: "Польша", price: 180000, stock: 2, low: 1, high: 3,
-      images: [IMG + "wwb360-1.webp", IMG + "wwb360-2.webp"],
+      images: [IMG + "wwb360-1.webp?2", IMG + "wwb360-2.webp?2", IMG + "wwb360-3.webp?2"],
       description: "Стиральная машина серии W1 White Edition с загрузкой 8 кг. Функция PowerWash экономит воду и электроэнергию на небольших загрузках, для особых тканей предусмотрены капсулы CapDosing.",
       features: ["QuickPowerWash — быстрая интенсивная стирка", "CapDosing — капсулы для стирки", "AddLoad — функция дозагрузки белья", "PowerWash — интенсивная стирка", "AutoClean — отсек для моющих средств"],
       specs: [["Загрузка", "8 кг"], ["Отжим", "до 1400 об/мин"], ["Программ стирки", "12"], ["Управление", "DirectSensor"], ["Защита от протечек", "Watercontrol System"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 64,3 см"], ["Цвет", "белый лотос"]] },
     { id: "wwi860", title: "Стиральная машина WWI 860 WPS White Edition", model: "WWI 860 WPS", sku: "", category: "Стиральные машины", country: "Польша", price: 280000, stock: 2, low: 1, high: 3,
-      images: [IMG + "wwi860-1.webp", IMG + "wwi860-2.webp"],
+      images: [IMG + "wwi860-1.webp?2", IMG + "wwi860-2.webp?2", IMG + "wwi860-3.webp?2"],
       description: "Стиральная машина серии W1 White Edition с загрузкой 9 кг и 24 программами. TwinDos сам дозирует моющее средство, PowerWash экономит воду и энергию, а система Waterproof полностью защищает от протечек.",
       features: ["PowerWash 2.0 — интенсивная стирка 2.0", "QuickPowerWash — быстрая интенсивная стирка", "CapDosing — капсулы для стирки", "AddLoad — функция дозагрузки белья", "EcoFeedback — контроль расхода воды и энергии", "AllergoWash — антиаллергенная"],
       specs: [["Загрузка", "9 кг"], ["Отжим", "до 1600 об/мин"], ["Программ стирки", "24"], ["Управление", "ComfortSensor"], ["Защита от протечек", "Waterproof System"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 64,3 см"], ["Цвет", "белый лотос"]] },
     { id: "tea525", title: "Сушильная машина TEA 525 WP Chrome Edition", model: "TEA 525 WP", sku: "", category: "Сушильные машины", country: "Чехия", price: 165000, stock: 2, low: 1, high: 3,
-      images: [IMG + "tea525-1.webp", IMG + "tea525-2.webp"],
+      images: [IMG + "tea525-1.webp?2", IMG + "tea525-2.webp?2", IMG + "tea525-3.webp?2"],
       description: "Сушильная машина серии T1 Chrome Edition с тепловым насосом, загрузка 8 кг. Сушит при низкой температуре — бережно к тканям и экономно по электроэнергии.",
       features: ["PerfectDry — безупречная сушка", "FragranceDos — ароматизированные капсулы", "EcoDry — энергосберегающая сушка", "AddLoad — дозагрузка белья", "EcoSpeed — ускоренная Эко сушка", "DryFresh — теплый обдув"],
       specs: [["Загрузка", "8 кг"], ["Тип сушки", "тепловой насос"], ["Программ", "12"], ["Управление", "EasyControl"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 64 см"], ["Вес", "52 кг"], ["Цвет", "белый лотос"]] },
     { id: "twc640", title: "Сушильная машина TWC 640 WP White Edition", model: "TWC 640 WP", sku: "", category: "Сушильные машины", country: "Чехия", price: 180000, stock: 2, low: 1, high: 3,
-      images: [IMG + "twc640-1.webp", IMG + "twc640-2.webp"],
+      images: [IMG + "twc640-1.webp?2", IMG + "twc640-2.webp?2", IMG + "twc640-3.webp?2"],
       description: "Сушильная машина серии T1 White Edition с тепловым насосом, загрузка 8 кг. Пара к стиральным машинам W1 White Edition: приборы можно поставить в колонну.",
       features: ["PerfectDry — безупречная сушка", "FragranceDos — ароматизированные капсулы", "EcoDry — энергосберегающая сушка", "AddLoad — дозагрузка белья", "EcoSpeed — ускоренная Эко сушка", "DryFresh — теплый обдув"],
       specs: [["Загрузка", "8 кг"], ["Тип сушки", "тепловой насос"], ["Программ", "10"], ["Управление", "DirectSensor"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 64,3 см"], ["Вес", "54 кг"], ["Цвет", "белый лотос"]] },
     { id: "twl780", title: "Сушильная машина TWL 780 WP White Edition", model: "TWL 780 WP", sku: "", category: "Сушильные машины", country: "Чехия", price: 285000, stock: 2, low: 1, high: 3,
-      images: [IMG + "twl780-1.webp", IMG + "twl780-2.webp"],
+      images: [IMG + "twl780-1.webp?2", IMG + "twl780-2.webp?2", IMG + "twl780-3.webp?2"],
       description: "Сушильная машина серии T1 White Edition с тепловым насосом, загрузка 9 кг, 19 программ. Обработка паром разглаживает бельё и сокращает время глажки.",
       features: ["PerfectDry — безупречная сушка", "FragranceDos — ароматизированные капсулы", "SteamFinish — финальная обработка паром", "EcoFeedback — индикация расхода воды и энергии", "EcoDry — энергосберегающая сушка", "AddLoad — дозагрузка белья"],
       specs: [["Загрузка", "9 кг"], ["Тип сушки", "тепловой насос"], ["Программ", "19"], ["Управление", "ComfortSensor"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 64,3 см"], ["Вес", "57 кг"], ["Цвет", "белый лотос"]] },
@@ -714,7 +714,9 @@
 
   /* Версия стандартного каталога. Если у владельца каталог уже сохранён в браузере, новые товары версии
      добавляются к нему один раз; его собственные правки и удалённые им товары не трогаются. */
-  var SEEDREV = 4, RKEY = 'mp.seedrev';
+  var SEEDREV = 5, RKEY = 'mp.seedrev';
+  /* версия 5: у этих машин фото заменены на снимки с русской панелью управления */
+  var IMG5 = ['wea125', 'wwb360', 'wwg880', 'wwi860', 'tea525', 'twc640', 'twh780', 'twl780'];
   /* товар: [версия, прежняя цена, новая цена] — цена меняется, только если её не правили */
   var PRICE_FIX = { wwg880: [2, null, 220000], twh780: [2, null, 220000], h2861: [2, 205000, 185000], wtv502: [3, null, 14900] };
   function mergeSeed(saved, from) {
@@ -726,6 +728,8 @@
       var q = have[p.id], fix = PRICE_FIX[p.id];
       if (q) {
         if (fix && fix[0] > from && (q.price === fix[1] || (fix[1] === null && typeof q.price !== 'number')) && typeof q.oldPrice !== 'number') q.price = fix[2];
+        /* если фото у товара стандартные (не загружены владельцем), список фото обновляется */
+        if (from < 5 && IMG5.indexOf(p.id) >= 0 && (q.images || []).every(function (u) { return String(u).indexOf(IMG + p.id + '-') === 0; })) q.images = clone(p.images);
         out.push(q);
       } else if (SEED_REVS[p.id] > from) out.push(clone(p));
     });
