@@ -6,8 +6,8 @@
 <title>Кабинет шоурума — Miele Пермь</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css?v=14">
-<link rel="stylesheet" href="assets/css/admin.css?v=14">
+<link rel="stylesheet" href="assets/css/style.css?v=15">
+<link rel="stylesheet" href="assets/css/admin.css?v=15">
 </head>
 <body class="adm">
 
@@ -90,6 +90,8 @@
             <div><label for="s-d3f">Третья ступень: от суммы, ₽</label><input id="s-d3f" name="d3from" type="number" min="0" step="1000" inputmode="numeric"></div>
             <div><label for="s-d3p">Скидка, %</label><input id="s-d3p" name="d3pct" type="number" min="0" max="90" step="0.5" inputmode="decimal"></div>
           </div>
+          <div><h2 style="margin-top:8px">Цены комплектов</h2><p>Цена каждого прибора в составе комплекта — сумма комплекта считается сама. На сайте рядом зачёркнута цена тех же приборов по отдельности (из каталога). Если в каталоге прибор стоит дешевле, чем в комплекте, берётся цена каталога.</p></div>
+          <div class="kitset" id="s-kits"></div>
           <div><h2 style="margin-top:8px">Разделы каталога</h2></div>
           <div><label for="s-cats">Вкладки каталога — каждый раздел с новой строки</label><textarea id="s-cats" name="cats" rows="8"></textarea><p class="hint">Раздел показывается на сайте, даже если товаров в нём пока нет. Вкладка «Акции» есть всегда: в неё попадают товары, у которых заполнена старая цена.</p></div>
           <div><h2 style="margin-top:8px">Контакты шоурума</h2></div>
@@ -151,6 +153,7 @@
         <div id="w-cat"><label for="e-cat">Категория</label><input id="e-cat" name="category" type="text" list="cats"><datalist id="cats"></datalist><p class="errm">Выберите или введите категорию</p></div>
         <div><label for="e-country">Страна-производитель</label><input id="e-country" name="country" type="text"></div>
       </div>
+      <div style="margin-top:16px"><span class="lbl">Показывать также в разделах</span><div class="alsos" id="e-also"></div><p class="hint">Товар появится ещё и в отмеченных разделах. Например, стирально-сушильная машина — в «Сушильных машинах» и в «Комплектах».</p></div>
       <div class="row" style="margin-top:16px">
         <div><label for="e-price">Цена, ₽</label><input id="e-price" name="price" type="number" min="0" step="100" inputmode="numeric"><p class="hint">Оставьте пустым — на сайте будет «Цена по запросу».</p></div>
         <div id="w-old"><label for="e-old">Старая цена, ₽ — для акции</label><input id="e-old" name="oldPrice" type="number" min="0" step="100" inputmode="numeric"><p class="hint">Если заполнить, старая цена на сайте будет зачёркнута, а товар попадёт во вкладку «Акции».</p><p class="errm">Старая цена должна быть больше текущей</p></div>
@@ -190,7 +193,7 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="assets/js/store.js?v=14"></script>
-<script src="assets/js/admin.js?v=14"></script>
+<script src="assets/js/store.js?v=15"></script>
+<script src="assets/js/admin.js?v=15"></script>
 </body>
 </html>

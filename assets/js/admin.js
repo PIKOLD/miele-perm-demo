@@ -150,7 +150,7 @@
   });
 
   /* ---------- Редактор ---------- */
-  var ed = $('#editor'), ef = $('form', ed), editing = null, pics = [];
+  var ed = $('#editor'), ef = $('form', ed), editing = null, pics = [], KITS = 'Комплекты';
   function drawPics() {
     $('#e-pics').innerHTML = pics.length ? pics.map(function (src, i) {
       return '<div class="pic"><img src="' + esc(src) + '" alt=""><button type="button" data-rm="' + i + '" aria-label="Убрать фото ' + (i + 1) + '">×</button></div>';
@@ -174,6 +174,9 @@
     el.features.value = (p.features || []).join('\n');
     el.specs.value = (p.specs || []).map(function (s) { return s[0] + ': ' + s[1]; }).join('\n');
     $('#cats').innerHTML = S.cats().map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
+    /* Дополнительные разделы товара: все разделы каталога и папка «Комплекты» */
+    var also = p.also || [], sec = S.cats(); if (sec.indexOf(KITS) < 0) sec.push(KITS);
+    $('#e-also').innerHTML = sec.map(function (c) { return '<label class="chk"><input type="checkbox" value="' + esc(c) + '"' + (also.indexOf(c) >= 0 ? ' checked' : '') + '><span>' + esc(c) + '</span></label>'; }).join('');
     $$('.bad', ef).forEach(function (n) { n.classList.remove('bad'); });
     drawPics(); drawNow(); ed.showModal(); $('.editor__b', ed).scrollTop = 0; el.title.focus();
   }
@@ -213,6 +216,7 @@
     var low = Math.max(1, parseInt(el.low.value, 10) || 1);
     var data = {
       title: title, model: el.model.value.trim(), sku: el.sku.value.trim(), category: cat, country: el.country.value.trim(),
+      also: Array.prototype.map.call(document.querySelectorAll('#e-also input:checked'), function (i) { return i.value; }).filter(function (c) { return c !== cat; }),
       price: price, oldPrice: old,
       stock: Math.max(0, parseInt(el.stock.value, 10) || 0), low: low, high: Math.max(low + 1, parseInt(el.high.value, 10) || low + 1),
       orderable: el.orderable.checked, visible: el.visible.checked, showroom: el.showroom.checked, images: pics.slice(),
@@ -258,7 +262,25 @@
     [1, 2, 3].forEach(function (n) { el['d' + n + 'from'].value = d[n - 1] ? d[n - 1].from : ''; el['d' + n + 'pct'].value = d[n - 1] ? d[n - 1].pct : ''; });
     el.cats.value = (c.cats || []).join('\n');
     el.showCount.checked = !!c.showCount;
+    /* Цены комплектов: поле на каждый прибор, сумма комплекта пересчитывается при вводе */
+    var by = {}; S.products().forEach(function (p) { by[p.id] = p; });
+    $('#s-kits').innerHTML = (c.sets || []).map(function (k, i) {
+      return '<fieldset class="kitset__k"><legend>' + esc(k.title) + '</legend>' + k.ids.map(function (id, n) {
+        var p = by[id], v = (k.prices || [])[n];
+        return '<div class="kitset__r"><label for="k' + i + '-' + n + '">' + esc(p ? p.title : id) + '<small>в каталоге: ' + (p && typeof p.price === 'number' ? S.price(p.price) : 'по запросу') + '</small></label>' +
+          '<input id="k' + i + '-' + n + '" type="number" min="0" step="100" inputmode="numeric" data-kit="' + i + '" data-n="' + n + '" value="' + (typeof v === 'number' ? v : '') + '" aria-label="Цена в комплекте: ' + esc(p ? p.title : id) + '"></div>';
+      }).join('') + '<p class="kitset__sum">Цена комплекта: <b data-ksum="' + i + '"></b></p></fieldset>';
+    }).join('');
+    kitSums();
   }
+  function kitInputs(i) { return Array.prototype.slice.call(sf.querySelectorAll('[data-kit="' + i + '"]')); }
+  function kitSums() {
+    Array.prototype.forEach.call(sf.querySelectorAll('[data-ksum]'), function (b) {
+      var inp = kitInputs(b.getAttribute('data-ksum')), full = inp.every(function (x) { return x.value !== ''; });
+      b.textContent = full ? S.price(inp.reduce(function (a, x) { return a + Math.max(0, Math.round(+x.value) || 0); }, 0)) : 'заполните все цены';
+    });
+  }
+  sf.addEventListener('input', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-kit')) kitSums(); });
   sf.addEventListener('submit', function (e) {
     e.preventDefault();
     var c = S.settings(), el = sf.elements;
@@ -271,6 +293,12 @@
       .filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
     c.cats = el.cats.value.split('\n').map(function (s) { return s.trim(); }).filter(function (s, i, a) { return s && a.indexOf(s) === i; });
     c.whatsapp = el.whatsapp.value.replace(/\D/g, '');
+    /* Цены комплектов сохраняются по названию комплекта; комплект с пустым полем остаётся со стандартными ценами */
+    c.kits = {};
+    (c.sets || []).forEach(function (k, i) {
+      var inp = kitInputs(i);
+      if (inp.length === k.ids.length && inp.every(function (x) { return x.value !== ''; })) c.kits[k.title] = inp.map(function (x) { return Math.max(0, Math.round(+x.value) || 0); });
+    });
     S.saveSettings(c); renderSettings(); toast('Настройки сохранены');
   });
   $('#export').addEventListener('click', function () {

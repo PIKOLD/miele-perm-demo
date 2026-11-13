@@ -108,6 +108,11 @@
       description: "Стиральная машина серии W1 White Edition с загрузкой 9 кг и 24 программами. TwinDos сам дозирует моющее средство, PowerWash экономит воду и энергию, а система Waterproof полностью защищает от протечек.",
       features: ["PowerWash 2.0 — интенсивная стирка 2.0", "QuickPowerWash — быстрая интенсивная стирка", "CapDosing — капсулы для стирки", "AddLoad — функция дозагрузки белья", "EcoFeedback — контроль расхода воды и энергии", "AllergoWash — антиаллергенная"],
       specs: [["Загрузка", "9 кг"], ["Отжим", "до 1600 об/мин"], ["Программ стирки", "24"], ["Управление", "ComfortSensor"], ["Защита от протечек", "Waterproof System"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 64,3 см"], ["Цвет", "белый лотос"]] },
+    { id: "wtr870", title: "Стирально-сушильная машина WTR 870 WPM PWash & TDos, 8/5 кг", model: "WTR 870 WPM", sku: "11584900", category: "Стиральные машины", country: "", price: 310000, stock: 2, low: 1, high: 3, also: ["Сушильные машины", "Комплекты"],
+      images: [IMG + "wtr870-1.webp", IMG + "wtr870-2.webp"],
+      description: "Стирально-сушильная машина серии WT1: стирает до 8 кг и сушит до 5 кг белья в одном корпусе, перекладывать бельё не нужно. TwinDos сам дозирует моющее средство, PowerWash экономит воду и энергию, а система Waterproof-Metal защищает от протечек.",
+      features: ["TwinDos — автоматическое дозирование моющих средств", "PowerWash — эффективная стирка малых загрузок", "QuickPower — быстрая стирка и сушка", "CapDosing — капсулы для особых тканей", "AllergoWash — антиаллергенная стирка", "AutoClean — самоочищающийся отсек для моющих средств"],
+      specs: [["Загрузка", "8 кг стирка, 5 кг сушка"], ["Отжим", "до 1600 об/мин"], ["Управление", "сенсорный дисплей M Touch"], ["Защита от протечек", "Waterproof-Metal"], ["Размеры (В×Ш×Г)", "85 × 59,6 × 63,7 см"], ["Цвет", "белый лотос"]] },
     { id: "tea525", title: "Сушильная машина TEA 525 WP Chrome Edition", model: "TEA 525 WP", sku: "", category: "Сушильные машины", country: "Чехия", price: 165000, stock: 2, low: 1, high: 3,
       images: [IMG + "tea525-1.webp?2", IMG + "tea525-2.webp?2", IMG + "tea525-3.webp?2"],
       description: "Сушильная машина серии T1 Chrome Edition с тепловым насосом, загрузка 8 кг. Сушит при низкой температуре — бережно к тканям и экономно по электроэнергии.",
@@ -138,6 +143,11 @@
       description: "Встраиваемый духовой шкаф линейки Active в отделке под нержавеющую сталь. Камера 76 л, покрытие PerfectClean — загрязнения легко отходят.",
       features: ["AirFry — жарка без масла", "CleanGlass — дверца из стекла", "SoftClose — плавное закрытие дверцы"],
       specs: [["Объём камеры", "76 л"], ["Очистка", "каталитическая"], ["Режимов работы", "9"], ["Управление", "EasyControl"], ["Мощность", "3,5 кВт"], ["Размеры (В×Ш×Г)", "59,6 × 59,5 × 56,8 см"], ["Цвет", "чёрный / нержавеющая сталь"]] },
+    { id: "h2465bp", title: "Духовой шкаф H 2465 BP с пиролизом, нержавеющая сталь", model: "H 2465 BP", sku: "12146550", category: "Духовые шкафы", country: "Германия", price: 150000, stock: 2, low: 1, high: 3,
+      images: [IMG + "h2465bp-1.webp", IMG + "h2465bp-2.webp"],
+      description: "Встраиваемый духовой шкаф линейки Active в отделке под нержавеющую сталь с пиролитической самоочисткой: камера очищается сама при высокой температуре. Объём камеры 76 л.",
+      features: ["AirFry — жарка без масла", "CleanGlass — гладкая стеклянная дверца"],
+      specs: [["Объём камеры", "76 л"], ["Очистка", "пиролитическая"], ["Управление", "EasyControl Plus"], ["Мощность", "3,6 кВт"], ["Размеры (В×Ш×Г)", "59,6 × 59,5 × 56,8 см"], ["Цвет", "чёрный / нержавеющая сталь"]] },
     { id: "h2861b", title: "Духовой шкаф H 2861 B, чёрный обсидиан", model: "H 2861 B OBSW", sku: "", category: "Духовые шкафы", country: "Германия", price: 160000, stock: 2, low: 1, high: 3,
       images: [IMG + "h2861b-1.webp", IMG + "h2861b-2.webp"],
       description: "Встраиваемый духовой шкаф в цвете «чёрный обсидиан». Камера 76 л и покрытие PerfectClean, с которого легко отходят загрязнения.",
@@ -314,7 +324,7 @@
       features: ["DirectWater — подключение к водопроводу", "CupSensor — датчик высоты чашки", "CoffeeSelect — выбор кофе из 3 контейнеров", "OneTouch — кофе одним касанием", "DoubleShot — двойная крепость", "TeaTimer — таймер для заваривания чая"],
       specs: [["Тип", "зерновая"], ["Давление", "15 бар"], ["Ёмкость для воды", "2,7 л"], ["Контейнеров для зёрен", "3"], ["Размеры (В×Ш×Г)", "45,5 × 59,5 × 47,5 см"], ["Цвет", "чёрный обсидиан"]] }
   ];
-  var SEED_ORDER = ["wea125", "wwb360", "wwg880", "wwi860", "wq1000", "tea525", "twc640", "twh780", "twl780", "tq1000", "wtv601", "wtv502", "b4312", "b4847", "h2465", "h2861b", "h2861", "h7260", "dgc7860", "m6012", "m2230", "m7244", "km7361fr", "km7361fl", "km8462fr", "km8462", "km7867", "kmda7876", "g5481", "g5790", "g5050", "g5863", "g7191", "g7980", "cm5410", "cm6560", "cm7550", "cva7440", "cva7845b", "das4630", "das4930", "dah1650", "da6698", "susf0", "suzf0", "sumf0", "hx1red", "hx1total", "hx3aqua", "km7464", "dgc7440", "kwt7112", "cva7845"];
+  var SEED_ORDER = ["wea125", "wwb360", "wwg880", "wwi860", "wq1000", "wtr870", "tea525", "twc640", "twh780", "twl780", "tq1000", "wtv601", "wtv502", "b4312", "b4847", "h2465", "h2465bp", "h2861b", "h2861", "h7260", "dgc7860", "m6012", "m2230", "m7244", "km7361fr", "km7361fl", "km8462fr", "km8462", "km7867", "kmda7876", "g5481", "g5790", "g5050", "g5863", "g7191", "g7980", "cm5410", "cm6560", "cm7550", "cva7440", "cva7845b", "das4630", "das4930", "dah1650", "da6698", "susf0", "suzf0", "sumf0", "hx1red", "hx1total", "hx3aqua", "km7464", "dgc7440", "kwt7112", "cva7845"];
   /*SEED_ADD:END*/
   /*SEED_SMALL:BEGIN — аксессуары, бытовая химия и сувениры из списка клиента от 12.11. Блок собирает research/build_small.py, руками не править */
   var SEED_SMALL = [
@@ -637,16 +647,21 @@
       images: [IMG + 'grater-1.webp', IMG + 'grater-2.webp'],
       description: "Ручная тёрка Microplane с логотипом Miele. Прорезиненная ножка не даёт тёрке скользить.",
       features: [],
-      specs: [] }
+      specs: [] },
+    { id: "coffee", title: "Кофе в зёрнах Miele Black Edition, в ассортименте", model: "", sku: '', category: "Кофемашины", country: '', price: 1300, stock: 5, low: 2, high: 8,
+      images: [IMG + 'coffee-1.webp', IMG + 'coffee-2.webp', IMG + 'coffee-3.webp'],
+      description: "Кофе в зёрнах Miele Black Edition для кофемашин Miele: Café Crema, Espresso и One for All. Сорта в наличии уточняйте у консультантов шоурума.",
+      features: [],
+      specs: [["Вид", "кофе в зёрнах"], ["Упаковка", "250 г"], ["Сорта", "Café Crema, Espresso, One for All"]] }
   ];
-  var SMALL_ORDER = ["wtv501", "wtv502", "wtv601", "wts610", "trk655", "baggn", "bagtu", "bagfjm", "kmts5704", "kmpd2800", "sfaa30", "sfaa50", "sfha30", "sfha50", "hxfsf", "hxfsf2", "t1filter", "hxhc", "hxroll", "cloth", "twindosbox", "sneakerbag", "ggrpk", "hbs60", "boxes", "up1", "up1a", "up2", "tdc", "fragrance", "ultrasoft", "ultracolor", "ucfb", "ultradark", "woolcare", "outdoor", "impra", "downcare", "ultrawhite", "sneakertabs", "powerdisk", "tabs", "dp14", "dp1", "salt", "rinse", "cofftabs", "desctabs", "milk", "descaler", "intense", "dishclean", "ovenclean", "dgclean", "ceran", "steelcare", "autocleaner", "desccart", "floorclean", "ovenset", "apron", "mug", "cups", "bottle", "kidapron", "grater"];
+  var SMALL_ORDER = ["wtv501", "wtv502", "wtv601", "wts610", "trk655", "baggn", "bagtu", "bagfjm", "kmts5704", "kmpd2800", "sfaa30", "sfaa50", "sfha30", "sfha50", "hxfsf", "hxfsf2", "t1filter", "hxhc", "hxroll", "cloth", "twindosbox", "sneakerbag", "ggrpk", "hbs60", "boxes", "up1", "up1a", "up2", "tdc", "fragrance", "ultrasoft", "ultracolor", "ucfb", "ultradark", "woolcare", "outdoor", "impra", "downcare", "ultrawhite", "sneakertabs", "powerdisk", "tabs", "dp14", "dp1", "salt", "rinse", "cofftabs", "desctabs", "milk", "descaler", "intense", "dishclean", "ovenclean", "dgclean", "ceran", "steelcare", "autocleaner", "desccart", "floorclean", "ovenset", "apron", "mug", "cups", "bottle", "kidapron", "grater", "coffee"];
   /*SEED_SMALL:END*/
   /* Каталог = исходные товары + список клиента от 12.11, в порядке его списка.
      Версии стандартного каталога: 2 — техника, 3 — аксессуары, бытовая химия и сувениры, 4 — G 7980 и кофемашины */
   var SEED_REVS = {}, REV4 = ['g7980', 'cm5410', 'cm6560', 'cm7550', 'cva7440', 'cva7845b'];
-  var REV6 = ['b4312', 'km8462fr'];
-  SEED_ADD.forEach(function (p) { SEED_REVS[p.id] = REV6.indexOf(p.id) >= 0 ? 6 : REV4.indexOf(p.id) >= 0 ? 4 : 2; });
-  SEED_SMALL.forEach(function (p) { SEED_REVS[p.id] = 3; });
+  var REV6 = ['b4312', 'km8462fr'], REV7 = ['wtr870', 'h2465bp', 'coffee'];
+  SEED_ADD.forEach(function (p) { SEED_REVS[p.id] = REV7.indexOf(p.id) >= 0 ? 7 : REV6.indexOf(p.id) >= 0 ? 6 : REV4.indexOf(p.id) >= 0 ? 4 : 2; });
+  SEED_SMALL.forEach(function (p) { SEED_REVS[p.id] = REV7.indexOf(p.id) >= 0 ? 7 : 3; });
   SEED = (function () {
     var by = {}; SEED.concat(SEED_ADD, SEED_SMALL).forEach(function (p) { by[p.id] = p; });
     var order = SEED_ORDER.filter(function (id) { return SMALL_ORDER.indexOf(id) < 0; }).concat(SMALL_ORDER);
@@ -720,7 +735,7 @@
 
   /* Версия стандартного каталога. Если у владельца каталог уже сохранён в браузере, новые товары версии
      добавляются к нему один раз; его собственные правки и удалённые им товары не трогаются. */
-  var SEEDREV = 6, RKEY = 'mp.seedrev';
+  var SEEDREV = 7, RKEY = 'mp.seedrev';
   /* версия 5: у этих машин фото заменены на снимки с русской панелью управления */
   var IMG5 = ['wea125', 'wwb360', 'wwg880', 'wwi860', 'tea525', 'twc640', 'twh780', 'twl780'];
   /* версия 6: у TQ 1000 убрано фото в интерьере; KM 6540 FR убрана из каталога по просьбе владельца */
@@ -777,7 +792,14 @@
       }
       Object.keys(s).forEach(function (k) { out[k] = s[k]; });
       out.rev = DEFAULTS.rev;
-      out.sets = clone(DEFAULTS.sets);   // состав и цены комплектов задаются в коде
+      /* Комплекты: состав задан в коде, цены владелец меняет в кабинете (хранятся в kits по названию комплекта) */
+      out.sets = clone(DEFAULTS.sets);
+      var kp = s.kits && typeof s.kits === 'object' ? s.kits : {};
+      out.sets.forEach(function (k) {
+        var own = kp[k.title];
+        if (Array.isArray(own) && own.length === k.ids.length && own.every(function (v) { return typeof v === 'number' && v >= 0; })) k.prices = own.slice();
+      });
+      out.kits = kp;
       /* Картинки папок: к сохранённым добавляются новые из стандартного набора */
       out.catImages = clone(DEFAULTS.catImages);
       Object.keys(s.catImages || {}).forEach(function (k) { out.catImages[k] = s.catImages[k]; });
@@ -859,8 +881,9 @@
       var tiers = (Store.settings().discounts || []).filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
       var pct = 0, next = null;
       tiers.forEach(function (t) { if (sum >= t.from) pct = t.pct; else if (!next) next = { pct: t.pct, need: t.from - sum }; });
-      var discount = Math.round(sum * pct / 100);
-      return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: sum - discount, next: next, tiers: tiers };
+      /* Итог со скидкой за объём округляется до 100 ₽ вниз — в пользу покупателя */
+      var total = pct ? Math.floor((sum - sum * pct / 100) / 100) * 100 : sum, discount = sum - total;
+      return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: total, next: next, tiers: tiers };
     },
     addLead: function (lead) {
       var l = Store.leads();

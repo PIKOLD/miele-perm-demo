@@ -200,3 +200,15 @@ dialog::backdrop { background: rgba(0, 0, 0, .45); }
 }
 .grp__in .abtn { flex: none; white-space: nowrap; }
 .grp__t span { white-space: nowrap; }
+
+/* Дополнительные разделы товара и цены комплектов */
+.f .lbl { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.alsos { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.kitset { display: grid; gap: 14px; }
+.kitset__k { border: 1px solid var(--line); padding: 12px 14px 14px; margin: 0; min-width: 0; }
+.kitset__k legend { font-weight: 700; padding: 0 6px; }
+.kitset__r { display: grid; grid-template-columns: minmax(0, 1fr) 140px; gap: 12px; align-items: center; padding: 6px 0; }
+.kitset__r label { margin: 0; font-weight: 400; }
+.kitset__r small { display: block; color: var(--muted); font-size: 12px; }
+.kitset__sum { margin: 8px 0 0; text-align: right; font-size: 14px; }
+@media (max-width: 560px) { .kitset__r { grid-template-columns: 1fr; gap: 4px; } }

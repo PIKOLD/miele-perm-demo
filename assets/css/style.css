@@ -371,12 +371,13 @@ button, input, textarea, select { font: inherit; color: inherit; }
   body[data-page="cart"] { background: #fff; color: #000; font-size: 10.5pt; }
   body[data-page="cart"] #hdr, body[data-page="cart"] #ftr, body[data-page="cart"] .cartv, body[data-page="cart"] #ask { display: none !important; }
   .offer { display: block; }
-  .offer__top { display: flex; flex-direction: column; align-items: center; gap: 7pt; padding-bottom: 10pt; border-bottom: 1.5pt solid #000; text-align: center; }
+  /* Шапка в одну строку: слева адрес и часы работы, по центру логотип, справа телефоны */
+  .offer__top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12pt; padding-bottom: 9pt; border-bottom: 1.5pt solid #000; }
   .offer__top img { height: 40pt; width: auto; }
-  .offer__co { display: grid; gap: 1.5pt; justify-items: center; font-size: 9.5pt; }
-  .offer__m { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 4pt; }
+  .offer__co { display: grid; gap: 1.5pt; font-size: 9.5pt; justify-items: start; text-align: left; }
+  .offer__co--r { justify-items: end; text-align: right; }
+  .offer__co b { font-size: 10.5pt; }
   .offer__m > span { display: inline-flex; align-items: center; gap: 2.5pt; white-space: nowrap; }
-  .offer__m > span + span::before { content: '·'; margin-right: 1.5pt; }
   .offer__m svg { width: 10pt; height: 10pt; flex: none; }
   .offer h1 { font-size: 20pt; margin: 16pt 0 2pt; letter-spacing: -.01em; }
   .offer__date { color: #444; margin-bottom: 10pt; }
@@ -420,6 +421,8 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .folder--sale .folder__name { color: var(--red); }
 
 .grid--kits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Отдельный товар в папке «Комплекты» (например, стирально-сушильная машина): картинка той же высоты, что у комплектов */
+.grid--kits .card:not(.kit) .card__pic { aspect-ratio: 16 / 9; padding: 6% 7%; }
 .kit__pics { display: flex; align-items: center; gap: 4%; aspect-ratio: 16 / 9; background: var(--soft); padding: 6% 7%; }
 .kit__pics a { flex: 1; min-width: 0; height: 100%; display: flex; }
 .kit__pics img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }

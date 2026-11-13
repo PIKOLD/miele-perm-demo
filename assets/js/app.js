@@ -92,12 +92,18 @@
     var folders = $('#folders'), tools = $('#cat-tools'), title = $('#cat-title'), back = $('#cat-back');
     var num = function (p) { return typeof p.price === 'number'; };
     var kits = S.kits();
+    var NAMES = {}; NAMES[SALE] = 'Акции'; NAMES[SETS] = 'Комплекты';
     var valid = function (c) { return c === SALE || (c === SETS && kits.length > 0) || cats.indexOf(c) >= 0; };
     var fromUrl = function () { var c = new URLSearchParams(location.search).get('cat') || ''; return valid(c) ? c : ''; };
     var cat = fromUrl();
-    var NAMES = {}; NAMES[SALE] = 'Акции'; NAMES[SETS] = 'Комплекты';
     var SHOW = /выставочн/i;
-    var inCat = function (c) { return list.filter(function (p) { return c === SALE ? S.onSale(p) : p.category === c; }); };
+    /* Товар показывается в своём разделе и в дополнительных (also); в дополнительных он идёт после «своих» товаров */
+    var isAlso = function (p, c) { return (p.also || []).indexOf(c) >= 0; };
+    var inCat = function (c) {
+      if (c === SALE) return list.filter(function (p) { return S.onSale(p); });
+      return list.filter(function (p) { return p.category === c; }).concat(list.filter(function (p) { return p.category !== c && isAlso(p, c); }));
+    };
+    var kitGoods = list.filter(function (p) { return isAlso(p, NAMES[SETS]); });   // отдельные товары в папке «Комплекты»
     var SORT = {
       stock: function (a, b) { return S.status(b).level - S.status(a).level || (b.stock || 0) - (a.stock || 0); },
       'price-asc': function (a, b) { return num(a) && num(b) ? a.price - b.price : num(b) - num(a); },
@@ -115,7 +121,7 @@
       return [SALE].concat(out);
     }
     function folder(c) {
-      var n = c === SETS ? kits.length : inCat(c).length, pic, cls = '';
+      var n = c === SETS ? kits.length + kitGoods.length : inCat(c).length, pic, cls = '';
       var count = c === SETS ? n + ' ' + S.plural(n, 'комплект', 'комплекта', 'комплектов')
         : n ? n + ' ' + S.plural(n, 'товар', 'товара', 'товаров') : (c === SALE || SHOW.test(c) ? 'Сейчас нет' : 'Под заказ');
       if (c === SALE) { pic = '<span class="folder__pct" aria-hidden="true">%</span>'; cls = ' folder--sale'; }
@@ -150,7 +156,7 @@
       title.textContent = root ? 'Каталог' : NAMES[cat] || cat;
       if (root) { folders.innerHTML = order().map(folder).join(''); return; }
       grid.classList.toggle('grid--kits', cat === SETS);
-      if (cat === SETS) { grid.innerHTML = kits.map(kitCard).join(''); return; }
+      if (cat === SETS) { grid.innerHTML = kits.map(kitCard).join('') + kitGoods.map(card).join(''); return; }
       var all = inCat(cat);
       var shown = all.filter(function (p) { return !only || S.status(p).level > 0; });
       if (SORT[sort]) shown = shown.map(function (p, i) { return [p, i]; }).sort(function (a, b) { return SORT[sort](a[0], b[0]) || a[1] - b[1]; }).map(function (x) { return x[0]; });
@@ -158,13 +164,14 @@
       var none = !all.length
         ? (cat === SALE ? 'Сейчас акционных предложений нет. О новых акциях расскажут консультанты шоурума.' : SHOW.test(cat) ? 'Сейчас выставочных образцов в продаже нет. О новых предложениях расскажут консультанты шоурума.' : 'В этом разделе товары скоро появятся на сайте. Нужную модель привезём под заказ' + lead + ' — позвоните или напишите нам.')
         : 'В этом разделе сейчас ничего нет в наличии. Нужную модель привезём под заказ' + lead + '.';
-      grid.innerHTML = shown.length ? shown.map(function (p) {
+      grid.innerHTML = shown.length ? shown.map(card).join('') : '<div class="empty"><p>' + esc(none) + '</p><button type="button" class="btn btn--line" id="reset">Все разделы</button></div>';
+    }
+    function card(p) {
         return '<div class="card"><a class="card__main" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
           '<div class="card__pic">' + saleBadge(p) + '<img src="' + esc((p.images || [])[0] || '') + '" alt="' + esc(p.title) + '" loading="lazy" width="600" height="600"></div>' +
           '<div class="card__body"><span class="card__cat">' + esc(p.category) + '</span><span class="card__title">' + esc(p.title) + '</span>' +
           showTag(p) + '<div class="card__foot">' + stockHtml(p) + priceHtml(p) + '</div></div></a>' +
           (S.status(p).key !== 'out' ? '<button type="button" class="card__add" data-add="' + esc(p.id) + '">' + addLabel(p.id) + '</button>' : '') + '</div>';
-      }).join('') : '<div class="empty"><p>' + esc(none) + '</p><button type="button" class="btn btn--line" id="reset">Все разделы</button></div>';
     }
     /* Открыть папку (или вернуться к списку папок). Кнопка «Назад» в браузере возвращает к папкам */
     function go(c, push) {
@@ -311,7 +318,7 @@
       var wa = digits(cfg.whatsapp), t = String(cfg.telegram || '').replace(/^@|\s/g, ''), tgNum = /^\+?\d+$/.test(t) ? digits(t) : '';
       var icons = function (num) { return (wa && num === wa ? ICON_WA : '') + (tgNum && num === tgNum ? ICON_TG : ''); };
       var nums = [cfg.phone, cfg.phone2].filter(Boolean), shown = {};
-      var html = '<span class="offer__m">' + nums.map(function (n) { shown[digits(n)] = 1; return '<span>' + esc(n) + icons(digits(n)) + '</span>'; }).join('') + '</span>';
+      var html = nums.map(function (n) { shown[digits(n)] = 1; return '<span class="offer__m"><span>' + esc(n) + icons(digits(n)) + '</span></span>'; }).join('');
       if (wa && !shown[wa]) html += '<span class="offer__m"><span>' + esc(fmt(wa)) + icons(wa) + '</span></span>';
       if (t && (!tgNum || (!shown[tgNum] && tgNum !== wa))) html += '<span class="offer__m"><span>' + esc(tgNum ? fmt(tgNum) : '@' + t) + ICON_TG + '</span></span>';
       return html;
@@ -355,7 +362,8 @@
          поэтому браузер не печатает свои колонтитулы с датой и адресом сайта */
       var cut = c.kits.length || c.pct;
       offer.innerHTML = '<table class="offer__page"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>' +
-        '<div class="offer__top"><img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co"><span><b>Шоурум Miele</b> · ' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span>' + offerPhones() + '<span>' + esc(cfg.hours) + '</span></div></div>' +
+        '<div class="offer__top"><div class="offer__co"><b>Шоурум Miele</b><span>' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span><span>' + esc(cfg.hours) + '</span></div>' +
+          '<img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co offer__co--r">' + offerPhones() + '</div></div>' +
         '<h1>Коммерческое предложение</h1><p class="offer__date">от ' + today + '</p>' +
         '<table class="offer__tbl"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
