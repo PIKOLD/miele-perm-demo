@@ -46,7 +46,8 @@
 
   function openTab(name) {
     $$('.tab').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'); });
-    ['products', 'leads', 'settings', 'users'].forEach(function (n) { $('#tab-' + n).hidden = n !== name; });
+    ['products', 'kits', 'leads', 'settings', 'users'].forEach(function (n) { $('#tab-' + n).hidden = n !== name; });
+    if (name === 'kits' && !kdirty) { kitsLoad(); renderKits(); }
   }
   $$('.tab').forEach(function (b) { b.addEventListener('click', function () { openTab(b.dataset.tab); }); });
 
@@ -253,6 +254,113 @@
     });
   });
 
+  /* ---------- Комплекты ---------- */
+  /* Черновик комплектов правится на вкладке и сохраняется целиком кнопкой «Сохранить комплекты» (настройка kitList) */
+  var kdraft = [], kdirty = false, klist = $('#kits-list');
+  function kitsLoad() {
+    kdraft = (S.settings().sets || []).map(function (k) {
+      return { title: k.title || '', note: k.note || '', ids: (k.ids || []).slice(), prices: (k.ids || []).map(function (id, n) { var v = (k.prices || [])[n]; return typeof v === 'number' ? v : null; }) };
+    });
+    kdirty = false;
+  }
+  function kitCalc(k, by) {
+    var sum = 0, full = 0, known = true, n = 0;
+    k.ids.forEach(function (id, i) {
+      var p = by[id]; if (!p) return;
+      n++;
+      var own = typeof p.price === 'number' ? p.price : null, sp = k.prices[i];
+      var v = typeof sp === 'number' ? (own === null ? sp : Math.min(sp, own)) : own;
+      if (v === null || own === null) known = false;
+      sum += v || 0; full += own || 0;
+    });
+    if (n < 2) return 'Добавьте в комплект хотя бы два прибора';
+    if (!known) return 'У одного из приборов нет цены — цена комплекта будет «по запросу»';
+    return 'Комплектом: ' + S.price(sum) + ' · по отдельности: ' + S.price(full) + (full > sum ? ' · выгода: ' + S.price(full - sum) : '');
+  }
+  function kitOptions(all, cur) {
+    var cats = [], per = {};
+    all.forEach(function (p) { var c = p.category || 'Без раздела'; if (!per[c]) { per[c] = []; cats.push(c); } per[c].push(p); });
+    return '<option value="">— выберите товар —</option>' + cats.map(function (c) {
+      return '<optgroup label="' + esc(c) + '">' + per[c].map(function (p) { return '<option value="' + esc(p.id) + '"' + (p.id === cur ? ' selected' : '') + '>' + esc(p.title) + '</option>'; }).join('') + '</optgroup>';
+    }).join('');
+  }
+  function renderKits() {
+    var all = S.products(), by = {}; all.forEach(function (p) { by[p.id] = p; });
+    klist.innerHTML = kdraft.length ? kdraft.map(function (k, i) {
+      return '<div class="box f kited" data-k="' + i + '">' +
+        '<div class="kited__top"><b>Комплект ' + (i + 1) + '</b><span>' +
+          '<button type="button" class="abtn abtn--ghost" data-kup' + (i === 0 ? ' disabled' : '') + ' aria-label="Поднять комплект выше">↑</button>' +
+          '<button type="button" class="abtn abtn--ghost" data-kdown' + (i === kdraft.length - 1 ? ' disabled' : '') + ' aria-label="Опустить комплект ниже">↓</button>' +
+          '<button type="button" class="abtn abtn--danger" data-kdel>Удалить комплект</button></span></div>' +
+        '<div class="row"><div><label for="kt' + i + '">Название</label><input id="kt' + i + '" type="text" data-kf="title" value="' + esc(k.title) + '" placeholder="Например: Колонна WQ 1000 + TQ 1000"></div>' +
+        '<div><label for="kn' + i + '">Подпись над названием</label><input id="kn' + i + '" type="text" data-kf="note" value="' + esc(k.note) + '" placeholder="Например: Nova Edition, серия W2/T2"></div></div>' +
+        '<div class="kited__rows"><div class="kited__head"><span>Прибор</span><span>Цена в комплекте, ₽</span><span></span></div>' + k.ids.map(function (id, n) {
+          var p = by[id], v = k.prices[n];
+          return '<div class="kited__r" data-n="' + n + '"><div><select data-kid aria-label="Прибор ' + (n + 1) + '">' + kitOptions(all, id) + '</select>' +
+            '<small>' + (p ? 'в каталоге: ' + (typeof p.price === 'number' ? S.price(p.price) : 'по запросу') : (id ? 'товар удалён из каталога' : '')) + '</small></div>' +
+            '<input type="number" min="0" step="100" inputmode="numeric" data-kprice value="' + (typeof v === 'number' ? v : '') + '" placeholder="как в каталоге" aria-label="Цена в комплекте, прибор ' + (n + 1) + '">' +
+            '<button type="button" class="abtn abtn--ghost" data-krm aria-label="Убрать прибор из комплекта">×</button></div>';
+        }).join('') + '</div>' +
+        '<div class="kited__foot"><button type="button" class="abtn" data-kaddrow>+ Прибор</button><span class="kited__sum" data-ksum>' + esc(kitCalc(k, by)) + '</span></div></div>';
+    }).join('') : '<div class="box"><p>Комплектов нет. Нажмите «+ Комплект», чтобы собрать первый.</p></div>';
+    $('#kit-note').textContent = kdirty ? 'Есть несохранённые изменения' : '';
+  }
+  function kitOf(el) { var box = el.closest('[data-k]'); return box ? +box.dataset.k : -1; }
+  function kitTouch(i) {
+    kdirty = true; $('#kit-note').textContent = 'Есть несохранённые изменения';
+    var by = {}; S.products().forEach(function (p) { by[p.id] = p; });
+    var s = klist.querySelector('[data-k="' + i + '"] [data-ksum]'); if (s && kdraft[i]) s.textContent = kitCalc(kdraft[i], by);
+  }
+  klist.addEventListener('input', function (e) {
+    var i = kitOf(e.target), k = kdraft[i]; if (!k) return;
+    if (e.target.hasAttribute('data-kf')) k[e.target.getAttribute('data-kf')] = e.target.value;
+    if (e.target.hasAttribute('data-kprice')) { var n = +e.target.closest('[data-n]').dataset.n; k.prices[n] = e.target.value === '' ? null : Math.max(0, Math.round(+e.target.value) || 0); }
+    kitTouch(i);
+  });
+  klist.addEventListener('change', function (e) {
+    if (!e.target.hasAttribute('data-kid')) return;
+    var i = kitOf(e.target), n = +e.target.closest('[data-n]').dataset.n;
+    kdraft[i].ids[n] = e.target.value; kdirty = true; renderKits();
+  });
+  klist.addEventListener('click', function (e) {
+    var i = kitOf(e.target), k = kdraft[i]; if (!k) return;
+    var move = function (d) { var t = kdraft[i + d]; kdraft[i + d] = k; kdraft[i] = t; };
+    if (e.target.closest('[data-kaddrow]')) { k.ids.push(''); k.prices.push(null); }
+    else if (e.target.closest('[data-krm]')) { var n = +e.target.closest('[data-n]').dataset.n; k.ids.splice(n, 1); k.prices.splice(n, 1); }
+    else if (e.target.closest('[data-kup]') && i > 0) move(-1);
+    else if (e.target.closest('[data-kdown]') && i < kdraft.length - 1) move(1);
+    else if (e.target.closest('[data-kdel]')) {
+      return confirmBox('Удалить комплект?', '«' + (k.title || 'Комплект ' + (i + 1)) + '» исчезнет из папки «Комплекты» после сохранения. Сами товары останутся в каталоге.', 'Удалить комплект', function () { kdraft.splice(i, 1); kdirty = true; renderKits(); });
+    } else return;
+    kdirty = true; renderKits();
+  });
+  $('#kit-add').addEventListener('click', function () {
+    kdraft.push({ title: '', note: '', ids: ['', ''], prices: [null, null] }); kdirty = true; renderKits();
+    var boxes = klist.querySelectorAll('[data-k]'), last = boxes[boxes.length - 1];
+    if (last) { last.scrollIntoView({ block: 'center' }); last.querySelector('[data-kf="title"]').focus(); }
+  });
+  $('#kit-save').addEventListener('click', function () {
+    var bad = '';
+    kdraft.forEach(function (k, i) {
+      var ids = k.ids.filter(Boolean), name = k.title.trim() || 'Комплект ' + (i + 1);
+      if (bad) return;
+      if (!k.title.trim()) bad = 'У комплекта ' + (i + 1) + ' нет названия.';
+      else if (k.ids.some(function (id) { return !id; })) bad = '«' + name + '»: выберите товар в каждой строке или уберите пустую строку.';
+      else if (ids.length < 2) bad = '«' + name + '»: в комплекте должно быть не меньше двух приборов.';
+      else if (ids.some(function (id, n) { return ids.indexOf(id) !== n; })) bad = '«' + name + '»: один и тот же товар выбран дважды.';
+    });
+    if (bad) return toast(bad, true);
+    var c = S.settings();
+    c.kitList = kdraft.map(function (k) { return { title: k.title.trim(), note: k.note.trim(), ids: k.ids.slice(), prices: k.prices.slice() }; });
+    delete c.kits;
+    S.saveSettings(c); kitsLoad(); renderKits(); toast('Комплекты сохранены');
+  });
+  $('#kit-reset').addEventListener('click', function () {
+    confirmBox('Вернуть стандартные комплекты?', 'Ваши изменения в комплектах будут заменены стандартным набором из пяти колонн.', 'Вернуть стандартные', function () {
+      var c = S.settings(); delete c.kitList; delete c.kits; S.saveSettings(c); kitsLoad(); renderKits(); toast('Стандартные комплекты возвращены');
+    });
+  });
+
   /* ---------- Настройки и данные ---------- */
   var sf = $('#set-form');
   function renderSettings() {
@@ -262,25 +370,7 @@
     [1, 2, 3].forEach(function (n) { el['d' + n + 'from'].value = d[n - 1] ? d[n - 1].from : ''; el['d' + n + 'pct'].value = d[n - 1] ? d[n - 1].pct : ''; });
     el.cats.value = (c.cats || []).join('\n');
     el.showCount.checked = !!c.showCount;
-    /* Цены комплектов: поле на каждый прибор, сумма комплекта пересчитывается при вводе */
-    var by = {}; S.products().forEach(function (p) { by[p.id] = p; });
-    $('#s-kits').innerHTML = (c.sets || []).map(function (k, i) {
-      return '<fieldset class="kitset__k"><legend>' + esc(k.title) + '</legend>' + k.ids.map(function (id, n) {
-        var p = by[id], v = (k.prices || [])[n];
-        return '<div class="kitset__r"><label for="k' + i + '-' + n + '">' + esc(p ? p.title : id) + '<small>в каталоге: ' + (p && typeof p.price === 'number' ? S.price(p.price) : 'по запросу') + '</small></label>' +
-          '<input id="k' + i + '-' + n + '" type="number" min="0" step="100" inputmode="numeric" data-kit="' + i + '" data-n="' + n + '" value="' + (typeof v === 'number' ? v : '') + '" aria-label="Цена в комплекте: ' + esc(p ? p.title : id) + '"></div>';
-      }).join('') + '<p class="kitset__sum">Цена комплекта: <b data-ksum="' + i + '"></b></p></fieldset>';
-    }).join('');
-    kitSums();
   }
-  function kitInputs(i) { return Array.prototype.slice.call(sf.querySelectorAll('[data-kit="' + i + '"]')); }
-  function kitSums() {
-    Array.prototype.forEach.call(sf.querySelectorAll('[data-ksum]'), function (b) {
-      var inp = kitInputs(b.getAttribute('data-ksum')), full = inp.every(function (x) { return x.value !== ''; });
-      b.textContent = full ? S.price(inp.reduce(function (a, x) { return a + Math.max(0, Math.round(+x.value) || 0); }, 0)) : 'заполните все цены';
-    });
-  }
-  sf.addEventListener('input', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-kit')) kitSums(); });
   sf.addEventListener('submit', function (e) {
     e.preventDefault();
     var c = S.settings(), el = sf.elements;
@@ -293,12 +383,6 @@
       .filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
     c.cats = el.cats.value.split('\n').map(function (s) { return s.trim(); }).filter(function (s, i, a) { return s && a.indexOf(s) === i; });
     c.whatsapp = el.whatsapp.value.replace(/\D/g, '');
-    /* Цены комплектов сохраняются по названию комплекта; комплект с пустым полем остаётся со стандартными ценами */
-    c.kits = {};
-    (c.sets || []).forEach(function (k, i) {
-      var inp = kitInputs(i);
-      if (inp.length === k.ids.length && inp.every(function (x) { return x.value !== ''; })) c.kits[k.title] = inp.map(function (x) { return Math.max(0, Math.round(+x.value) || 0); });
-    });
     S.saveSettings(c); renderSettings(); toast('Настройки сохранены');
   });
   $('#export').addEventListener('click', function () {
@@ -353,6 +437,6 @@
     confirmBox('Отключить кабинет на этом устройстве?', 'Чтобы снова включить его здесь, понадобятся ссылка доступа и пароль.', 'Отключить кабинет', function () { S.deactivate(); location.href = 'index.html'; });
   });
 
-  function renderAll() { renderProducts(); renderLeads(); renderSettings(); renderAccess(); }
+  function renderAll() { renderProducts(); kitsLoad(); renderKits(); renderLeads(); renderSettings(); renderAccess(); }
   window.addEventListener('storage', function () { if (!app.hidden) { renderProducts(); renderLeads(); } });
 })();

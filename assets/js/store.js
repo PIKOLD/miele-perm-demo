@@ -794,7 +794,14 @@
       out.rev = DEFAULTS.rev;
       /* Комплекты: состав задан в коде, цены владелец меняет в кабинете (хранятся в kits по названию комплекта) */
       out.sets = clone(DEFAULTS.sets);
-      var kp = s.kits && typeof s.kits === 'object' ? s.kits : {};
+      /* Если владелец редактировал комплекты на вкладке «Комплекты», берётся его список целиком (kitList) */
+      if (Array.isArray(s.kitList)) {
+        out.sets = s.kitList.filter(function (k) { return k && Array.isArray(k.ids); }).map(function (k) {
+          return { title: String(k.title || ''), note: String(k.note || ''), ids: k.ids.map(String), prices: k.ids.map(function (id, i) { var v = (k.prices || [])[i]; return typeof v === 'number' && v >= 0 ? v : null; }) };
+        });
+        out.kitList = clone(out.sets);
+      }
+      var kp = !Array.isArray(s.kitList) && s.kits && typeof s.kits === 'object' ? s.kits : {};
       out.sets.forEach(function (k) {
         var own = kp[k.title];
         if (Array.isArray(own) && own.length === k.ids.length && own.every(function (v) { return typeof v === 'number' && v >= 0; })) k.prices = own.slice();

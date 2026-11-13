@@ -92,8 +92,9 @@
     var folders = $('#folders'), tools = $('#cat-tools'), title = $('#cat-title'), back = $('#cat-back');
     var num = function (p) { return typeof p.price === 'number'; };
     var kits = S.kits();
+    var kitGoods = list.filter(function (p) { return (p.also || []).indexOf('Комплекты') >= 0; });   // отдельные товары в папке «Комплекты»
     var NAMES = {}; NAMES[SALE] = 'Акции'; NAMES[SETS] = 'Комплекты';
-    var valid = function (c) { return c === SALE || (c === SETS && kits.length > 0) || cats.indexOf(c) >= 0; };
+    var valid = function (c) { return c === SALE || (c === SETS && kits.length + kitGoods.length > 0) || cats.indexOf(c) >= 0; };
     var fromUrl = function () { var c = new URLSearchParams(location.search).get('cat') || ''; return valid(c) ? c : ''; };
     var cat = fromUrl();
     var SHOW = /выставочн/i;
@@ -103,7 +104,6 @@
       if (c === SALE) return list.filter(function (p) { return S.onSale(p); });
       return list.filter(function (p) { return p.category === c; }).concat(list.filter(function (p) { return p.category !== c && isAlso(p, c); }));
     };
-    var kitGoods = list.filter(function (p) { return isAlso(p, NAMES[SETS]); });   // отдельные товары в папке «Комплекты»
     var SORT = {
       stock: function (a, b) { return S.status(b).level - S.status(a).level || (b.stock || 0) - (a.stock || 0); },
       'price-asc': function (a, b) { return num(a) && num(b) ? a.price - b.price : num(b) - num(a); },
@@ -117,7 +117,7 @@
     /* Порядок папок: акции, разделы, комплекты — сразу после стиральных и сушильных машин */
     function order() {
       var out = cats.slice(), at = Math.max(out.indexOf('Стиральные машины'), out.indexOf('Сушильные машины')) + 1;
-      if (kits.length) out.splice(at, 0, SETS);
+      if (kits.length + kitGoods.length) out.splice(at, 0, SETS);
       return [SALE].concat(out);
     }
     function folder(c) {
@@ -127,7 +127,7 @@
       if (c === SALE) { pic = '<span class="folder__pct" aria-hidden="true">%</span>'; cls = ' folder--sale'; }
       else if (c === SETS) {
         cls = ' folder--duo';
-        pic = kits[0].items.slice(0, 2).map(function (p) { return '<img src="' + esc((p.images || [])[0] || '') + '" alt="">'; }).join('');
+        pic = (kits[0] ? kits[0].items.slice(0, 2) : kitGoods.slice(0, 2)).map(function (p) { return '<img src="' + esc((p.images || [])[0] || '') + '" alt="">'; }).join('');
       } else {
         var src = (cfg.catImages || {})[c] || ((inCat(c)[0] || {}).images || [])[0];
         pic = src ? '<img src="' + esc(src) + '" alt="">' : '<img class="folder__logo" src="assets/img/miele-logo.svg" alt="">';
