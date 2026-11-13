@@ -700,10 +700,58 @@
     ]
   };
 
+  /* Серверный режим. На хостинге страница сначала получает данные скриптом api/state.php (window.MP_STATE):
+     каталог, настройки и заявки читаются оттуда, а изменения из кабинета сразу отправляются на сервер.
+     Без этого скрипта (демо, локальный просмотр) всё хранится в браузере, как раньше. Корзина всегда хранится в браузере. */
+  var SRV = window.MP_STATE && window.MP_STATE.server ? window.MP_STATE : null;
+  var SMAP = {}; SMAP[PKEY] = 'products'; SMAP[SKEY] = 'settings'; SMAP[LKEY] = 'leads'; SMAP['mp.seedrev'] = 'seedrev';
+  function api(act, body, keep) {
+    return fetch('api/act.php?do=' + act, { method: 'POST', credentials: 'same-origin', keepalive: !!keep,
+      headers: { 'Content-Type': 'application/json', 'X-CSRF': (SRV && SRV.csrf) || '' }, body: JSON.stringify(body || {}) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { d.status = r.status; d.ok = r.ok && d.ok !== false; return d; }); });
+  }
+  function saveFail(d) {
+    d = d || {};
+    var msg = d.status === 401 || d.status === 403
+      ? 'Сеанс кабинета закончился. Обновите страницу и войдите снова — последнее изменение не сохранено.'
+      : 'Не удалось сохранить на сервере' + (d.error ? ': ' + d.error : '. Проверьте интернет и повторите.');
+    if (typeof window.MP_onSaveError === 'function') window.MP_onSaveError(msg); else alert(msg);
+  }
+  var dirty = {}, pushT = null;
+  function push() {
+    clearTimeout(pushT);
+    pushT = setTimeout(function () {
+      var body = {}, keys = Object.keys(dirty); if (!keys.length) return;
+      keys.forEach(function (k) { body[k] = SRV[k]; }); dirty = {};
+      api('save', body).then(function (d) { if (!d.ok) saveFail(d); }, function () { saveFail(); });
+    }, 40);
+  }
+  /* Заявки меняются по одной (отметить, удалить), чтобы не затереть заявку, пришедшую в эту минуту */
+  function writeLeads(list) {
+    if (!SRV.admin) return false;
+    var old = SRV.leads || [], byNew = {}, byOld = {}, check = function (d) { if (!d.ok) saveFail(d); };
+    list.forEach(function (l) { byNew[l.id] = l; }); old.forEach(function (l) { byOld[l.id] = l; });
+    if (list.some(function (l) { return !byOld[l.id]; })) api('leads_set', { leads: list }).then(check, saveFail);
+    else old.forEach(function (l) {
+      var n = byNew[l.id];
+      if (!n) api('lead_delete', { id: l.id }).then(check, saveFail);
+      else if (!!n.done !== !!l.done) api('lead_update', { id: l.id, done: !!n.done }).then(check, saveFail);
+    });
+    SRV.leads = clone(list);
+    return true;
+  }
   function read(key, fallback) {
+    if (SRV && SMAP[key]) { var sv = SRV[SMAP[key]]; return sv === null || sv === undefined ? fallback : clone(sv); }
     try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
   }
   function write(key, value) {
+    if (SRV && SMAP[key]) {
+      var name = SMAP[key];
+      if (name === 'leads') return writeLeads(value);
+      SRV[name] = clone(value);
+      if (SRV.admin) { dirty[name] = 1; push(); }   // у посетителя изменения остаются только в памяти страницы
+      return true;
+    }
     try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
   }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -760,6 +808,8 @@
   }
 
   var Store = {
+    server: !!SRV,   // true — данные на сервере хостинга, false — демо в браузере
+    lastError: '',
     /* Разделы, переименованные 11.11: у сохранённых товаров старое название заменяется на новое */
     products: function () {
       var RENAMED = { 'Аксессуары и бытовая химия': 'Аксессуары', 'Варочные панели': 'Варочные поверхности' };
@@ -822,16 +872,25 @@
         return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ('0' + b.toString(16)).slice(-2); }).join('') === ACCESS;
       });
     },
-    unlocked: function () { try { return localStorage.getItem(UNKEY) === '1'; } catch (e) { return false; } },
-    unlock: function () { try { localStorage.setItem(UNKEY, '1'); } catch (e) {} },
+    unlocked: function () { if (SRV) return !!SRV.admin; try { return localStorage.getItem(UNKEY) === '1'; } catch (e) { return false; } },
+    unlock: function () { if (SRV) return; try { localStorage.setItem(UNKEY, '1'); } catch (e) {} },
     isOwner: function () { return Store.check(Store.key()).then(function (ok) { return ok && Store.unlocked(); }); },
-    checkPass: function (pw) { var p = read(PASSKEY, null) || PASS; return pbkdf(pw, p.salt).then(function (h) { return h === p.hash; }); },
+    /* На сервере пароль проверяет сервер (вместе с ключом из ссылки) и открывает сеанс кабинета */
+    checkPass: function (pw) {
+      if (SRV) return api('login', { key: Store.key(), password: pw }).then(function (d) { Store.lastError = d.ok ? '' : (d.error || 'Нет связи с сервером'); return d.ok; }, function () { Store.lastError = 'Нет связи с сервером'; return false; });
+      var p = read(PASSKEY, null) || PASS; return pbkdf(pw, p.salt).then(function (h) { return h === p.hash; }); },
     setPass: function (pw) {
+      if (SRV) return api('passwd', { password: pw }).then(function (d) { Store.lastError = d.ok ? '' : (d.error || 'Нет связи с сервером'); return d.ok; }, function () { Store.lastError = 'Нет связи с сервером'; return false; });
       var salt = toHex(crypto.getRandomValues(new Uint8Array(16)).buffer);
       return pbkdf(pw, salt).then(function (h) { return write(PASSKEY, { salt: salt, hash: h }); });
     },
     activate: function (key) { return Store.check(key).then(function (ok) { if (ok) { try { localStorage.setItem(KKEY, key); } catch (e) {} } return ok; }); },
-    deactivate: function () { try { localStorage.removeItem(KKEY); localStorage.removeItem(UNKEY); } catch (e) {} },
+    deactivate: function () { if (SRV) api('logout', {}, true); try { localStorage.removeItem(KKEY); localStorage.removeItem(UNKEY); } catch (e) {} },
+    /* Фото товара: на сервере файл загружается в папку uploads, в демо остаётся внутри записи товара */
+    upload: function (dataUrl) {
+      if (!SRV) return Promise.resolve(dataUrl);
+      return api('upload', { data: dataUrl }).then(function (d) { if (d.ok && d.url) return d.url; throw new Error(d.error || 'Не удалось загрузить фото'); });
+    },
     /* Разделы каталога: список из настроек + разделы, которые есть у товаров, но не внесены в список */
     cats: function () {
       var out = (Store.settings().cats || []).slice();
@@ -892,7 +951,9 @@
       var total = pct ? Math.floor((sum - sum * pct / 100) / 100) * 100 : sum, discount = sum - total;
       return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: total, next: next, tiers: tiers };
     },
+    /* Заявка посетителя. На сервере возвращает обещание: true — принята, false — не отправилась */
     addLead: function (lead) {
+      if (SRV) return api('lead', lead).then(function (d) { Store.lastError = d.ok ? '' : (d.error || ''); return d.ok; }, function () { Store.lastError = ''; return false; });
       var l = Store.leads();
       lead.id = 'l' + Date.now().toString(36);
       lead.ts = new Date().toISOString();
@@ -900,7 +961,7 @@
       l.unshift(lead);
       return Store.saveLeads(l);
     },
-    reset: function () { [PKEY, SKEY, LKEY].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} }); },
+    reset: function () { if (SRV) return; [PKEY, SKEY, LKEY].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} }); },
     exportAll: function () { return { products: Store.products(), settings: Store.settings(), leads: Store.leads(), exported: new Date().toISOString() }; },
 
     /* Система остатков: количество в штуках + два порога на каждый товар.

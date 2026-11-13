@@ -14,3 +14,11 @@ RedirectMatch 404 ^/data(/|$)
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
 </IfModule>
+
+# Служебный файл серверной части напрямую не открывается
+RedirectMatch 404 ^/api/lib\.php$
+
+# Политика безопасности содержимого: скрипты, стили, шрифты и картинки — только со своего сайта
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+</IfModule>

@@ -21,13 +21,17 @@
     var btn = $('button', gate); btn.disabled = true;
     S.checkPass($('#pw').value).then(function (ok) {
       btn.disabled = false; $('#pw-wrap').classList.toggle('bad', !ok);
+      var em = $('#pw-wrap .errm'); if (em) { if (!em.dataset.t) em.dataset.t = em.textContent; em.textContent = !ok && S.lastError ? S.lastError : em.dataset.t; }
       if (!ok) return $('#pw').focus();
-      $('#pw').value = ''; S.unlock(); show(true);
+      $('#pw').value = '';
+      if (S.server) return location.reload();
+      S.unlock(); show(true);
     });
   });
   $('#pw').addEventListener('input', function () { $('#pw-wrap').classList.remove('bad'); });
 
   /* ---------- Общие ---------- */
+  window.MP_onSaveError = function (msg) { toast(msg, true); };
   var toastT;
   function toast(msg, err) {
     var t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (err ? ' err' : '');
@@ -197,7 +201,8 @@
         cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
         var ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0, cv.width, cv.height);
         var data = cv.toDataURL('image/webp', .82); if (data.indexOf('data:image/webp') !== 0) data = cv.toDataURL('image/jpeg', .85);
-        pics.push(data); drawPics(); URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
+        S.upload(data).then(function (src) { pics.push(src); drawPics(); }, function (er) { toast('Фото «' + file.name + '» не загрузилось: ' + (er && er.message || 'ошибка'), true); });
       };
       img.onerror = function () { toast('Файл «' + file.name + '» не похож на изображение', true); URL.revokeObjectURL(url); };
       img.src = url;
@@ -431,12 +436,17 @@
     e.preventDefault();
     var pw = $('#n-pw').value; $('#w-npw').classList.toggle('bad', pw.length < 8);
     if (pw.length < 8) return $('#n-pw').focus();
-    S.setPass(pw).then(function () { $('#n-pw').value = ''; toast('Пароль изменён. Передайте новый пароль тем, у кого есть ссылка'); });
+    S.setPass(pw).then(function (ok) {
+      if (ok === false) return toast('Пароль не изменён: ' + (S.lastError || 'ошибка'), true);
+      $('#n-pw').value = ''; toast('Пароль изменён. Передайте новый пароль тем, у кого есть ссылка');
+    });
   });
   $('#a-off').addEventListener('click', function () {
     confirmBox('Отключить кабинет на этом устройстве?', 'Чтобы снова включить его здесь, понадобятся ссылка доступа и пароль.', 'Отключить кабинет', function () { S.deactivate(); location.href = 'index.html'; });
   });
 
+  /* На сервере сброса демо нет: данные настоящие */
+  if (S.server) { var rb = $('#reset'); if (rb) { rb.parentNode.hidden = true; if (rb.parentNode.previousElementSibling) rb.parentNode.previousElementSibling.hidden = true; } }
   function renderAll() { renderProducts(); kitsLoad(); renderKits(); renderLeads(); renderSettings(); renderAccess(); }
   window.addEventListener('storage', function () { if (!app.hidden) { renderProducts(); renderLeads(); } });
 })();

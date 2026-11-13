@@ -230,11 +230,12 @@
         '<div class="fld"><label for="f-name">Имя</label><input id="f-name" name="name" autocomplete="given-name" required><p class="err" id="e-name">Напишите, как к вам обращаться</p></div>' +
         '<div class="fld"><label for="f-phone">Телефон</label><input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 900 000-00-00" required><p class="err" id="e-phone">Проверьте номер: нужно не меньше 10 цифр</p></div>' +
         '<div class="fld"><label for="f-msg">Комментарий <span style="color:var(--muted);font-weight:400">— необязательно</span></label><textarea id="f-msg" name="comment" rows="3"></textarea></div>' +
+        '<input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
         '<label class="agree"><input type="checkbox" name="agree" required><span>Я даю <a href="consent.html" target="_blank">согласие на обработку персональных данных</a> и ознакомлен(а) с <a href="privacy.html" target="_blank">политикой обработки персональных данных</a></span></label>' +
         '<button class="btn btn--m" type="submit">Отправить заявку</button>' +
         '<p class="form__note">Перезвоним в рабочее время: ' + esc(cfg.hours) + '.</p>' +
       '</form>';
-    var form = $('form', box), name = form.elements.name, phone = form.elements.phone, agree = form.elements.agree;
+    var form = $('form', box), name = form.elements.name, phone = form.elements.phone, agree = form.elements.agree, shown = Date.now();
     var okName = function () { return name.value.trim().length >= 2; };
     var okPhone = function () { return phone.value.replace(/\D/g, '').length >= 10; };
     function mark(input, ok, errId) {
@@ -255,9 +256,20 @@
       if (!a) return name.focus();
       if (!b) return phone.focus();
       if (!agree.checked) return agree.focus();
-      S.addLead({ name: name.value.trim(), phone: phone.value.trim(), comment: form.elements.comment.value.trim(), productId: product ? product.id : '', product: product ? product.title : '', order: order ? order() : '' });
-      box.innerHTML = '<div class="done" role="status" tabindex="-1"><h3>Заявка принята</h3><p>Спасибо, ' + esc(name.value.trim()) + '. Перезвоним в рабочее время: ' + esc(cfg.hours) + '.</p>' + '</div>';
-      $('.done', box).focus();
+      var btn = $('button[type=submit]', form), who = name.value.trim(), note = $('.form__err', form);
+      if (btn.disabled) return;
+      btn.disabled = true; if (note) note.remove();
+      /* В демо заявка сохраняется сразу; на сервере ждём ответа и показываем ошибку, если отправка не удалась */
+      Promise.resolve(S.addLead({ name: who, phone: phone.value.trim(), comment: form.elements.comment.value.trim(), productId: product ? product.id : '', product: product ? product.title : '', order: order ? order() : '',
+        agree: true, hp: form.elements.website.value, ms: Date.now() - shown })).then(function (ok) {
+        if (ok === false) {
+          btn.disabled = false;
+          btn.insertAdjacentHTML('beforebegin', '<p class="form__err" role="alert">' + esc(S.lastError || 'Заявка не отправилась. Проверьте интернет и попробуйте ещё раз') + '. Или позвоните: ' + esc(cfg.phone) + '.</p>');
+          return;
+        }
+        box.innerHTML = '<div class="done" role="status" tabindex="-1"><h3>Заявка принята</h3><p>Спасибо, ' + esc(who) + '. Перезвоним в рабочее время: ' + esc(cfg.hours) + '.</p>' + '</div>';
+        $('.done', box).focus();
+      });
     });
   }
 
