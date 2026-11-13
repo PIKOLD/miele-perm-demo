@@ -62,7 +62,7 @@
           '<li><a href="' + wa() + '" target="_blank" rel="noopener">WhatsApp</a></li>' + (tg ? '<li><a href="' + esc(tg) + '" target="_blank" rel="noopener">Telegram</a></li>' : '') +
           '<li>' + esc(cfg.address) + '</li><li>' + esc(cfg.hours) + '</li></ul></div>' +
       '</div><div class="ftr__legal">' +
-        '<p>© ' + new Date().getFullYear() + ' Шоурум Miele, Пермь. Реквизиты продавца (наименование, ИНН, ОГРН) указываются здесь перед запуском сайта.</p>' +
+        '<p>© ' + new Date().getFullYear() + ' Шоурум Miele, Пермь. ООО «ВАТЕКС», ИНН 5906178610, ОГРН 1235900021279.</p>' +
         '<p>Информация на сайте носит справочный характер и не является публичной офертой (ст. 437 ГК РФ). Наличие, цены и характеристики уточняйте у консультантов шоурума. Miele — зарегистрированный товарный знак Miele &amp; Cie. KG.</p>' +
       '</div></div></footer>' +
       '<div class="ck" role="region" aria-label="Уведомление о cookie"><p>Сайт использует только технические файлы cookie и локальное хранилище — они нужны для его работы. <a href="privacy.html#cookies">Подробнее</a></p><button type="button">Понятно</button></div>';
