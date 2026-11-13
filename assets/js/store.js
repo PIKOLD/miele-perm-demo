@@ -788,6 +788,9 @@
   var IMG5 = ['wea125', 'wwb360', 'wwg880', 'wwi860', 'tea525', 'twc640', 'twh780', 'twl780'];
   /* версия 6: у TQ 1000 убрано фото в интерьере; KM 6540 FR убрана из каталога по просьбе владельца */
   var IMG6 = ['tq1000'], GONE = { km6540: 6 };
+  /* 13.11: у мелких товаров (химия, аксессуары, сувениры) обрезаны белые поля вокруг фото. Адрес стандартного фото получает отметку версии,
+     чтобы телефоны не показывали старую копию из памяти; фото, загруженные владельцем, не трогаются. */
+  var IMGV = {}; 'apron autocleaner bagtu bottle boxes ceran cloth cofftabs cups descaler desccart desctabs dgclean dishclean downcare dp1 dp14 floorclean fragrance ggrpk grater hxfsf hxfsf2 hxhc hxroll impra intense kidapron kmpd2800 kmts5704 milk mug outdoor ovenclean ovenset powerdisk rinse salt sfaa30 sfaa50 sfha30 sfha50 sneakerbag sneakertabs steelcare t1filter tabs tdc trk655 ucfb ultracolor ultradark ultrasoft ultrawhite up1 up1a up2 woolcare wtv501'.split(' ').forEach(function (id) { IMGV[id] = 2; });
   /* товар: [версия, прежняя цена, новая цена] — цена меняется, только если её не правили */
   var PRICE_FIX = { wwg880: [2, null, 220000], twh780: [2, null, 220000], h2861: [2, 205000, 185000], wtv502: [3, null, 14900] };
   function mergeSeed(saved, from) {
@@ -817,6 +820,7 @@
       if (saved && from < SEEDREV) { saved = mergeSeed(saved, from); write(PKEY, saved); write(RKEY, SEEDREV); }
       return (saved || clone(SEED)).map(function (p) {
         if (RENAMED[p.category]) p.category = RENAMED[p.category];
+        if (IMGV[p.id]) p.images = (p.images || []).map(function (u) { u = String(u); return u.indexOf(IMG + p.id + '-') === 0 && u.indexOf('?') < 0 ? u + '?' + IMGV[p.id] : u; });
         /* У товаров, сохранённых до появления галочки «Есть в шоуруме», она ставится по остатку */
         if (typeof p.showroom !== 'boolean') p.showroom = (parseInt(p.stock, 10) || 0) > 0;
         if (p.features) p.features = p.features.map(function (f) { return f in FEAT_FIX ? FEAT_FIX[f] : f; }).filter(Boolean);
