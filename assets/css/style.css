@@ -444,7 +444,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   .folder__name { padding: 12px 12px 0; font-size: 15px; }
   .folder__n { padding: 2px 12px 0; }
   .folder { padding-bottom: 14px; }
-  .grid--kits { grid-template-columns: 1fr; }
+  .grid--kits { grid-template-columns: minmax(0, 1fr); }
   .kit__list li { flex-direction: column; gap: 0; }
   .salon__btns { grid-template-columns: 1fr 1fr; }
 }
@@ -464,3 +464,14 @@ button, input, textarea, select { font: inherit; color: inherit; }
 /* Поле-ловушка для роботов: человеку не видно */
 .hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .form__err { color: var(--red); font-size: 14px; margin: 0 0 12px; }
+
+/* Печать предложения с iPhone и iPad. Там браузер сам ставит поля листа и свою строку внизу, а размеры в пунктах
+   рисует на треть крупнее, чем на компьютере, — поэтому предложение уменьшаем и убираем собственные поля. */
+@media print {
+  @supports (-webkit-touch-callout: none) {
+    .offer { zoom: .75; padding: 5mm 6mm 0; }
+    .offer__page, .offer__page > tbody, .offer__page > tbody > tr, .offer__page > tbody > tr > td { display: block; }
+    .offer__page > thead, .offer__page > tfoot { display: none; }
+    .offer table.offer__sum { break-inside: avoid; }
+  }
+}

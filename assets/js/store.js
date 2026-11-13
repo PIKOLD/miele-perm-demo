@@ -8,7 +8,7 @@
   /* Хеш ключа доступа к кабинету (SHA-256). Сам ключ есть только в ссылке, которую передают владельцу. */
   var ACCESS = '6b8e63984b5bcaf4b482b44258e408e772e1350aecc44cf39d8b94197ea740f7';
   /* Пароль кабинета: в коде только хеш PBKDF2. Сменённый пароль хранится так же, хешем. */
-  var PASSKEY = 'mp.pass', UNKEY = 'mp.unlocked';
+  var PASSKEY = 'mp.pass', UNKEY = 'mp.unlocked', memKey = '';
   var PASS = { salt: '45f74115bb01e4ad5a013987a7cb45c7', hash: 'f8ab82c841877c0b0621d7ba81d27f48238980b46147ba46d841ad0236cf6a73' };
   function toHex(buf) { return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); }
   function fromHex(str) { var a = new Uint8Array(str.length / 2); for (var i = 0; i < a.length; i++) a[i] = parseInt(str.substr(i * 2, 2), 16); return a; }
@@ -865,7 +865,7 @@
     saveSettings: function (s) { return write(SKEY, s); },
     leads: function () { return read(LKEY, []); },
     saveLeads: function (l) { return write(LKEY, l); },
-    key: function () { try { return localStorage.getItem(KKEY) || ''; } catch (e) { return ''; } },
+    key: function () { try { return localStorage.getItem(KKEY) || memKey; } catch (e) { return memKey; } },
     check: function (key) {
       if (!key || !window.crypto || !crypto.subtle) return Promise.resolve(false);
       return crypto.subtle.digest('SHA-256', new TextEncoder().encode(key)).then(function (buf) {
@@ -884,7 +884,7 @@
       var salt = toHex(crypto.getRandomValues(new Uint8Array(16)).buffer);
       return pbkdf(pw, salt).then(function (h) { return write(PASSKEY, { salt: salt, hash: h }); });
     },
-    activate: function (key) { return Store.check(key).then(function (ok) { if (ok) { try { localStorage.setItem(KKEY, key); } catch (e) {} } return ok; }); },
+    activate: function (key) { return Store.check(key).then(function (ok) { if (ok) { memKey = key; try { localStorage.setItem(KKEY, key); } catch (e) {} } return ok; }); },
     deactivate: function () { if (SRV) api('logout', {}, true); try { localStorage.removeItem(KKEY); localStorage.removeItem(UNKEY); } catch (e) {} },
     /* Фото товара: на сервере файл загружается в папку uploads, в демо остаётся внутри записи товара */
     upload: function (dataUrl) {

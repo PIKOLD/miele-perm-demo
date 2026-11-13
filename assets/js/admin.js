@@ -11,7 +11,10 @@
     if (ok) { renderAll(); openTab(location.hash === '#leads' ? 'leads' : 'products'); }
   }
   var link = location.hash.match(/^#k=([A-Za-z0-9_-]{20,})$/);
-  (link ? S.activate(link[1]) : S.check(S.key())).then(function (ok) {
+  /* Личная ссылка открыта по http: проверка ключа и вход работают только по https — открываем её же по https */
+  if (link && location.protocol === 'http:' && !(window.crypto && crypto.subtle)) return location.replace('https://' + location.host + location.pathname + location.hash);
+  /* На сервере открытого сеанса кабинета достаточно: он создаётся только после входа по ключу и паролю */
+  (link ? S.activate(link[1]) : S.server && S.unlocked() ? Promise.resolve(true) : S.check(S.key())).then(function (ok) {
     if (link) history.replaceState(null, '', location.pathname);
     if (ok && !S.unlocked()) { gate.hidden = false; document.title = 'Кабинет шоурума — Miele Пермь'; return $('#pw').focus(); }
     show(ok);
