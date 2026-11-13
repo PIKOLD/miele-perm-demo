@@ -10,12 +10,18 @@
     document.title = ok ? 'Кабинет шоурума — Miele Пермь' : 'Страница не найдена';
     if (ok) { renderAll(); openTab(location.hash === '#leads' ? 'leads' : 'products'); }
   }
-  var link = location.hash.match(/^#k=([A-Za-z0-9_-]{20,})$/);
+  var hash0 = location.hash, link = hash0.match(/^#k=([A-Za-z0-9_-]{20,})$/);
+  /* Причина отказа — в журнал сервера (без самого ключа): длина хвоста адреса, есть ли в нём ключ, подошёл ли формат, работает ли шифрование, сохранён ли ключ на устройстве */
+  function why() { try { new Image().src = 'assets/img/miele-logo.svg?kab=' + [hash0.length, /^#k=/.test(hash0) ? 1 : 0, link ? 1 : 0, window.crypto && crypto.subtle ? 1 : 0, S.key() ? 1 : 0, location.protocol === 'https:' ? 1 : 0].join('-'); } catch (e) {} }
+  /* Ссылку с ключом вставили в уже открытую вкладку с этой страницей: браузер меняет только хвост адреса и страницу не перезагружает — перезагружаем сами */
+  window.addEventListener('hashchange', function () { if (app.hidden && /^#k=[A-Za-z0-9_-]{20,}$/.test(location.hash)) location.reload(); });
   /* Личная ссылка открыта по http: проверка ключа и вход работают только по https — открываем её же по https */
   if (link && location.protocol === 'http:' && !(window.crypto && crypto.subtle)) return location.replace('https://' + location.host + location.pathname + location.hash);
   /* На сервере открытого сеанса кабинета достаточно: он создаётся только после входа по ключу и паролю */
   (link ? S.activate(link[1]) : S.server && S.unlocked() ? Promise.resolve(true) : S.check(S.key())).then(function (ok) {
-    if (link) history.replaceState(null, '', location.pathname);
+    /* Верный ключ остаётся в адресной строке: тогда адрес, скопированный из браузера, тоже открывает кабинет на другом устройстве */
+    if (link && !ok) history.replaceState(null, '', location.pathname);
+    if (!ok) why();
     if (ok && !S.unlocked()) { gate.hidden = false; document.title = 'Кабинет шоурума — Miele Пермь'; return $('#pw').focus(); }
     show(ok);
   });
@@ -422,7 +428,7 @@
   });
 
   /* ---------- Вкладка «Доступ» ---------- */
-  function renderAccess() { $('#a-link').value = location.origin + location.pathname + '#k=' + S.key(); }
+  function renderAccess() { $('#a-link').value = S.key() ? location.origin + location.pathname + '#k=' + S.key() : 'Откройте кабинет по личной ссылке — она появится здесь'; }
   $('#a-copy').addEventListener('click', function () {
     var inp = $('#a-link'); inp.focus(); inp.select();
     var done = function () { toast('Ссылка скопирована'); };
