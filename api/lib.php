@@ -168,3 +168,24 @@ function mp_str($v, int $max): string {
     $s = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', $s) ?? '';
     return mb_substr($s, 0, $max);
 }
+
+/* Состав заказа из корзины (для таблицы в кабинете): принимаются только известные поля, строки обрезаются, числа приводятся к целым */
+function mp_cart($v): ?array {
+    if (!is_array($v) || !is_array($v['items'] ?? null)) return null;
+    $int = function ($x): ?int { return is_numeric($x) ? max(0, min(2000000000, (int)$x)) : null; };
+    $items = [];
+    foreach (array_slice($v['items'], 0, 100) as $it) {
+        if (!is_array($it)) continue;
+        $img = mp_str($it['img'] ?? '', 300);
+        if (!preg_match('#^(assets|uploads)/[A-Za-z0-9_./-]+(\?[0-9]+)?$#', $img) || strpos($img, '..') !== false) $img = '';
+        $items[] = ['id' => mp_str($it['id'] ?? '', 80), 'title' => mp_str($it['title'] ?? '', 300), 'sub' => mp_str($it['sub'] ?? '', 300), 'img' => $img,
+            'qty' => max(1, min(99, (int)($it['qty'] ?? 1))), 'price' => $int($it['price'] ?? null), 'old' => $int($it['old'] ?? null), 'sum' => $int($it['sum'] ?? null)];
+    }
+    if (!$items) return null;
+    $kits = [];
+    foreach (array_slice(is_array($v['kits'] ?? null) ? $v['kits'] : [], 0, 20) as $k) {
+        if (is_array($k)) $kits[] = ['title' => mp_str($k['title'] ?? '', 200), 'n' => max(1, min(99, (int)($k['n'] ?? 1))), 'off' => (int)$int($k['off'] ?? 0)];
+    }
+    return ['items' => $items, 'kits' => $kits, 'goods' => (int)$int($v['goods'] ?? 0), 'pct' => max(0, min(100, (int)($v['pct'] ?? 0))),
+        'discount' => (int)$int($v['discount'] ?? 0), 'total' => (int)$int($v['total'] ?? 0), 'ask' => max(0, min(9999, (int)($v['ask'] ?? 0)))];
+}

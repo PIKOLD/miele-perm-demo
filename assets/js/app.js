@@ -222,7 +222,7 @@
   }
 
   /* ---------- Заявка ---------- */
-  function leadForm(box, product, order) {
+  function leadForm(box, product, order, cart) {
     if (!box) return;
     box.innerHTML =
       '<form class="form" novalidate>' +
@@ -260,7 +260,7 @@
       if (btn.disabled) return;
       btn.disabled = true; if (note) note.remove();
       /* В демо заявка сохраняется сразу; на сервере ждём ответа и показываем ошибку, если отправка не удалась */
-      Promise.resolve(S.addLead({ name: who, phone: phone.value.trim(), comment: form.elements.comment.value.trim(), productId: product ? product.id : '', product: product ? product.title : '', order: order ? order() : '',
+      Promise.resolve(S.addLead({ name: who, phone: phone.value.trim(), comment: form.elements.comment.value.trim(), productId: product ? product.id : '', product: product ? product.title : '', order: order ? order() : '', cart: cart ? cart() : null,
         agree: true, hp: form.elements.website.value, ms: Date.now() - shown })).then(function (ok) {
         if (ok === false) {
           btn.disabled = false;
@@ -340,6 +340,15 @@
       return c.rows.map(function (r) { return r.p.title + ' × ' + r.qty + (r.sum === null ? ' (цена по запросу)' : ' — ' + money(r.sum)); }).join('; ') +
         '. Итого: ' + money(c.total) + (c.setOff ? ' (цена комплекта: −' + money(c.setOff) + ')' : '') + (c.pct ? ' (скидка за объём ' + c.pct + '%)' : '');
     }
+    /* Состав заказа для кабинета: строки с фото, ценой и суммой и итоги — как в печатном предложении, на момент отправки заявки */
+    function orderData() {
+      var c = S.cartCalc();
+      return { items: c.rows.map(function (r) {
+        var p = r.p;
+        return { id: p.id, title: p.title, sub: [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku].filter(Boolean).join(', '), img: (p.images || [])[0] || '', qty: r.qty,
+          price: typeof p.price === 'number' ? p.price : null, old: S.onSale(p) ? p.oldPrice : null, sum: r.sum };
+      }), kits: c.kits.map(function (k) { return { title: k.title, n: k.n, off: k.off }; }), goods: c.goods, pct: c.pct, discount: c.discount, total: c.total, ask: c.ask };
+    }
     function draw() {
       var c = S.cartCalc();
       cartCount();
@@ -405,7 +414,7 @@
     });
     window.addEventListener('storage', draw);
     draw();
-    leadForm($('#lead'), null, orderText);
+    leadForm($('#lead'), null, orderText, orderData);
   }
 
   /* ---------- Контакты шоурума на главной ---------- */

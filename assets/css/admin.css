@@ -71,7 +71,7 @@ body.adm { background: var(--soft); font-size: 15px; }
 .ld__who a { color: var(--red); text-decoration: none; margin-left: 10px; font-variant-numeric: tabular-nums; }
 .ld__meta { font-size: 13px; color: var(--muted); }
 .ld__txt { grid-column: 1; }
-.ld__acts { grid-row: 1 / span 3; grid-column: 2; display: flex; gap: 8px; align-items: flex-start; }
+.ld__acts { grid-row: 1 / span 2; grid-column: 2; display: flex; gap: 8px; align-items: flex-start; }
 
 /* Настройки */
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
@@ -224,4 +224,35 @@ dialog::backdrop { background: rgba(0, 0, 0, .45); }
   .kited__head { display: none; }
   .kited__r { grid-template-columns: minmax(0, 1fr) 44px; }
   .kited__r > div { grid-column: 1 / -1; }
+}
+
+/* Заказ из корзины в заявке — таблицей, как в печатном предложении */
+.lo { grid-column: 1 / -1; margin-top: 8px; border-top: 1px solid var(--ink); }
+.lo__head, .lo__row { display: grid; grid-template-columns: 22px 56px minmax(0, 1fr) 64px 130px 120px; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.lo__head { padding: 8px 0; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lo__head span:nth-child(n+4), .lo__qty, .lo__price, .lo__sum { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lo__n { color: var(--muted); font-size: 13px; }
+.lo__pic { width: 56px; height: 56px; background: #F6F4F2; }
+.lo__pic img { display: block; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.lo__name { font-weight: 500; line-height: 1.3; }
+.lo__name small { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; color: var(--muted); }
+.lo__price s { color: var(--muted); font-size: 12px; }
+.lo__each { display: none; }
+.lo__sum { font-weight: 600; }
+.lo__tot { display: grid; gap: 6px; width: min(100%, 400px); margin: 12px 0 0 auto; font-variant-numeric: tabular-nums; }
+.lo__tot div { display: flex; justify-content: space-between; gap: 16px; }
+.lo__tot dt { color: var(--muted); }
+.lo__tot dd { margin: 0; white-space: nowrap; }
+.lo__tot .lo__total { margin-top: 2px; padding-top: 8px; border-top: 1px solid var(--ink); font-size: 17px; font-weight: 700; }
+.lo__tot .lo__total dt { color: inherit; }
+.lo__note { margin: 8px 0 0; font-size: 13px; color: var(--muted); text-align: right; }
+.ld.done .lo__pic img { opacity: .6; }
+@media (max-width: 760px) {
+  .lo__head, .lo__n, .lo__qty, .lo__price { display: none; }
+  .lo__row { grid-template-columns: 52px minmax(0, 1fr) auto; gap: 4px 12px; align-items: start; }
+  .lo__pic { width: 52px; height: 52px; grid-row: 1 / span 2; }
+  .lo__name { grid-column: 2 / 4; }
+  .lo__each { display: block; grid-column: 2; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .lo__each s { font-size: 12px; }
+  .lo__sum { grid-column: 3; align-self: end; }
 }

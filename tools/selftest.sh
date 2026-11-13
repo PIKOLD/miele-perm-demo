@@ -58,10 +58,10 @@ has "товар без номера отклонён" "$(post save '{"products":
 SID=""
 has "заявка без согласия отклонена" "$(post lead '{"name":"Иван","phone":"+79001112233","ms":5000}')" 'согласие'
 has "заявка с коротким телефоном отклонена" "$(post lead '{"name":"Иван","phone":"123","agree":true,"ms":5000}')" 'Проверьте'
-has "заявка принята" "$(post lead '{"name":"Иван Тестов","phone":"+79001112233","comment":"<script>x</script>","agree":true,"ms":5000,"hp":""}')" '"ok":true'
+has "заявка принята" "$(post lead '{"name":"Иван Тестов","phone":"+79001112233","comment":"<script>x</script>","agree":true,"ms":5000,"hp":"","cart":{"items":[{"id":"a","title":"Позиция заказа","img":"assets/img/products/a-1.webp?2","qty":2,"price":100,"sum":200},{"id":"b","title":"Чужая картинка","img":"https://evil.example/x.png","qty":1,"price":null,"sum":null}],"total":200,"goods":200}}')" '"ok":true'
 post lead '{"name":"Робот","phone":"+79001112233","agree":true,"ms":5000,"hp":"spam"}' > /dev/null
 SID="$SIDA"
-ST=$(state); has "владелец видит заявку" "$ST" 'Иван Тестов'; hasnt "заявка робота не сохранена" "$ST" 'Робот'
+ST=$(state); has "владелец видит заявку" "$ST" 'Иван Тестов'; has "состав заказа сохранён" "$ST" 'Позиция заказа'; has "фото позиции сохранено" "$ST" 'a-1.webp?2'; hasnt "чужая картинка в заказе отброшена" "$ST" 'evil.example'; hasnt "заявка робота не сохранена" "$ST" 'Робот'
 LID=$(printf '%s' "$ST" | sed 's/.*"leads":\[{"id":"\([^"]*\)".*/\1/')
 has "заявка отмечена обработанной" "$(post lead_update "{\"id\":\"$LID\",\"done\":true}")" '"ok":true'
 has "отметка сохранилась" "$(state)" '"done":true'

@@ -247,6 +247,41 @@
   });
 
   /* ---------- Заявки ---------- */
+  /* Старые заявки хранят заказ одной строкой текста — разбираем её на позиции, фото берём из каталога по названию */
+  function parseOrder(t) {
+    var m = /^(.*)\. Итого: ([^₽]+)₽(.*)$/.exec(t || ''); if (!m) return null;
+    var by = {}; S.products().forEach(function (p) { by[p.title] = p; });
+    var num = function (s) { return +String(s).replace(/\D/g, ''); }, bad = false;
+    var items = m[1].split('; ').map(function (s) {
+      var r = /^(.*) × (\d+)(?: — ([^₽]+)₽| \(цена по запросу\))$/.exec(s); if (!r) { bad = true; return null; }
+      var p = by[r[1]], qty = +r[2] || 1, sum = r[3] ? num(r[3]) : null;
+      return { title: r[1], sub: p ? [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku].filter(Boolean).join(', ') : '', img: p ? (p.images || [])[0] || '' : '', qty: qty, price: sum === null ? null : Math.round(sum / qty), sum: sum };
+    });
+    if (bad) return null;
+    var total = num(m[2]), goods = 0, ask = 0; items.forEach(function (it) { if (it.sum === null) ask += it.qty; else goods += it.sum; });
+    var kit = /цена комплекта: −([^₽]+)₽/.exec(m[3]), pct = /скидка за объём (\d+)%/.exec(m[3]), off = kit ? num(kit[1]) : 0;
+    return { items: items, kits: off ? [{ title: '', n: 1, off: off }] : [], goods: goods, pct: pct ? +pct[1] : 0, discount: Math.max(0, goods - off - total), total: total, ask: ask };
+  }
+  /* Заказ из корзины — таблицей, как в печатном предложении: фото, название, количество, цена, сумма и итоги */
+  function leadOrder(x) {
+    var c = x.cart && x.cart.items && x.cart.items.length ? x.cart : parseOrder(x.order), money = S.price;
+    if (!c) return x.order ? '<div class="ld__txt">' + esc(x.order) + '</div>' : '';
+    var cut = (c.kits && c.kits.length) || c.pct, line = function (t, v, cls) { return '<div' + (cls ? ' class="' + cls + '"' : '') + '><dt>' + t + '</dt><dd>' + v + '</dd></div>'; };
+    return '<div class="lo"><div class="lo__head"><span>№</span><span></span><span>Наименование</span><span>Кол-во</span><span>Цена</span><span>Сумма</span></div>' +
+      c.items.map(function (it, i) {
+        var known = typeof it.price === 'number', price = known ? (it.old ? '<s>' + money(it.old) + '</s> ' : '') + money(it.price) : 'по запросу';
+        return '<div class="lo__row"><span class="lo__n">' + (i + 1) + '</span><span class="lo__pic">' + (it.img ? '<img src="' + esc(it.img) + '" alt="" loading="lazy">' : '') + '</span>' +
+          '<span class="lo__name">' + esc(it.title) + (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span>' +
+          '<span class="lo__qty">' + (+it.qty || 1) + '</span><span class="lo__price">' + price + '</span>' +
+          '<span class="lo__each">' + (+it.qty || 1) + ' шт.' + (known ? ' × ' + price : '') + '</span>' +
+          '<span class="lo__sum">' + (typeof it.sum === 'number' ? money(it.sum) : 'по запросу') + '</span></div>';
+      }).join('') +
+      '<dl class="lo__tot">' + (cut ? line('Итого', money(c.goods)) : '') +
+        (c.kits || []).map(function (k) { return line('Цена комплекта' + (k.title ? ': ' + esc(k.title) : '') + (k.n > 1 ? ' × ' + (+k.n) : ''), '−' + money(k.off)); }).join('') +
+        (c.pct ? line('Скидка за объём заказа ' + (+c.pct) + '%', '−' + money(c.discount)) : '') +
+        line(cut ? 'Итого со скидкой' : 'Итого', money(c.total), 'lo__total') + '</dl>' +
+      (c.ask ? '<p class="lo__note">Позиции с ценой по запросу в сумму не входят.</p>' : '') + '</div>';
+  }
   function renderLeads() {
     var l = S.leads(), fresh = l.filter(function (x) { return !x.done; }).length, badge = $('#lead-badge');
     badge.hidden = !fresh; badge.textContent = fresh;
@@ -254,7 +289,7 @@
       var d = new Date(x.ts), when = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) + ', ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
       return '<div class="ld' + (x.done ? ' done' : '') + '" data-id="' + esc(x.id) + '"><div class="ld__who">' + esc(x.name) + '<a href="tel:+' + esc(x.phone.replace(/\D/g, '')) + '">' + esc(x.phone) + '</a></div>' +
         '<div class="ld__meta">' + esc(when) + (x.product ? ' · ' + esc(x.product) : x.order ? ' · заказ из корзины' : ' · общий вопрос') + (x.done ? ' · обработана' : '') + '</div>' +
-        (x.order ? '<div class="ld__txt">' + esc(x.order) + '</div>' : '') +
+        leadOrder(x) +
         (x.comment ? '<div class="ld__txt">' + esc(x.comment) + '</div>' : '') +
         '<div class="ld__acts"><button class="abtn" type="button" data-done>' + (x.done ? 'Вернуть в работу' : 'Отметить обработанной') + '</button><button class="abtn abtn--ghost" type="button" data-rm>Удалить</button></div></div>';
     }).join('') + '</div>' : '<div class="none"><p>Заявок пока нет. Отправьте пробную с сайта — она появится здесь.</p><a class="abtn" href="index.html#ask" target="_blank">Открыть форму на сайте</a></div>';

@@ -88,6 +88,7 @@ switch ($do) {
             'productId' => mp_str($in['productId'] ?? '', 80),
             'product' => mp_str($in['product'] ?? '', 300),
             'order' => mp_str($in['order'] ?? '', 6000),
+            'cart' => mp_cart($in['cart'] ?? null),
             'agree' => gmdate('Y-m-d\TH:i:s\Z'),      // когда дано согласие на обработку данных
         ];
         $h = mp_lock();
