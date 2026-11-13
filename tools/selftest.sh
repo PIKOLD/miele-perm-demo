@@ -18,6 +18,7 @@ sed -i "s/^const MP_ACCESS = '[0-9a-f]*'/const MP_ACCESS = '$KH'/" "$T/a/site/ap
 php -r '$s=bin2hex(random_bytes(16)); echo json_encode(["salt"=>$s,"hash"=>hash_pbkdf2("sha256",$argv[1],hex2bin($s),150000,64)]);' "$PW" > "$T/mp-data/auth.json"
 php -S 127.0.0.1:$PORT -t "$T/a/site" > "$T/server.log" 2>&1 &
 PID=$!
+trap 'kill "$PID" 2>/dev/null; rm -rf "${T:?}"' EXIT
 sleep 1
 
 PASS=0; FAIL=0
@@ -31,6 +32,7 @@ state() { curl -s -m 30 -H 'X-Forwarded-Proto: https' -H "Cookie: mpsid=$SID" "$
 login() {
   R=$(curl -si -m 30 -H 'X-Forwarded-Proto: https' -H 'Content-Type: application/json' -X POST -d "{\"key\":\"$1\",\"password\":\"$2\"}" "$U/act.php?do=login")
   S=$(printf '%s' "$R" | grep -i '^set-cookie: mpsid=' | tail -1 | sed 's/.*mpsid=\([^;]*\).*/\1/' | tr -d '\r')
+  printf '%s' "$S" > "$T/sid"
   printf '%s' "$R" | tail -1
 }
 
@@ -39,7 +41,7 @@ has "вход с неверным паролем отклонён" "$(login "$KE
 has "вход с неверным ключом отклонён" "$(login wrongkey "$PW")" 'Неверный пароль'
 has "вход по http запрещён" "$(curl -s -m 30 -H 'Content-Type: application/json' -X POST -d '{}' "$U/act.php?do=login")" 'https'
 has "вход с верными ключом и паролем" "$(login "$KEY" "$PW")" '"ok":true'
-SID="$S"
+SID=$(cat "$T/sid")
 ST=$(state); has "после входа: режим владельца" "$ST" '"admin":true'
 TOKEN=$(printf '%s' "$ST" | sed 's/.*"csrf":"\([^"]*\)".*/\1/')
 has "сохранение без защитного кода отклонено" "$(post save '{"settings":{"phone":"1"}}')" 'Сеанс устарел'
@@ -86,6 +88,4 @@ has "после 8 неверных попыток вход блокируетс�
 has "запрос с чужого сайта отклонён" "$(curl -s -m 30 -H 'Origin: https://evil.example' -H 'Content-Type: application/json' -X POST -d '{}' "$U/act.php?do=lead")" 'другого сайта'
 has "служебные данные не лежат в папке сайта" "$(ls "$T/a/site")" 'api'; hasnt "в папке сайта нет файлов данных" "$(ls -R "$T/a/site")" 'state.json'
 
-kill "$PID" 2>/dev/null
-rm -rf "${T:?}"
 echo "ИТОГО: пройдено $PASS, ошибок $FAIL"
