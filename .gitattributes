@@ -1,0 +1,3 @@
+tools/*.sh text eol=lf
+api/*.php text eol=lf
+.htaccess text eol=lf
