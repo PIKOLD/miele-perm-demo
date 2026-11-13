@@ -23,3 +23,10 @@ RedirectMatch 404 ^/api/lib\.php$
 <IfModule mod_headers.c>
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 </IfModule>
+
+# Страницы сайта браузер каждый раз сверяет с сервером — тогда обновления сразу доходят до телефонов
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header always set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
