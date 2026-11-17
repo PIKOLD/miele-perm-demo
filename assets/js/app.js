@@ -441,15 +441,17 @@
   function showroomGallery() {
     var openers = document.querySelectorAll('[data-sr]'); if (!openers.length) return;
     /* Только самые удачные кадры (просьба владельца 17.11) */
-    var pics = ['s06', 's01', 's09', 's11', 's07', 's04', 's12', 's03'].map(function (f) { return 'assets/img/showroom/' + f; }), N = pics.length, cur = 0, x0 = null;
+    var tiles = Array.prototype.slice.call(document.querySelectorAll('.shw__t'));
+    var pics = ['s01', 's09', 's11', 's04', 's07'].map(function (f) { return 'assets/img/showroom/' + f; }), N = pics.length, cur = 0, x0 = null;
+    var caps = pics.map(function (p, i) { var b = tiles[i] && tiles[i].querySelector('b'); return b ? b.textContent : ''; });
     var lb = document.createElement('dialog'); lb.className = 'lb'; lb.setAttribute('aria-label', 'Фото шоурума');
-    lb.innerHTML = '<div class="lb__top"><span class="lb__n"></span><button type="button" class="lb__x" aria-label="Закрыть">×</button></div>' +
+    lb.innerHTML = '<div class="lb__top"><span><span class="lb__n"></span><span class="lb__cap"></span></span><button type="button" class="lb__x" aria-label="Закрыть">×</button></div>' +
       '<div class="lb__stage"><img alt="Шоурум Miele в Перми"><button type="button" class="lb__btn lb__prev" aria-label="Предыдущее фото">←</button><button type="button" class="lb__btn lb__next" aria-label="Следующее фото">→</button></div>' +
       '<div class="lb__strip">' + pics.map(function (p, i) { return '<button type="button" data-k="' + i + '" aria-label="Фото ' + (i + 1) + '"><img src="' + p + '-t.webp?v=2" alt="" loading="lazy"></button>'; }).join('') + '</div>';
     document.body.appendChild(lb);
-    var img = $('.lb__stage img', lb), n = $('.lb__n', lb);
+    var img = $('.lb__stage img', lb), n = $('.lb__n', lb), cap = $('.lb__cap', lb);
     function show(i) {
-      cur = (i + N) % N; img.src = pics[cur] + '.webp?v=2'; n.textContent = (cur + 1) + ' / ' + N;
+      cur = (i + N) % N; img.src = pics[cur] + '.webp?v=2'; n.textContent = ('0' + (cur + 1)).slice(-2) + ' / ' + ('0' + N).slice(-2); cap.textContent = caps[cur];
       lb.querySelectorAll('.lb__strip button').forEach(function (b, k) { b.setAttribute('aria-current', k === cur ? 'true' : 'false'); if (k === cur) b.scrollIntoView({ block: 'nearest', inline: 'center' }); });
       var nx = new Image(); nx.src = pics[(cur + 1) % N] + '.webp';
     }
