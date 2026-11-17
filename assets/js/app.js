@@ -102,10 +102,11 @@
     /* Товар показывается в своём разделе и в дополнительных (also); в дополнительных он идёт после «своих» товаров */
     var isAlso = function (p, c) { return (p.also || []).indexOf(c) >= 0; };
     var inCat = function (c) {
-      /* В «Акциях» стирально-сушильные машины (товар отмечен ещё и в разделе стиральных или сушильных) идут после пар «стиральная + сушильная» */
+      /* В «Акциях» сначала стиральные, затем сушильные, сразу за ними стирально-сушильные (товар отмечен ещё и в разделе стиральных или сушильных), потом всё остальное (правка 17.11) */
       if (c === SALE) {
-        var sale = list.filter(function (p) { return S.onSale(p); }), dual = function (p) { return isAlso(p, 'Стиральные машины') || isAlso(p, 'Сушильные машины'); };
-        return sale.filter(function (p) { return !dual(p); }).concat(sale.filter(dual));
+        var dual = function (p) { return isAlso(p, 'Стиральные машины') || isAlso(p, 'Сушильные машины'); };
+        var rank = function (p) { return dual(p) ? 2 : p.category === 'Стиральные машины' ? 0 : p.category === 'Сушильные машины' ? 1 : 3; };
+        return [0, 1, 2, 3].reduce(function (out, r) { return out.concat(list.filter(function (p) { return S.onSale(p) && rank(p) === r; })); }, []);
       }
       return list.filter(function (p) { return p.category === c; }).concat(list.filter(function (p) { return p.category !== c && isAlso(p, c); }));
     };
@@ -444,11 +445,11 @@
     var lb = document.createElement('dialog'); lb.className = 'lb'; lb.setAttribute('aria-label', 'Фото шоурума');
     lb.innerHTML = '<div class="lb__top"><span class="lb__n"></span><button type="button" class="lb__x" aria-label="Закрыть">×</button></div>' +
       '<div class="lb__stage"><img alt="Шоурум Miele в Перми"><button type="button" class="lb__btn lb__prev" aria-label="Предыдущее фото">←</button><button type="button" class="lb__btn lb__next" aria-label="Следующее фото">→</button></div>' +
-      '<div class="lb__strip">' + pics.map(function (p, i) { return '<button type="button" data-k="' + i + '" aria-label="Фото ' + (i + 1) + '"><img src="' + p + '-t.webp" alt="" loading="lazy"></button>'; }).join('') + '</div>';
+      '<div class="lb__strip">' + pics.map(function (p, i) { return '<button type="button" data-k="' + i + '" aria-label="Фото ' + (i + 1) + '"><img src="' + p + '-t.webp?v=2" alt="" loading="lazy"></button>'; }).join('') + '</div>';
     document.body.appendChild(lb);
     var img = $('.lb__stage img', lb), n = $('.lb__n', lb);
     function show(i) {
-      cur = (i + N) % N; img.src = pics[cur] + '.webp'; n.textContent = (cur + 1) + ' / ' + N;
+      cur = (i + N) % N; img.src = pics[cur] + '.webp?v=2'; n.textContent = (cur + 1) + ' / ' + N;
       lb.querySelectorAll('.lb__strip button').forEach(function (b, k) { b.setAttribute('aria-current', k === cur ? 'true' : 'false'); if (k === cur) b.scrollIntoView({ block: 'nearest', inline: 'center' }); });
       var nx = new Image(); nx.src = pics[(cur + 1) % N] + '.webp';
     }

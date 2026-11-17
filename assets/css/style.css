@@ -542,3 +542,21 @@ button.salon__pic:hover img { transform: scale(1.03); }
 .lb__strip button[aria-current="true"] { border-color: #fff; opacity: 1; }
 .lb__strip img { width: 100%; height: 100%; object-fit: cover; }
 @media (max-width: 640px) { .lb__btn { width: 42px; height: 42px; font-size: 20px; } .lb__strip button { width: 60px; height: 44px; } .lb__stage { padding: 0 4px; } }
+
+/* 17.11: предложение ещё компактнее — 8 позиций с итогами на одном листе, сноска про оферту в две строки */
+@media print {
+  .offer { padding: 0 15mm; }
+  .offer__page > thead > tr > td, .offer__page > tfoot > tr > td { height: 9mm; }
+  .offer__top { padding-bottom: 6pt; }
+  .offer__top img { height: 28pt; }
+  .offer h1 { font-size: 15pt; margin: 8pt 0 5pt; }
+  .offer__tbl th, .offer__tbl td { padding: 2.5pt 5pt; }
+  .offer__tbl small { font-size: 8pt; margin-top: 1pt; line-height: 1.25; }
+  .offer__pic img { width: 32pt; height: 32pt; }
+  .offer__pic { width: 38pt; }
+  .offer table.offer__sum { margin-top: 6pt; }
+  .offer__sum th, .offer__sum td { padding: 2pt 6pt; }
+  .offer__total th, .offer__total td { font-size: 12pt; padding-top: 4pt; }
+  .offer__p { margin-top: 6pt; font-size: 9pt; }
+  .offer__legal { margin-top: 8pt; font-size: 7.5pt; line-height: 1.35; }
+}
