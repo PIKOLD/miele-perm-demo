@@ -907,6 +907,8 @@
       Store.products().forEach(function (p) { if (p.category && out.indexOf(p.category) < 0) out.push(p.category); });
       return out;
     },
+    /* Срок под заказ: у товара может быть свой («от 5 дней» / «от 30 дней», галочки в кабинете, 17.11), иначе общий из настроек */
+    leadOf: function (p) { return (p && p.lead) || Store.settings().leadTime || ''; },
     /* «Акция до 30 ноября» — если у акционного товара задана дата окончания */
     saleUntilText: function (p) {
       if (!Store.onSale(p) || !/^\d{4}-\d\d-\d\d$/.test(p.saleUntil || '')) return '';

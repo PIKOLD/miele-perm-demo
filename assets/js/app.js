@@ -16,7 +16,7 @@
   function stockHtml(p) {
     var st = S.status(p), text = st.label;
     if (st.key === 'low' && cfg.showCount) text += ' · ' + p.stock + ' шт.';
-    if (st.key === 'order' && cfg.leadTime) text += ' · ' + cfg.leadTime;
+    if (st.key === 'order' && S.leadOf(p)) text += ' · ' + S.leadOf(p);
     return '<span class="stock stock--' + st.key + '"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>' + esc(text) + '</span>';
   }
   /* Цена. Если задана старая цена — она зачёркнута, новая выделена */
@@ -304,7 +304,7 @@
           '<p class="pd__go"' + (S.cart()[p.id] ? '' : ' hidden') + '><a href="cart.html">Перейти в корзину</a></p>' +
           '<p class="pd__msg">Написать: <a target="_blank" rel="noopener" href="' + wa(ask) + '">WhatsApp</a>' + (tg ? '<a target="_blank" rel="noopener" href="' + esc(tg) + '">Telegram</a>' : '') + '</p>' +
           '<p class="pd__hint">' + [p.showroom ? 'Товар можно посмотреть в шоуруме: ' + esc(cfg.address) + '.' : st.level > 0 ? 'Товар в наличии. Адрес шоурума: ' + esc(cfg.address) + '.' : '',
-            st.level > 0 ? '' : 'Привезём под заказ' + esc(lead) + '. Точный срок назовёт консультант.'].filter(Boolean).join(' ') + '</p></div>' +
+            st.level > 0 ? '' : 'Привезём под заказ' + esc(S.leadOf(p) ? ' ' + S.leadOf(p) : '') + '. Точный срок назовёт консультант.'].filter(Boolean).join(' ') + '</p></div>' +
         (p.features && p.features.length ? '<ul class="feat">' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>' : '') +
       '</div></div></div>' +
       '<section class="sec sec--soft"><div class="wrap pd__more"><div><h2>Описание</h2><p>' + esc(p.description) + '</p></div>' +

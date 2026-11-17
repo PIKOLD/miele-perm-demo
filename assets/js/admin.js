@@ -184,6 +184,7 @@
     el.price.value = typeof p.price === 'number' ? p.price : ''; el.oldPrice.value = typeof p.oldPrice === 'number' ? p.oldPrice : ''; el.saleUntil.value = p.saleUntil || '';
     el.stock.value = parseInt(p.stock, 10) || 0; el.low.value = p.low || cfg.lowDefault; el.high.value = p.high || cfg.highDefault;
     el.orderable.checked = p.orderable !== false; el.visible.checked = p.visible !== false; el.showroom.checked = !!p.showroom;
+    el.lead5.checked = p.lead === 'от 5 дней'; el.lead30.checked = p.lead === 'от 30 дней';
     el.description.value = p.description || '';
     el.features.value = (p.features || []).join('\n');
     el.specs.value = (p.specs || []).map(function (s) { return s[0] + ': ' + s[1]; }).join('\n');
@@ -199,6 +200,8 @@
   }
   ['stock', 'low', 'high'].forEach(function (n) { ef.elements[n].addEventListener('input', drawNow); });
   ef.elements.orderable.addEventListener('change', drawNow);
+  /* Срок под заказ: две галочки, отмечена может быть только одна */
+  ['lead5', 'lead30'].forEach(function (n, i, all) { ef.elements[n].addEventListener('change', function () { if (this.checked) ef.elements[all[1 - i]].checked = false; }); });
   ef.elements.title.addEventListener('input', function () { if (this.value.trim()) $('#w-title').classList.remove('bad'); });
   ef.elements.category.addEventListener('input', function () { if (this.value.trim()) $('#w-cat').classList.remove('bad'); });
   ef.elements.oldPrice.addEventListener('input', function () { $('#w-old').classList.remove('bad'); });
@@ -238,6 +241,7 @@
       price: price, oldPrice: old, saleUntil: old !== null ? el.saleUntil.value : '',
       stock: Math.max(0, parseInt(el.stock.value, 10) || 0), low: low, high: Math.max(low + 1, parseInt(el.high.value, 10) || low + 1),
       orderable: el.orderable.checked, visible: el.visible.checked, showroom: el.showroom.checked, images: pics.slice(),
+      lead: el.lead5.checked ? 'от 5 дней' : el.lead30.checked ? 'от 30 дней' : '',
       description: el.description.value.trim(),
       features: el.features.value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
       specs: el.specs.value.split('\n').map(function (s) { var i = s.indexOf(':'); return i > 0 ? [s.slice(0, i).trim(), s.slice(i + 1).trim()] : null; }).filter(function (s) { return s && s[0] && s[1]; })

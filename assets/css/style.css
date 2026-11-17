@@ -560,3 +560,14 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .offer__p { margin-top: 6pt; font-size: 9pt; }
   .offer__legal { margin-top: 8pt; font-size: 7.5pt; line-height: 1.35; }
 }
+
+/* 17.11, вечер: шапка предложения ближе к верху листа, фото товаров крупнее, итоги и сноска плотнее */
+@media print {
+  .offer__page > thead > tr > td { height: 5mm; }
+  .offer__pic { width: 46pt; }
+  .offer__pic img { width: 40pt; height: 40pt; }
+  .offer__sum { line-height: 1.2; }
+  .offer__sum th, .offer__sum td { padding: 1.5pt 6pt; }
+  .offer__total th, .offer__total td { padding-top: 3pt; }
+  .offer__legal { line-height: 1.2; margin-top: 6pt; }
+}
