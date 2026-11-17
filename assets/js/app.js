@@ -440,8 +440,8 @@
   /* ---------- Галерея шоурума: мозаика на главной и просмотр во весь экран ---------- */
   function showroomGallery() {
     var openers = document.querySelectorAll('[data-sr]'); if (!openers.length) return;
-    var N = 16, cur = 0, x0 = null, pics = [];
-    for (var i = 1; i <= N; i++) pics.push('assets/img/showroom/s' + (i < 10 ? '0' : '') + i);
+    /* Только самые удачные кадры (просьба владельца 17.11) */
+    var pics = ['s06', 's01', 's09', 's11', 's07', 's04', 's12', 's03'].map(function (f) { return 'assets/img/showroom/' + f; }), N = pics.length, cur = 0, x0 = null;
     var lb = document.createElement('dialog'); lb.className = 'lb'; lb.setAttribute('aria-label', 'Фото шоурума');
     lb.innerHTML = '<div class="lb__top"><span class="lb__n"></span><button type="button" class="lb__x" aria-label="Закрыть">×</button></div>' +
       '<div class="lb__stage"><img alt="Шоурум Miele в Перми"><button type="button" class="lb__btn lb__prev" aria-label="Предыдущее фото">←</button><button type="button" class="lb__btn lb__next" aria-label="Следующее фото">→</button></div>' +

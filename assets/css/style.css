@@ -571,3 +571,9 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .offer__total th, .offer__total td { padding-top: 3pt; }
   .offer__legal { line-height: 1.2; margin-top: 6pt; }
 }
+
+/* 17.11, вечер: фото шоурума крупнее */
+@media (min-width: 1021px) {
+  .salon { grid-template-columns: 4fr 7fr; }
+  .salon__pic { aspect-ratio: 4 / 3; }
+}
