@@ -634,3 +634,9 @@ button.salon__pic:hover img { transform: scale(1.03); }
 .shw__t--d img { --z: 1.3; --o: 40% 78%; }                /* встраиваемая техника: без кондиционера, таблички и коробки внизу */
 .shw__t--e img { --z: 1.35; --o: 50% 55%; }                /* ресепшн: без плаката слева и стеллажа с химией справа */
 @media (max-width: 640px) { .shw__t--d, .shw__t--e { grid-row: span 2; } }
+
+/* 17.11, поздно: фото товаров в предложении на 25% крупнее (просьба владельца) */
+@media print {
+  .offer__pic { width: 56pt; }
+  .offer__pic img { width: 50pt; height: 50pt; }
+}
