@@ -671,11 +671,11 @@
   SEED.forEach(function (p) { p.visible = true; p.orderable = true; p.showroom = p.stock > 0; });
 
   var DEFAULTS = {
-    rev: 3,                   // версия настроек (2 — «Гладильные системы» перед «Пылесосами», 3 — скидка 7% от 1 300 000 ₽)
+    rev: 4,                   // версия настроек (2 — «Гладильные системы» перед «Пылесосами», 3 — скидка 7% от 1 300 000 ₽, 4 — срок под заказ от 30 дней)
     showCount: true,         // показывать покупателям «2 шт.», когда осталось мало
     lowDefault: 2,            // порог «мало» для новых товаров
     highDefault: 5,           // порог «много» для новых товаров
-    leadTime: 'от 5 дней',    // срок для товаров «под заказ»
+    leadTime: 'от 30 дней',   // срок для товаров «под заказ» (просьба владельца 16.11)
     phone: '+7(342)2-411-494',
     phone2: '+7(951)936-94-78',
     whatsapp: '79519369478',
@@ -755,6 +755,8 @@
     try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
   }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  /* Сегодняшняя дата по часам посетителя в виде 2026-11-30 */
+  function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 
   /* Формулировки особенностей из источника, переписанные понятнее: прежняя строка -> новая (пустая — строка убирается) */
   var FEAT_FIX = {
@@ -790,7 +792,7 @@
   var IMG6 = ['tq1000'], GONE = { km6540: 6 };
   /* 13.11: у мелких товаров (химия, аксессуары, сувениры) обрезаны белые поля вокруг фото. Адрес стандартного фото получает отметку версии,
      чтобы телефоны не показывали старую копию из памяти; фото, загруженные владельцем, не трогаются. */
-  var IMGV = {}; 'apron autocleaner bagtu bottle boxes ceran cloth cofftabs cups descaler desccart desctabs dgclean dishclean downcare dp1 dp14 floorclean fragrance ggrpk grater hxfsf hxfsf2 hxhc hxroll impra intense kidapron kmpd2800 kmts5704 milk mug outdoor ovenclean ovenset powerdisk rinse salt sfaa30 sfaa50 sfha30 sfha50 sneakerbag sneakertabs steelcare t1filter tabs tdc trk655 ucfb ultracolor ultradark ultrasoft ultrawhite up1 up1a up2 woolcare wtv501'.split(' ').forEach(function (id) { IMGV[id] = 2; });
+  var IMGV = {}; 'apron autocleaner bagtu bottle boxes ceran cloth cofftabs cups descaler desccart desctabs dgclean dishclean downcare dp1 dp14 floorclean fragrance ggrpk grater hxfsf hxfsf2 hxhc hxroll impra intense kidapron kmpd2800 kmts5704 milk mug outdoor ovenclean ovenset powerdisk rinse salt sfaa30 sfaa50 sfha30 sfha50 sneakerbag sneakertabs steelcare t1filter tabs tdc trk655 ucfb ultracolor ultradark ultrasoft ultrawhite up1 up1a up2 woolcare wtv501 g5050'.split(' ').forEach(function (id) { IMGV[id] = 2; });
   /* товар: [версия, прежняя цена, новая цена] — цена меняется, только если её не правили */
   var PRICE_FIX = { wwg880: [2, null, 220000], twh780: [2, null, 220000], h2861: [2, 205000, 185000], wtv502: [3, null, 14900] };
   function mergeSeed(saved, from) {
@@ -823,6 +825,8 @@
         if (IMGV[p.id]) p.images = (p.images || []).map(function (u) { u = String(u); return u.indexOf(IMG + p.id + '-') === 0 && u.indexOf('?') < 0 ? u + '?' + IMGV[p.id] : u; });
         /* У товаров, сохранённых до появления галочки «Есть в шоуруме», она ставится по остатку */
         if (typeof p.showroom !== 'boolean') p.showroom = (parseInt(p.stock, 10) || 0) > 0;
+        /* Акция с датой окончания: после этой даты старая цена снова становится ценой товара */
+        if (p.saleUntil && typeof p.oldPrice === 'number' && today() > p.saleUntil) { p.price = p.oldPrice; p.oldPrice = null; p.saleUntil = ''; }
         if (p.features) p.features = p.features.map(function (f) { return f in FEAT_FIX ? FEAT_FIX[f] : f; }).filter(Boolean);
         return p;
       });
@@ -844,6 +848,8 @@
       if (!(s.rev >= 3) && Array.isArray(s.discounts) && !s.discounts.some(function (t) { return +t.from >= 1300000 || +t.pct >= 7; })) {
         s.discounts = s.discounts.concat([{ from: 1300000, pct: 7 }]);
       }
+      /* 16.11: срок под заказ — от 30 дней (если владелец не менял прежний «от 5 дней» на свой) */
+      if (!(s.rev >= 4) && s.leadTime === 'от 5 дней') delete s.leadTime;
       Object.keys(s).forEach(function (k) { out[k] = s[k]; });
       out.rev = DEFAULTS.rev;
       /* Комплекты: состав задан в коде, цены владелец меняет в кабинете (хранятся в kits по названию комплекта) */
@@ -900,6 +906,12 @@
       var out = (Store.settings().cats || []).slice();
       Store.products().forEach(function (p) { if (p.category && out.indexOf(p.category) < 0) out.push(p.category); });
       return out;
+    },
+    /* «Акция до 30 ноября» — если у акционного товара задана дата окончания */
+    saleUntilText: function (p) {
+      if (!Store.onSale(p) || !/^\d{4}-\d\d-\d\d$/.test(p.saleUntil || '')) return '';
+      var d = p.saleUntil.split('-'), M = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+      return 'Акция до ' + (+d[2]) + ' ' + M[+d[1] - 1] + (+d[0] !== new Date().getFullYear() ? ' ' + d[0] : '');
     },
     onSale: function (p) { return typeof p.price === 'number' && typeof p.oldPrice === 'number' && p.oldPrice > p.price; },
     tgLink: function () { var t = String(Store.settings().telegram || '').replace(/^@|\s/g, ''); return t ? 'https://t.me/' + (/^\d+$/.test(t) ? '+' : '') + t : ''; },

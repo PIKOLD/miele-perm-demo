@@ -181,15 +181,18 @@
     $('#ed-title').textContent = id ? 'Изменить товар' : 'Новый товар';
     var el = ef.elements;
     el.title.value = p.title; el.model.value = p.model || ''; el.sku.value = p.sku || ''; el.category.value = p.category || ''; el.country.value = p.country || '';
-    el.price.value = typeof p.price === 'number' ? p.price : ''; el.oldPrice.value = typeof p.oldPrice === 'number' ? p.oldPrice : '';
+    el.price.value = typeof p.price === 'number' ? p.price : ''; el.oldPrice.value = typeof p.oldPrice === 'number' ? p.oldPrice : ''; el.saleUntil.value = p.saleUntil || '';
     el.stock.value = parseInt(p.stock, 10) || 0; el.low.value = p.low || cfg.lowDefault; el.high.value = p.high || cfg.highDefault;
     el.orderable.checked = p.orderable !== false; el.visible.checked = p.visible !== false; el.showroom.checked = !!p.showroom;
     el.description.value = p.description || '';
     el.features.value = (p.features || []).join('\n');
     el.specs.value = (p.specs || []).map(function (s) { return s[0] + ': ' + s[1]; }).join('\n');
     $('#cats').innerHTML = S.cats().map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
-    /* Дополнительные разделы товара: все разделы каталога и папка «Комплекты» */
-    var also = p.also || [], sec = S.cats(); if (sec.indexOf(KITS) < 0) sec.push(KITS);
+    /* Дополнительные разделы товара (по просьбе владельца 15.11): стиральные и сушильные машины, «Комплекты» и распродажа образцов.
+       Раздел, в котором товар уже отмечен, тоже показывается, чтобы отметка не пропала при сохранении */
+    var also = p.also || [], cats = S.cats();
+    var sec = ['Стиральные машины', 'Сушильные машины', KITS, 'Распродажа выставочных образцов'].filter(function (c) { return c === KITS || cats.indexOf(c) >= 0; });
+    also.forEach(function (c) { if (sec.indexOf(c) < 0) sec.push(c); });
     $('#e-also').innerHTML = sec.map(function (c) { return '<label class="chk"><input type="checkbox" value="' + esc(c) + '"' + (also.indexOf(c) >= 0 ? ' checked' : '') + '><span>' + esc(c) + '</span></label>'; }).join('');
     $$('.bad', ef).forEach(function (n) { n.classList.remove('bad'); });
     drawPics(); drawNow(); ed.showModal(); $('.editor__b', ed).scrollTop = 0; el.title.focus();
@@ -232,7 +235,7 @@
     var data = {
       title: title, model: el.model.value.trim(), sku: el.sku.value.trim(), category: cat, country: el.country.value.trim(),
       also: Array.prototype.map.call(document.querySelectorAll('#e-also input:checked'), function (i) { return i.value; }).filter(function (c) { return c !== cat; }),
-      price: price, oldPrice: old,
+      price: price, oldPrice: old, saleUntil: old !== null ? el.saleUntil.value : '',
       stock: Math.max(0, parseInt(el.stock.value, 10) || 0), low: low, high: Math.max(low + 1, parseInt(el.high.value, 10) || low + 1),
       orderable: el.orderable.checked, visible: el.visible.checked, showroom: el.showroom.checked, images: pics.slice(),
       description: el.description.value.trim(),
@@ -288,7 +291,7 @@
     $('#leads').innerHTML = l.length ? '<div class="leads">' + l.map(function (x) {
       var d = new Date(x.ts), when = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) + ', ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
       return '<div class="ld' + (x.done ? ' done' : '') + '" data-id="' + esc(x.id) + '"><div class="ld__who">' + esc(x.name) + '<a href="tel:+' + esc(x.phone.replace(/\D/g, '')) + '">' + esc(x.phone) + '</a></div>' +
-        '<div class="ld__meta">' + esc(when) + (x.product ? ' · ' + esc(x.product) : x.order ? ' · заказ из корзины' : ' · общий вопрос') + (x.done ? ' · обработана' : '') + '</div>' +
+        '<div class="ld__meta">' + esc(when) + (x.product ? ' · ' + esc(x.product) : x.order ? (/^Заявка со страницы/.test(x.order) ? ' · ' + esc(x.order.replace(/^Заявка со страницы /, 'страница ')) : ' · заказ из корзины') : ' · общий вопрос') + (x.done ? ' · обработана' : '') + '</div>' +
         leadOrder(x) +
         (x.comment ? '<div class="ld__txt">' + esc(x.comment) + '</div>' : '') +
         '<div class="ld__acts"><button class="abtn" type="button" data-done>' + (x.done ? 'Вернуть в работу' : 'Отметить обработанной') + '</button><button class="abtn abtn--ghost" type="button" data-rm>Удалить</button></div></div>';

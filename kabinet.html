@@ -6,8 +6,8 @@
 <title>Кабинет шоурума — Miele Пермь</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css?v=22">
-<link rel="stylesheet" href="assets/css/admin.css?v=22">
+<link rel="stylesheet" href="assets/css/style.css?v=24">
+<link rel="stylesheet" href="assets/css/admin.css?v=24">
 </head>
 <body class="adm">
 
@@ -84,7 +84,7 @@
             <div><label for="s-high">Порог «много» для новых товаров, шт.</label><input id="s-high" name="highDefault" type="number" min="2" step="1"></div>
           </div>
           <label class="chk"><input type="checkbox" name="showCount"><span>Показывать покупателям точное количество, когда осталось мало («Осталось мало · 2 шт.»)</span></label>
-          <div><label for="s-lead">Срок поставки под заказ</label><input id="s-lead" name="leadTime" type="text"><p class="hint">Показывается у товаров с остатком 0. Например: от 5 дней.</p></div>
+          <div><label for="s-lead">Срок поставки под заказ</label><input id="s-lead" name="leadTime" type="text"><p class="hint">Показывается у товаров с остатком 0. Например: от 30 дней.</p></div>
           <div><h2 style="margin-top:8px">Скидка за объём заказа в корзине</h2><p>Если сумма корзины не меньше порога, покупатель видит скидку. Оставьте поля пустыми, чтобы отключить ступень.</p></div>
           <div class="row">
             <div><label for="s-d1f">Первая ступень: от суммы, ₽</label><input id="s-d1f" name="d1from" type="number" min="0" step="1000" inputmode="numeric"></div>
@@ -164,6 +164,9 @@
         <div><label for="e-price">Цена, ₽</label><input id="e-price" name="price" type="number" min="0" step="100" inputmode="numeric"><p class="hint">Оставьте пустым — на сайте будет «Цена по запросу».</p></div>
         <div id="w-old"><label for="e-old">Старая цена, ₽ — для акции</label><input id="e-old" name="oldPrice" type="number" min="0" step="100" inputmode="numeric"><p class="hint">Если заполнить, старая цена на сайте будет зачёркнута, а товар попадёт во вкладку «Акции».</p><p class="errm">Старая цена должна быть больше текущей</p></div>
       </div>
+      <div class="row" style="margin-top:16px">
+        <div><label for="e-until">Акция действует до</label><input id="e-until" name="saleUntil" type="date"><p class="hint">Последний день акции включительно. На сайте будет «Акция до …», а на следующий день товар сам вернётся к старой цене. Пусто — акция без срока.</p></div>
+      </div>
 
       <fieldset class="fs"><legend>Наличие</legend>
         <div class="row3">
@@ -200,7 +203,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="api/state.php"></script>
-<script src="assets/js/store.js?v=22"></script>
-<script src="assets/js/admin.js?v=22"></script>
+<script src="assets/js/store.js?v=24"></script>
+<script src="assets/js/admin.js?v=24"></script>
 </body>
 </html>

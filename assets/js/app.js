@@ -25,6 +25,7 @@
     var ask = p.price === null || p.price === undefined || p.price === '';
     return '<span class="price' + (ask ? ' price--ask' : '') + '">' + S.price(p.price) + '</span>';
   }
+  function untilHtml(p) { var t = S.saleUntilText(p); return t ? '<span class="until">' + esc(t) + '</span>' : ''; }
   function saleBadge(p) { return S.onSale(p) ? '<span class="sale">−' + Math.max(1, Math.round((1 - p.price / p.oldPrice) * 100)) + '%</span>' : ''; }
   /* Метка «Есть в шоуруме»: образец выставлен в зале (галочка в кабинете) */
   function showTag(p) { return p.showroom ? '<span class="inshow">Есть в шоуруме</span>' : ''; }
@@ -37,7 +38,7 @@
   /* ---------- Шапка, подвал, cookie ---------- */
   function layout() {
     var home = $('body').dataset.page === 'home' ? '' : 'index.html';
-    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], [home + '#showroom', 'Шоурум', null], [home + '#service', 'Сервис', null]];
+    var links = [[home + '#catalog', 'Каталог', ''], ['index.html?cat=' + SALE + '#catalog', 'Акции', SALE], [home + '#showroom', 'Шоурум', null], [home + '#service', 'Сервис', null], ['designers.html', 'Дизайнерам', null]];
     var nav = links.map(function (l) { return '<a href="' + l[0] + '"' + (l[2] !== null ? ' data-cat="' + l[2] + '"' : '') + '>' + l[1] + '</a>'; }).join('');
     var bag = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
     $('#hdr').innerHTML =
@@ -57,7 +58,7 @@
       '<footer class="ftr"><div class="wrap"><div class="ftr__grid">' +
         '<div><a class="logo" href="index.html"><img class="logo__img" src="assets/img/miele-logo.svg" alt="Miele" width="104" height="40"></a><p class="ftr__about">Фирменный шоурум бытовой техники Miele в Перми. Подбор, доставка, установка и сервис.</p></div>' +
         '<div><h3>Каталог</h3><ul><li><a href="index.html?cat=' + SALE + '#catalog" data-cat="' + SALE + '">Акции</a></li><li><a href="index.html?cat=' + SETS + '#catalog" data-cat="' + SETS + '">Комплекты</a></li>' + S.cats().map(function (c) { return '<li><a href="index.html?cat=' + encodeURIComponent(c) + '#catalog" data-cat="' + esc(c) + '">' + esc(c) + '</a></li>'; }).join('') + '</ul></div>' +
-        '<div><h3>Покупателям</h3><ul><li><a href="cart.html">Корзина</a></li><li><a href="' + home + '#service">Доставка и установка</a></li><li><a href="' + home + '#showroom">Как нас найти</a></li><li><a href="privacy.html">Политика обработки персональных данных</a></li><li><a href="consent.html">Согласие на обработку данных</a></li><li><a href="privacy.html#cookies">Файлы cookie</a></li></ul></div>' +
+        '<div><h3>Покупателям</h3><ul><li><a href="cart.html">Корзина</a></li><li><a href="' + home + '#service">Доставка, установка и гарантия</a></li><li><a href="designers.html">Дизайнерам и архитекторам</a></li><li><a href="' + home + '#showroom">Как нас найти</a></li><li><a href="privacy.html">Политика обработки персональных данных</a></li><li><a href="consent.html">Согласие на обработку данных</a></li><li><a href="privacy.html#cookies">Файлы cookie</a></li></ul></div>' +
         '<div><h3>Контакты</h3><ul><li><a href="tel:' + tel + '">' + esc(cfg.phone) + '</a></li>' + (tel2 ? '<li><a href="tel:' + tel2 + '">' + esc(cfg.phone2) + '</a></li>' : '') +
           '<li><a href="' + wa() + '" target="_blank" rel="noopener">WhatsApp</a></li>' + (tg ? '<li><a href="' + esc(tg) + '" target="_blank" rel="noopener">Telegram</a></li>' : '') +
           '<li>' + esc(cfg.address) + '</li><li>' + esc(cfg.hours) + '</li></ul></div>' +
@@ -101,7 +102,11 @@
     /* Товар показывается в своём разделе и в дополнительных (also); в дополнительных он идёт после «своих» товаров */
     var isAlso = function (p, c) { return (p.also || []).indexOf(c) >= 0; };
     var inCat = function (c) {
-      if (c === SALE) return list.filter(function (p) { return S.onSale(p); });
+      /* В «Акциях» стирально-сушильные машины (товар отмечен ещё и в разделе стиральных или сушильных) идут после пар «стиральная + сушильная» */
+      if (c === SALE) {
+        var sale = list.filter(function (p) { return S.onSale(p); }), dual = function (p) { return isAlso(p, 'Стиральные машины') || isAlso(p, 'Сушильные машины'); };
+        return sale.filter(function (p) { return !dual(p); }).concat(sale.filter(dual));
+      }
       return list.filter(function (p) { return p.category === c; }).concat(list.filter(function (p) { return p.category !== c && isAlso(p, c); }));
     };
     var SORT = {
@@ -170,7 +175,7 @@
         return '<div class="card"><a class="card__main" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
           '<div class="card__pic">' + saleBadge(p) + '<img src="' + esc((p.images || [])[0] || '') + '" alt="' + esc(p.title) + '" loading="lazy" width="600" height="600"></div>' +
           '<div class="card__body"><span class="card__cat">' + esc(p.category) + '</span><span class="card__title">' + esc(p.title) + '</span>' +
-          showTag(p) + '<div class="card__foot">' + stockHtml(p) + priceHtml(p) + '</div></div></a>' +
+          showTag(p) + untilHtml(p) + '<div class="card__foot">' + stockHtml(p) + priceHtml(p) + '</div></div></a>' +
           (S.status(p).key !== 'out' ? '<button type="button" class="card__add" data-add="' + esc(p.id) + '">' + addLabel(p.id) + '</button>' : '') + '</div>';
     }
     /* Открыть папку (или вернуться к списку папок). Кнопка «Назад» в браузере возвращает к папкам */
@@ -293,7 +298,7 @@
       '<div class="pd"><div class="gal"><div class="gal__main">' + saleBadge(p) + '<img id="gal-main" src="' + esc(imgs[0]) + '" alt="' + esc(p.title) + '" width="900" height="900"></div>' +
         (imgs.length > 1 ? '<div class="gal__th">' + imgs.map(function (src, i) { return '<button type="button" data-i="' + i + '" aria-current="' + (i === 0) + '" aria-label="Фото ' + (i + 1) + '"><img src="' + esc(src) + '" alt="" loading="lazy"></button>'; }).join('') + '</div>' : '') + '</div>' +
       '<div class="pd__info"><p class="eyebrow">' + esc(p.category) + '</p><h1>' + esc(p.title) + '</h1><p class="pd__meta">' + esc(meta) + '</p>' +
-        '<div class="pd__buy">' + priceHtml(p) + stockHtml(p) + showTag(p) +
+        '<div class="pd__buy">' + priceHtml(p) + untilHtml(p) + stockHtml(p) + showTag(p) +
           '<div class="pd__btns">' + (st.key !== 'out' ? '<button type="button" class="btn" id="pd-add">' + addLabel(p.id) + '</button>' : '') + '<a class="btn btn--line" href="#ask">' + (st.level > 0 ? 'Оставить заявку' : 'Заказать') + '</a></div>' +
           '<p class="pd__go"' + (S.cart()[p.id] ? '' : ' hidden') + '><a href="cart.html">Перейти в корзину</a></p>' +
           '<p class="pd__msg">Написать: <a target="_blank" rel="noopener" href="' + wa(ask) + '">WhatsApp</a>' + (tg ? '<a target="_blank" rel="noopener" href="' + esc(tg) + '">Telegram</a>' : '') + '</p>' +
@@ -385,7 +390,7 @@
       offer.innerHTML = '<table class="offer__page"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>' +
         '<div class="offer__top"><div class="offer__co"><b>Шоурум Miele</b><span>' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span><span>' + esc(cfg.hours) + '</span></div>' +
           '<img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co offer__co--r">' + offerPhones() + '</div></div>' +
-        '<h1>Коммерческое предложение</h1><p class="offer__date">от ' + today + '</p>' +
+        '<h1>Коммерческое предложение <span class="offer__date">от ' + today + '</span></h1>' +
         '<table class="offer__tbl"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
           return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td><td>' + (r.sum === null ? 'по запросу' : money(r.sum)) + '</td></tr>';
@@ -424,13 +429,46 @@
       if (k === 'tel') { el.textContent = cfg.phone; el.href = 'tel:' + tel; }
       else if (k === 'tel2') { if (tel2) { el.textContent = cfg.phone2; el.href = 'tel:' + tel2; } else el.hidden = true; }
       else if (k === 'wa') el.href = wa('Здравствуйте! Хочу проконсультироваться по технике Miele.');
+      else if (k === 'wa-designer') el.href = wa('Здравствуйте! Я дизайнер интерьеров, хочу обсудить подбор техники Miele для проекта.');
       else if (k === 'tg') { if (tg) el.href = tg; else el.hidden = true; }
       else if (k === 'gis' || k === 'ymaps') el.href = cfg[k];
       else el.textContent = cfg[k];
     });
   }
 
-  layout(); catalog(); sets(); contacts(); productPage(); cartPage();
+  /* ---------- Галерея шоурума: мозаика на главной и просмотр во весь экран ---------- */
+  function showroomGallery() {
+    var openers = document.querySelectorAll('[data-sr]'); if (!openers.length) return;
+    var N = 16, cur = 0, x0 = null, pics = [];
+    for (var i = 1; i <= N; i++) pics.push('assets/img/showroom/s' + (i < 10 ? '0' : '') + i);
+    var lb = document.createElement('dialog'); lb.className = 'lb'; lb.setAttribute('aria-label', 'Фото шоурума');
+    lb.innerHTML = '<div class="lb__top"><span class="lb__n"></span><button type="button" class="lb__x" aria-label="Закрыть">×</button></div>' +
+      '<div class="lb__stage"><img alt="Шоурум Miele в Перми"><button type="button" class="lb__btn lb__prev" aria-label="Предыдущее фото">←</button><button type="button" class="lb__btn lb__next" aria-label="Следующее фото">→</button></div>' +
+      '<div class="lb__strip">' + pics.map(function (p, i) { return '<button type="button" data-k="' + i + '" aria-label="Фото ' + (i + 1) + '"><img src="' + p + '-t.webp" alt="" loading="lazy"></button>'; }).join('') + '</div>';
+    document.body.appendChild(lb);
+    var img = $('.lb__stage img', lb), n = $('.lb__n', lb);
+    function show(i) {
+      cur = (i + N) % N; img.src = pics[cur] + '.webp'; n.textContent = (cur + 1) + ' / ' + N;
+      lb.querySelectorAll('.lb__strip button').forEach(function (b, k) { b.setAttribute('aria-current', k === cur ? 'true' : 'false'); if (k === cur) b.scrollIntoView({ block: 'nearest', inline: 'center' }); });
+      var nx = new Image(); nx.src = pics[(cur + 1) % N] + '.webp';
+    }
+    function open(i) { if (typeof lb.showModal !== 'function') { window.open(pics[i] + '.webp', '_blank'); return; } lb.showModal(); document.body.style.overflow = 'hidden'; show(i); }
+    lb.addEventListener('close', function () { document.body.style.overflow = ''; });
+    openers.forEach(function (b) { b.addEventListener('click', function () { open(+b.dataset.sr || 0); }); });
+    lb.addEventListener('click', function (e) {
+      if (e.target.closest('.lb__x')) return lb.close();
+      if (e.target.closest('.lb__prev')) return show(cur - 1);
+      if (e.target.closest('.lb__next')) return show(cur + 1);
+      var k = e.target.closest('[data-k]'); if (k) return show(+k.dataset.k);
+      if (e.target.classList.contains('lb__stage')) lb.close();
+    });
+    lb.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') show(cur - 1); else if (e.key === 'ArrowRight') show(cur + 1); });
+    var st = $('.lb__stage', lb);
+    st.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    st.addEventListener('touchend', function (e) { if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1)); });
+  }
+
+  layout(); catalog(); sets(); contacts(); productPage(); cartPage(); showroomGallery();
   S.isOwner().then(function (ok) {
     if (!ok) return;
     var bar = document.createElement('div'); bar.className = 'demo';
@@ -438,4 +476,5 @@
     $('#hdr').insertBefore(bar, $('#hdr .hdr'));
   });
   leadForm($('#lead-home'));
+  leadForm($('#lead-designer'), null, function () { return 'Заявка со страницы «Дизайнерам и архитекторам»'; });
 })();
