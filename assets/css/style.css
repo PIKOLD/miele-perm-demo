@@ -716,3 +716,9 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .shw__slider .shw__s .shw__cap em { display: none; }
   .shw__dl dd { font-size: 17px; }
 }
+
+/* 18.11: фото шоурума крупнее — слайдер занимает две трети ширины */
+@media (min-width: 1021px) {
+  .shw__in { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 3.5vw, 56px); }
+  .shw__txt .shw__btns { max-width: none; }
+}
