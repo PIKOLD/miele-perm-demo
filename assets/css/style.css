@@ -686,3 +686,33 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .offer__terms { margin-top: 10pt; font-size: 9pt; line-height: 1.35; break-inside: avoid; }
   .offer__terms p { margin: 0; }
 }
+
+/* 18.11, вариант клиента: слева заголовок, текст, контакты и кнопки; справа большое фото, которое само листается */
+.shw__in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
+.shw__txt h2 { font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -.03em; margin-bottom: 18px; }
+.shw__txt .lead { max-width: 44ch; margin: 0 0 30px; }
+.shw__dl { margin: 0 0 30px; display: grid; gap: 16px; }
+.shw__dl dt { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .55); margin-bottom: 3px; }
+.shw__dl dd { margin: 0; font-size: 18px; line-height: 1.45; }
+.shw__dl dd a { text-decoration: none; }
+.shw__dl dd a:hover { text-decoration: underline; }
+.shw__txt .shw__btns { max-width: 460px; margin: 0; }
+.shw__slider { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #2a2a2a; }
+.shw__slider .shw__s { position: absolute; inset: 0; height: auto; aspect-ratio: auto; opacity: 0; transition: opacity 1s ease; }
+.shw__slider .shw__s.on { opacity: 1; }
+.shw__slider .shw__s img { transition: transform 6s ease-out; }
+.shw__slider .shw__s.on img { transform: scale(calc(var(--z, 1) * 1.04)); }
+.shw__slider .shw__t--b img { --p: 50% 10%; --z: 1; --o: 50% 10%; }
+.shw__slider .shw__t--c img { --p: 50% 60%; --z: 1; --o: 50% 60%; }
+.shw__slider .shw__cap { padding-right: 190px; }
+.shw__ctl { position: absolute; right: clamp(12px, 1.6vw, 20px); bottom: clamp(12px, 1.6vw, 20px); z-index: 3; display: flex; align-items: center; gap: 8px; }
+.shw__n { margin-right: 8px; font-size: 13px; font-weight: 600; letter-spacing: .1em; color: rgba(255, 255, 255, .85); }
+.shw__ctl .shw__arr { width: 44px; height: 44px; background: rgba(0, 0, 0, .35); border-color: rgba(255, 255, 255, .5); }
+@media (max-width: 1020px) {
+  .shw__in { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .shw__slider .shw__cap { padding-right: 16px; padding-bottom: 70px; }
+  .shw__slider .shw__s .shw__cap em { display: none; }
+  .shw__dl dd { font-size: 17px; }
+}

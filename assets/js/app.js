@@ -475,22 +475,24 @@
     st.addEventListener('touchend', function (e) { if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1)); });
   }
 
-  /* Лента фото шоурума (18.11): листается сама, пальцем и стрелками; фото не открываются */
+  /* Слайдер фото шоурума (18.11): кадры сменяются сами, стрелками и свайпом; по нажатию ничего не открывается */
   function showroomRail() {
-    var rail = $('.shw__rail'); if (!rail) return;
-    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches, hold = false, t;
-    function step(d) {
-      var s = rail.querySelector('.shw__s'), w = s ? s.getBoundingClientRect().width + 12 : 300;
-      var end = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
-      if (d > 0 && end) rail.scrollTo({ left: 0, behavior: 'smooth' });
-      else if (d < 0 && rail.scrollLeft <= 4) rail.scrollTo({ left: rail.scrollWidth, behavior: 'smooth' });
-      else rail.scrollBy({ left: d * w, behavior: 'smooth' });
+    var box = $('.shw__slider'); if (!box) return;
+    var sl = box.querySelectorAll('.shw__s'), n = $('.shw__n', box), N = sl.length, cur = 0, hold = false, t, x0 = null;
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function pad(i) { return (i < 10 ? '0' : '') + i; }
+    function show(i) {
+      cur = (i + N) % N;
+      sl.forEach(function (s, k) { s.classList.toggle('on', k === cur); });
+      if (n) n.textContent = pad(cur + 1) + ' / ' + pad(N);
     }
-    document.querySelectorAll('.shw__arr').forEach(function (b) { b.addEventListener('click', function () { step(+b.dataset.d); restart(); }); });
-    function restart() { clearInterval(t); if (!still) t = setInterval(function () { if (!hold && !document.hidden) step(1); }, 3800); }
-    ['mouseenter', 'touchstart', 'focusin'].forEach(function (e) { rail.addEventListener(e, function () { hold = true; }, { passive: true }); });
-    ['mouseleave', 'touchend', 'focusout'].forEach(function (e) { rail.addEventListener(e, function () { hold = false; }, { passive: true }); });
-    restart();
+    function restart() { clearInterval(t); if (!still) t = setInterval(function () { if (!hold && !document.hidden) show(cur + 1); }, 4500); }
+    box.querySelectorAll('.shw__arr').forEach(function (b) { b.addEventListener('click', function () { show(cur + +b.dataset.d); restart(); }); });
+    box.addEventListener('mouseenter', function () { hold = true; });
+    box.addEventListener('mouseleave', function () { hold = false; });
+    box.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; hold = true; }, { passive: true });
+    box.addEventListener('touchend', function (e) { hold = false; if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) { show(cur + (dx < 0 ? 1 : -1)); restart(); } });
+    show(0); restart();
   }
 
   layout(); catalog(); sets(); contacts(); productPage(); cartPage(); showroomGallery(); showroomRail();

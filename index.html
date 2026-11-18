@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css?v=32">
+<link rel="stylesheet" href="assets/css/style.css?v=33">
 </head>
 <body data-page="home">
 <div id="hdr"></div>
@@ -58,33 +58,31 @@
   </section>
 
   <section class="sec sec--dark on-dark shw" id="showroom">
-    <div class="wrap">
-      <div class="shw__head">
+    <div class="wrap shw__in">
+      <div class="shw__txt">
         <h2>Посмотрите технику вживую</h2>
         <p class="lead">Откройте дверцу, покрутите переключатель, послушайте, как закрывается духовой шкаф. По фотографии этого не понять.</p>
-      </div>
-      <div class="shw__card">
-          <dl>
-            <div><dt>Адрес</dt><dd data-cfg="address">Пермь, ул. Сибирская, 61</dd></div>
-            <div><dt>Телефон</dt><dd><a data-cfg="tel" href="tel:+73422411494">+7(342)2-411-494</a><br><a data-cfg="tel2" href="tel:+79519369478">+7(951)936-94-78</a></dd></div>
-            <div><dt>Режим работы</dt><dd data-cfg="hours">Пн–Чт 11:00–19:00, Пт 11:00–18:00</dd></div>
-          </dl>
-          <div class="shw__btns">
+        <dl class="shw__dl">
+          <div><dt>Адрес</dt><dd data-cfg="address">Пермь, ул. Сибирская, 61</dd></div>
+          <div><dt>Режим работы</dt><dd data-cfg="hours">Пн–Чт 11:00–19:00, Пт 11:00–18:00</dd></div>
+          <div><dt>Телефон</dt><dd><a data-cfg="tel" href="tel:+73422411494">+7(342)2-411-494</a><br><a data-cfg="tel2" href="tel:+79519369478">+7(951)936-94-78</a></dd></div>
+        </dl>
+        <div class="shw__btns">
             <a class="btn" data-cfg="gis" href="#" target="_blank" rel="noopener">Маршрут в 2ГИС</a>
             <a class="btn btn--white" data-cfg="ymaps" href="#" target="_blank" rel="noopener">Яндекс Карты</a>
             <a class="btn btn--white" data-cfg="wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
             <a class="btn btn--white" data-cfg="tg" href="#" target="_blank" rel="noopener">Telegram</a>
           </div>
       </div>
+      <div class="shw__slider" aria-label="Фото шоурума">
+        <figure class="shw__s on shw__t--a"><img src="assets/img/showroom/s01.webp?v=2" alt="Кухня со встроенной техникой Miele в шоуруме" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>01</i><b>Кухонная зона</b><em>Духовой шкаф, варочная панель и вытяжка в живом интерьере</em></figcaption></figure>
+        <figure class="shw__s shw__t--b"><img src="assets/img/showroom/s09.webp?v=2" alt="Колонны из стиральных и сушильных машин Miele" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>02</i><b>Прачечная</b><em>Колонны из стиральных и сушильных машин</em></figcaption></figure>
+        <figure class="shw__s shw__t--c"><img src="assets/img/showroom/s11.webp?v=2" alt="Кофемашины Miele в шоуруме" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>03</i><b>Кофемашины</b><em>Сравните модели и вкус кофе</em></figcaption></figure>
+        <figure class="shw__s shw__t--d"><img src="assets/img/showroom/s04.webp?v=2" alt="Линия встраиваемых духовых шкафов и холодильников" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>04</i><b>Встраиваемая техника</b><em>Духовые шкафы, пароварки и холодильники</em></figcaption></figure>
+        <figure class="shw__s shw__t--e"><img src="assets/img/showroom/s07.webp?v=2" alt="Зона консультаций в шоуруме Miele" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>05</i><b>Зона консультаций</b><em>Подберём технику и посчитаем комплект</em></figcaption></figure>
+        <div class="shw__ctl"><span class="shw__n">01 / 05</span><button type="button" class="shw__arr" data-d="-1" aria-label="Предыдущее фото">←</button><button type="button" class="shw__arr" data-d="1" aria-label="Следующее фото">→</button></div>
+      </div>
     </div>
-    <div class="shw__rail" aria-label="Фото шоурума">
-      <figure class="shw__s shw__t--a"><img src="assets/img/showroom/s01.webp?v=2" alt="Кухня со встроенной техникой Miele в шоуруме" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>01</i><b>Кухонная зона</b><em>Духовой шкаф, варочная панель и вытяжка в живом интерьере</em></figcaption></figure>
-      <figure class="shw__s shw__t--b"><img src="assets/img/showroom/s09.webp?v=2" alt="Колонны из стиральных и сушильных машин Miele" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>02</i><b>Прачечная</b><em>Колонны из стиральных и сушильных машин</em></figcaption></figure>
-      <figure class="shw__s shw__t--c"><img src="assets/img/showroom/s11.webp?v=2" alt="Кофемашины Miele в шоуруме" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>03</i><b>Кофемашины</b><em>Сравните модели и вкус кофе</em></figcaption></figure>
-      <figure class="shw__s shw__t--d"><img src="assets/img/showroom/s04.webp?v=2" alt="Линия встраиваемых духовых шкафов и холодильников" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>04</i><b>Встраиваемая техника</b><em>Духовые шкафы, пароварки и холодильники</em></figcaption></figure>
-      <figure class="shw__s shw__t--e"><img src="assets/img/showroom/s07.webp?v=2" alt="Зона консультаций в шоуруме Miele" loading="lazy" draggable="false"><figcaption class="shw__cap"><i>05</i><b>Зона консультаций</b><em>Подберём технику и посчитаем комплект</em></figcaption></figure>
-    </div>
-    <div class="wrap shw__nav"><button type="button" class="shw__arr" data-d="-1" aria-label="Предыдущие фото">←</button><button type="button" class="shw__arr" data-d="1" aria-label="Следующие фото">→</button></div>
   </section>
 
   <section class="sec sec--soft" id="service">
@@ -141,7 +139,7 @@
 
 <div id="ftr"></div>
 <script src="api/state.php"></script>
-<script src="assets/js/store.js?v=32"></script>
-<script src="assets/js/app.js?v=32"></script>
+<script src="assets/js/store.js?v=33"></script>
+<script src="assets/js/app.js?v=33"></script>
 </body>
 </html>
