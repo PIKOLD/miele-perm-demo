@@ -640,3 +640,49 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .offer__pic { width: 56pt; }
   .offer__pic img { width: 50pt; height: 50pt; }
 }
+
+/* 18.11: раздел «Шоурум» — текст сверху, под ним вытянутая плашка с контактами, ниже лента фото (листается, не открывается) */
+.shw__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px clamp(28px, 5vw, 80px); align-items: end; margin-bottom: clamp(24px, 3vw, 36px); }
+.shw__head .lead { max-width: 52ch; margin: 0 0 6px; }
+.shw__card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: 20px clamp(24px, 4vw, 56px); align-items: center; }
+.shw__card dl { grid-template-columns: minmax(0, .9fr) minmax(0, .8fr) minmax(0, 1.1fr); gap: 16px 28px; }
+.shw__card dl > div:last-child { grid-column: auto; }
+.shw__card dd { white-space: nowrap; }
+.shw__btns { margin-top: 0; }
+.shw__rail { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: clamp(28px, 3.5vw, 44px);
+  padding-inline: max(var(--gut), calc((100vw - var(--wrap)) / 2)); scroll-padding-inline: max(var(--gut), calc((100vw - var(--wrap)) / 2)); }
+.shw__rail::-webkit-scrollbar { display: none; }
+.shw__s { position: relative; flex: none; margin: 0; height: clamp(260px, 30vw, 430px); aspect-ratio: 4 / 3; overflow: hidden; scroll-snap-align: start; background: #2a2a2a; color: #fff; user-select: none; }
+.shw__s.shw__t--b, .shw__s.shw__t--c { aspect-ratio: 3 / 4; }
+.shw__s img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; filter: brightness(1.03) contrast(1.08) saturate(1.12);
+  object-position: var(--p, 50% 50%); transform: scale(var(--z, 1)); transform-origin: var(--o, 50% 50%); }
+.shw__s::before { content: ""; position: absolute; inset: 0; z-index: 1; box-shadow: inset 0 0 90px rgba(0, 0, 0, .35); }
+.shw__s::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .2) 34%, transparent 58%); }
+.shw__s .shw__cap em { max-height: 3em; opacity: 1; }
+.shw__s.shw__t--a img { --p: 0% 50%; --z: 1.18; --o: 32% 40%; }
+.shw__s.shw__t--d img { --z: 1.3; --o: 40% 78%; }
+.shw__s.shw__t--e img { --z: 1.35; --o: 50% 55%; }
+.shw__nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.shw__arr { width: 48px; height: 48px; border: 1px solid rgba(255, 255, 255, .4); background: none; color: #fff; font-size: 20px; cursor: pointer; transition: background .2s, color .2s; }
+.shw__arr:hover { background: #fff; color: var(--ink); }
+@media (max-width: 1020px) {
+  .shw__head, .shw__card { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .shw__card dl { grid-template-columns: minmax(0, 1fr); }
+  .shw__card dd { white-space: normal; }
+  .shw__s { height: 64vw; }
+  .shw__s .shw__cap em { display: none; }
+  .shw__nav { justify-content: flex-start; }
+}
+
+/* 18.11: фото товара — всегда целиком; широкие снимки с меньшими полями */
+.gal__main.wide { padding: 5%; }
+
+/* 18.11: предложение — колонка «Со скидкой» и условия поставки */
+@media print {
+  .offer__tbl--cut th, .offer__tbl--cut td { padding-left: 4pt; padding-right: 4pt; }
+  .offer__cut { font-weight: 700; }
+  .offer__terms { margin-top: 10pt; font-size: 9pt; line-height: 1.35; break-inside: avoid; }
+  .offer__terms p { margin: 0; }
+}

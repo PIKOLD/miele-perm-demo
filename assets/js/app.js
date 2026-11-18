@@ -25,6 +25,8 @@
     var ask = p.price === null || p.price === undefined || p.price === '';
     return '<span class="price' + (ask ? ' price--ask' : '') + '">' + S.price(p.price) + '</span>';
   }
+  /* Название товара без разрыва внутри модели: «M 6012», «WQ 1000» не переносятся (18.11) */
+  function nbt(t) { return esc(t).replace(/([A-Z]{1,4}) (?=\d)/g, '$1 '); }
   function untilHtml(p) { var t = S.saleUntilText(p); return t ? '<span class="until">' + esc(t) + '</span>' : ''; }
   function saleBadge(p) { return S.onSale(p) ? '<span class="sale">−' + Math.max(1, Math.round((1 - p.price / p.oldPrice) * 100)) + '%</span>' : ''; }
   /* Метка «Есть в шоуруме»: образец выставлен в зале (галочка в кабинете) */
@@ -175,7 +177,7 @@
     function card(p) {
         return '<div class="card"><a class="card__main" href="product.html?id=' + encodeURIComponent(p.id) + '">' +
           '<div class="card__pic">' + saleBadge(p) + '<img src="' + esc((p.images || [])[0] || '') + '" alt="' + esc(p.title) + '" loading="lazy" width="600" height="600"></div>' +
-          '<div class="card__body"><span class="card__cat">' + esc(p.category) + '</span><span class="card__title">' + esc(p.title) + '</span>' +
+          '<div class="card__body"><span class="card__cat">' + esc(p.category) + '</span><span class="card__title">' + nbt(p.title) + '</span>' +
           showTag(p) + untilHtml(p) + '<div class="card__foot">' + stockHtml(p) + priceHtml(p) + '</div></div></a>' +
           (S.status(p).key !== 'out' ? '<button type="button" class="card__add" data-add="' + esc(p.id) + '">' + addLabel(p.id) + '</button>' : '') + '</div>';
     }
@@ -298,7 +300,7 @@
       '<div class="wrap"><nav class="crumbs" aria-label="Навигация"><a href="index.html">Главная</a> / <a href="index.html?cat=' + encodeURIComponent(p.category) + '#catalog">' + esc(p.category) + '</a> / ' + esc(p.model || p.title) + '</nav>' +
       '<div class="pd"><div class="gal"><div class="gal__main">' + saleBadge(p) + '<img id="gal-main" src="' + esc(imgs[0]) + '" alt="' + esc(p.title) + '" width="900" height="900"></div>' +
         (imgs.length > 1 ? '<div class="gal__th">' + imgs.map(function (src, i) { return '<button type="button" data-i="' + i + '" aria-current="' + (i === 0) + '" aria-label="Фото ' + (i + 1) + '"><img src="' + esc(src) + '" alt="" loading="lazy"></button>'; }).join('') + '</div>' : '') + '</div>' +
-      '<div class="pd__info"><p class="eyebrow">' + esc(p.category) + '</p><h1>' + esc(p.title) + '</h1><p class="pd__meta">' + esc(meta) + '</p>' +
+      '<div class="pd__info"><p class="eyebrow">' + esc(p.category) + '</p><h1>' + nbt(p.title) + '</h1><p class="pd__meta">' + esc(meta) + '</p>' +
         '<div class="pd__buy">' + priceHtml(p) + untilHtml(p) + stockHtml(p) + showTag(p) +
           '<div class="pd__btns">' + (st.key !== 'out' ? '<button type="button" class="btn" id="pd-add">' + addLabel(p.id) + '</button>' : '') + '<a class="btn btn--line" href="#ask">' + (st.level > 0 ? 'Оставить заявку' : 'Заказать') + '</a></div>' +
           '<p class="pd__go"' + (S.cart()[p.id] ? '' : ' hidden') + '><a href="cart.html">Перейти в корзину</a></p>' +
@@ -312,7 +314,8 @@
       '</div></section>' +
       '<section class="sec" id="ask"><div class="wrap ask"><div><p class="eyebrow">Заявка</p><h2>Узнать о наличии и заказать</h2><p class="lead">Оставьте телефон — консультант подтвердит наличие, расскажет об условиях доставки и установки.</p></div><div id="lead"></div></div></section>';
     var main = $('#gal-main'), wrapEl = main.parentNode;
-    function fit() { wrapEl.classList.toggle('cover', main.naturalWidth > main.naturalHeight * 1.25); }
+    /* Фото товара всегда целиком (правка 18.11): широкие снимки — с меньшими полями, без обрезки */
+    function fit() { wrapEl.classList.remove('cover'); wrapEl.classList.toggle('wide', main.naturalWidth > main.naturalHeight * 1.25); }
     main.addEventListener('load', fit); if (main.complete) fit();
     root.addEventListener('click', function (e) {
       if (e.target.id === 'pd-add') { S.cartAdd(p.id); e.target.textContent = addLabel(p.id); $('.pd__go', root).hidden = false; return cartCount(); }
@@ -352,7 +355,7 @@
       return { items: c.rows.map(function (r) {
         var p = r.p;
         return { id: p.id, title: p.title, sub: [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku].filter(Boolean).join(', '), img: (p.images || [])[0] || '', qty: r.qty,
-          price: typeof p.price === 'number' ? p.price : null, old: S.onSale(p) ? p.oldPrice : null, sum: r.sum };
+          price: typeof p.price === 'number' ? p.price : null, old: S.onSale(p) ? p.oldPrice : null, sum: r.sum, price2: r.unit2, sum2: r.sum2 };
       }), kits: c.kits.map(function (k) { return { title: k.title, n: k.n, off: k.off }; }), goods: c.goods, pct: c.pct, discount: c.discount, total: c.total, ask: c.ask };
     }
     function draw() {
@@ -367,7 +370,7 @@
         var p = r.p, href = 'product.html?id=' + encodeURIComponent(p.id);
         return '<div class="ci" data-id="' + esc(p.id) + '">' +
           '<a class="ci__pic" href="' + href + '" tabindex="-1" aria-hidden="true"><img src="' + esc((p.images || [])[0] || '') + '" alt="" loading="lazy"></a>' +
-          '<div class="ci__info"><a class="ci__title" href="' + href + '">' + esc(p.title) + '</a>' + stockHtml(p) + '<span class="ci__each">' + priceHtml(p) + (r.sum !== null ? ' за шт.' : '') + '</span></div>' +
+          '<div class="ci__info"><a class="ci__title" href="' + href + '">' + nbt(p.title) + '</a>' + stockHtml(p) + '<span class="ci__each">' + priceHtml(p) + (r.sum !== null ? ' за шт.' : '') + '</span></div>' +
           '<div class="qty"><button type="button" data-q="-1" aria-label="Уменьшить количество">−</button><input type="number" min="1" max="99" step="1" inputmode="numeric" value="' + r.qty + '" aria-label="Количество: ' + esc(p.title) + '"><button type="button" data-q="1" aria-label="Увеличить количество">+</button></div>' +
           '<div class="ci__sum">' + (r.sum === null ? '<span class="price price--ask">по запросу</span>' : '<span class="price">' + money(r.sum) + '</span>') + '</div>' +
           '<button type="button" class="ci__rm" data-rm aria-label="Убрать из корзины: ' + esc(p.title) + '">×</button></div>';
@@ -392,15 +395,16 @@
         '<div class="offer__top"><div class="offer__co"><b>Шоурум Miele</b><span>' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span><span>' + esc(cfg.hours) + '</span></div>' +
           '<img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co offer__co--r">' + offerPhones() + '</div></div>' +
         '<h1>Коммерческое предложение <span class="offer__date">от ' + today + '</span></h1>' +
-        '<table class="offer__tbl"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
+        '<table class="offer__tbl' + (cut ? ' offer__tbl--cut' : '') + '"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th>' + (cut ? '<th>Со скидкой</th>' : '') + '<th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
-          return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td><td>' + (r.sum === null ? 'по запросу' : money(r.sum)) + '</td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td>' + (cut ? '<td class="offer__cut">' + (r.sum === null ? '—' : money(r.unit2)) + '</td>' : '') + '<td>' + (r.sum === null ? 'по запросу' : money(cut ? r.sum2 : r.sum)) + '</td></tr>';
         }).join('') + '</tbody></table>' +
         '<table class="offer__sum"><tbody>' + (cut ? '<tr><th>Итого</th><td>' + money(c.goods) + '</td></tr>' : '') +
           c.kits.map(function (k) { return '<tr><th>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</th><td>−' + money(k.off) + '</td></tr>'; }).join('') +
           (c.pct ? '<tr><th>Скидка за объём заказа ' + c.pct + '%</th><td>−' + money(c.discount) + '</td></tr>' : '') +
           '<tr class="offer__total"><th>' + (cut ? 'Итого со скидкой' : 'Итого') + '</th><td>' + money(c.total) + '</td></tr></tbody></table>' +
         (c.ask ? '<p class="offer__p">Позиции с ценой по запросу в сумму не включены — стоимость уточнит консультант.</p>' : '') +
+        '<div class="offer__terms"><p>Доставка, погрузочно-разгрузочные работы оплачиваются дополнительно.</p><p>Подключение бытовой техники оплачивается согласно прайс-листу.</p><p>Бесплатное хранение товара на складе Поставщика — 2 месяца.</p></div>' +
         '<p class="offer__legal">Предложение сформировано на сайте ' + today + ', носит информационный характер и не является публичной офертой (ст. 437 ГК РФ). Цены и наличие действительны на дату формирования — уточняйте у консультантов шоурума.</p>' +
         '</td></tr></tbody></table>';
     }
@@ -471,7 +475,25 @@
     st.addEventListener('touchend', function (e) { if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1)); });
   }
 
-  layout(); catalog(); sets(); contacts(); productPage(); cartPage(); showroomGallery();
+  /* Лента фото шоурума (18.11): листается сама, пальцем и стрелками; фото не открываются */
+  function showroomRail() {
+    var rail = $('.shw__rail'); if (!rail) return;
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches, hold = false, t;
+    function step(d) {
+      var s = rail.querySelector('.shw__s'), w = s ? s.getBoundingClientRect().width + 12 : 300;
+      var end = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
+      if (d > 0 && end) rail.scrollTo({ left: 0, behavior: 'smooth' });
+      else if (d < 0 && rail.scrollLeft <= 4) rail.scrollTo({ left: rail.scrollWidth, behavior: 'smooth' });
+      else rail.scrollBy({ left: d * w, behavior: 'smooth' });
+    }
+    document.querySelectorAll('.shw__arr').forEach(function (b) { b.addEventListener('click', function () { step(+b.dataset.d); restart(); }); });
+    function restart() { clearInterval(t); if (!still) t = setInterval(function () { if (!hold && !document.hidden) step(1); }, 3800); }
+    ['mouseenter', 'touchstart', 'focusin'].forEach(function (e) { rail.addEventListener(e, function () { hold = true; }, { passive: true }); });
+    ['mouseleave', 'touchend', 'focusout'].forEach(function (e) { rail.addEventListener(e, function () { hold = false; }, { passive: true }); });
+    restart();
+  }
+
+  layout(); catalog(); sets(); contacts(); productPage(); cartPage(); showroomGallery(); showroomRail();
   S.isOwner().then(function (ok) {
     if (!ok) return;
     var bar = document.createElement('div'); bar.className = 'demo';

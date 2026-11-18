@@ -951,7 +951,7 @@
         count += q; if (known) sum += p.price * q; else ask += q;
       });
       /* Если в корзине собран комплект целиком, приборы считаются по цене комплекта */
-      var left = {}, kits = [], setOff = 0, goods = sum;
+      var left = {}, kits = [], setOff = 0, goods = sum, inKit = {}, kitPrice = {};
       rows.forEach(function (r) { left[r.p.id] = r.qty; });
       Store.kits().forEach(function (k) {
         if (!k.off || k.items.length < k.set.ids.length) return;
@@ -959,13 +959,20 @@
         if (!n) return;
         k.items.forEach(function (p) { left[p.id] -= n; });
         kits.push({ title: k.set.title, n: n, off: k.off * n }); setOff += k.off * n;
+        k.items.forEach(function (p, j) { inKit[p.id] = (inKit[p.id] || 0) + n; kitPrice[p.id] = k.prices[j]; });
       });
       sum -= setOff;
       var tiers = (Store.settings().discounts || []).filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
       var pct = 0, next = null;
       tiers.forEach(function (t) { if (sum >= t.from) pct = t.pct; else if (!next) next = { pct: t.pct, need: t.from - sum }; });
-      /* Итог со скидкой за объём округляется до 100 ₽ вниз — в пользу покупателя */
-      var total = pct ? Math.floor((sum - sum * pct / 100) / 100) * 100 : sum, discount = sum - total;
+      /* Цена со скидкой у каждой строки (просьба владельца 18.11): приборы из комплекта — по цене комплекта, затем скидка за объём.
+         Итог — сумма этих строк, чтобы цифры в предложении сходились до рубля */
+      rows.forEach(function (r) {
+        if (r.sum === null) return;
+        var kn = Math.min(inKit[r.p.id] || 0, r.qty), base = (kn ? kn * kitPrice[r.p.id] : 0) + (r.qty - kn) * r.p.price;
+        r.unit2 = Math.round(base / r.qty * (1 - pct / 100)); r.sum2 = r.unit2 * r.qty;
+      });
+      var total = (pct || setOff) ? rows.reduce(function (a, r) { return a + (r.sum2 || 0); }, 0) : sum, discount = sum - total;
       return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: total, next: next, tiers: tiers };
     },
     /* Заявка посетителя. На сервере возвращает обещание: true — принята, false — не отправилась */
