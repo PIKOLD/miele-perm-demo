@@ -722,3 +722,29 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .shw__in { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 3.5vw, 56px); }
   .shw__txt .shw__btns { max-width: none; }
 }
+
+/* 20.11: первый экран — смена фото с медленным приближением и полосками-индикаторами */
+.hero__slides { position: absolute; inset: 0; }
+.hero__slides .hero__img { opacity: 0; transition: opacity 1.4s ease; object-position: var(--mp, center); transform: scale(1.02); }
+.hero__slides .hero__img.on { opacity: 1; animation: heroZoom 7.5s linear forwards; }
+@keyframes heroZoom { from { transform: scale(1.02); } to { transform: scale(1.1); } }
+.hero::after { z-index: 0; }
+.hero__bar { position: absolute; left: 0; right: 0; bottom: 22px; z-index: 2; display: flex; justify-content: flex-end; align-items: center; gap: 18px; pointer-events: none; }
+.hero__lbl { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
+.hero__lbl b { margin-right: 8px; color: #fff; }
+.hero__dots { display: flex; gap: 6px; pointer-events: auto; }
+.hero__dots button { width: 44px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; display: flex; align-items: center; }
+.hero__dots i { position: relative; display: block; width: 100%; height: 2px; background: rgba(255, 255, 255, .3); overflow: hidden; }
+.hero__dots i::after { content: ""; position: absolute; inset: 0; background: #fff; transform: scaleX(0); transform-origin: left; }
+.hero__dots .done i::after { transform: scaleX(1); }
+.hero__dots .on i::after { animation: heroBar 6s linear forwards; }
+@keyframes heroBar { to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .hero__slides .hero__img.on { animation: none; }
+  .hero__dots .on i::after { animation: none; transform: scaleX(1); }
+}
+@media (max-width: 1020px) {
+  .hero__lbl { display: none; }
+  .hero__bar { justify-content: flex-start; bottom: 14px; }
+  .hero__in { padding-bottom: 64px; }
+}

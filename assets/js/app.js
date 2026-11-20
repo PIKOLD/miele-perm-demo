@@ -495,7 +495,23 @@
     show(0); restart();
   }
 
-  layout(); catalog(); sets(); contacts(); productPage(); cartPage(); showroomGallery(); showroomRail();
+  /* Первый экран (20.11): фото сменяются сами каждые 6 с, полоски внизу показывают прогресс и переключают кадр */
+  function heroSlides() {
+    var box = $('.hero__slides'); if (!box) return;
+    var im = box.querySelectorAll('img'), dots = document.querySelectorAll('.hero__dots button'), lbl = $('.hero__lbl'), N = im.length, cur = 0, t;
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function show(i) {
+      cur = (i + N) % N;
+      im.forEach(function (x, k) { x.classList.toggle('on', k === cur); });
+      dots.forEach(function (d, k) { d.classList.toggle('on', k === cur); d.classList.toggle('done', k < cur); });
+      if (lbl) lbl.innerHTML = '<b>0' + (cur + 1) + '</b> ' + esc(im[cur].dataset.label || '');
+    }
+    function restart() { clearTimeout(t); if (!still) t = setTimeout(function () { if (!document.hidden) show(cur + 1); restart(); }, 6000); }
+    dots.forEach(function (d) { d.addEventListener('click', function () { show(+d.dataset.h); restart(); }); });
+    show(0); restart();
+  }
+
+  layout(); catalog(); sets(); contacts(); productPage(); cartPage(); showroomGallery(); showroomRail(); heroSlides();
   S.isOwner().then(function (ok) {
     if (!ok) return;
     var bar = document.createElement('div'); bar.className = 'demo';
