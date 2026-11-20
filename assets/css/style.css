@@ -766,3 +766,7 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .hero__in { padding-top: 18px; padding-bottom: 36px; }
   .hero__bar { top: calc(62vw - 32px); bottom: auto; }
 }
+
+/* 20.11, вечер: пункты меню тем же шрифтом, что телефон справа; логотип в КП на 20% крупнее */
+.nav a { font-size: 15px; font-weight: 600; color: #fff; }
+@media print { .offer__top img { height: 34pt; } }

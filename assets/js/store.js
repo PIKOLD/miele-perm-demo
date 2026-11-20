@@ -952,9 +952,9 @@
       });
       /* Порядок техники в корзине и предложении (просьба владельца 20.11): варочные панели, духовые шкафы, СВЧ, посудомойки, вытяжки,
          стиральные, сушильные, монтажные комплекты, гладильные системы; затем прочая техника; остальные аксессуары, химия и сувениры — в конце */
-      var ORDER = ['Варочные поверхности', 'Духовые шкафы', 'Микроволновые печи', 'Посудомоечные машины', 'Вытяжки', 'Стиральные машины', 'Сушильные машины', '', 'Гладильные системы'];
+      var ORDER = ['Варочные поверхности', 'Духовые шкафы', 'Микроволновые печи', 'Кофемашины', 'Посудомоечные машины', 'Вытяжки', 'Стиральные машины', 'Сушильные машины', '', 'Гладильные системы'];
       var rank = function (p) {
-        if (/монтажн/i.test(p.title || '')) return 7;
+        if (/монтажн/i.test(p.title || '')) return 8;
         var i = ORDER.indexOf(p.category); if (i >= 0) return i;
         return /^(Аксессуары|Бытовая химия|Сувенирная продукция)$/.test(p.category || '') ? 20 : 10;
       };
@@ -979,7 +979,8 @@
       rows.forEach(function (r) {
         if (r.sum === null) return;
         var kn = Math.min(inKit[r.p.id] || 0, r.qty), base = (kn ? kn * kitPrice[r.p.id] : 0) + (r.qty - kn) * r.p.price;
-        r.unit2 = Math.round(base / r.qty * (1 - pct / 100)); r.sum2 = r.unit2 * r.qty;
+        /* цена со скидкой округляется вниз до 100 ₽ (в пользу покупателя), поэтому и итог круглый (просьба владельца 20.11) */
+        r.unit2 = pct ? Math.floor(base / r.qty * (1 - pct / 100) / 100) * 100 : Math.round(base / r.qty); r.sum2 = r.unit2 * r.qty;
       });
       var total = (pct || setOff) ? rows.reduce(function (a, r) { return a + (r.sum2 || 0); }, 0) : sum, discount = sum - total;
       return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: total, next: next, tiers: tiers };
