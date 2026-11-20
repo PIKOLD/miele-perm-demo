@@ -748,3 +748,5 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .hero__bar { justify-content: flex-start; bottom: 14px; }
   .hero__in { padding-bottom: 64px; }
 }
+/* 20.11: первый экран выше на компьютере — фото меньше режутся */
+@media (min-width: 1021px) { .hero { min-height: min(88vh, 860px); } }
