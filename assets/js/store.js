@@ -950,6 +950,15 @@
         rows.push({ p: p, qty: q, sum: known ? p.price * q : null });
         count += q; if (known) sum += p.price * q; else ask += q;
       });
+      /* Порядок техники в корзине и предложении (просьба владельца 20.11): варочные панели, духовые шкафы, СВЧ, посудомойки, вытяжки,
+         стиральные, сушильные, монтажные комплекты, гладильные системы; затем прочая техника; остальные аксессуары, химия и сувениры — в конце */
+      var ORDER = ['Варочные поверхности', 'Духовые шкафы', 'Микроволновые печи', 'Посудомоечные машины', 'Вытяжки', 'Стиральные машины', 'Сушильные машины', '', 'Гладильные системы'];
+      var rank = function (p) {
+        if (/монтажн/i.test(p.title || '')) return 7;
+        var i = ORDER.indexOf(p.category); if (i >= 0) return i;
+        return /^(Аксессуары|Бытовая химия|Сувенирная продукция)$/.test(p.category || '') ? 20 : 10;
+      };
+      rows = rows.map(function (r, i) { return { r: r, i: i }; }).sort(function (a, b) { return rank(a.r.p) - rank(b.r.p) || a.i - b.i; }).map(function (x) { return x.r; });
       /* Если в корзине собран комплект целиком, приборы считаются по цене комплекта */
       var left = {}, kits = [], setOff = 0, goods = sum, inKit = {}, kitPrice = {};
       rows.forEach(function (r) { left[r.p.id] = r.qty; });
