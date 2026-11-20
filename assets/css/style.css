@@ -750,3 +750,19 @@ button.salon__pic:hover img { transform: scale(1.03); }
 }
 /* 20.11: первый экран выше на компьютере — фото меньше режутся */
 @media (min-width: 1021px) { .hero { min-height: min(88vh, 860px); } }
+
+/* 20.11: КП — заголовки и колонки с числами по центру */
+@media print {
+  .offer__tbl th { text-align: center !important; }
+  .offer__tbl td:nth-child(n+4) { text-align: center; }
+}
+
+/* 20.11: первый экран на телефоне — фото сверху целиком (16:10), текст и кнопки ниже на тёмном фоне */
+@media (max-width: 640px) {
+  .hero { display: block; min-height: 0; }
+  .hero__slides { position: relative; height: 62vw; }
+  .hero__slides .hero__img { object-position: center; }
+  .hero::after { inset: 0 0 auto 0; height: 62vw; background: linear-gradient(0deg, #1b1714 0%, rgba(27, 23, 20, 0) 38%); }
+  .hero__in { padding-top: 18px; padding-bottom: 36px; }
+  .hero__bar { top: calc(62vw - 32px); bottom: auto; }
+}

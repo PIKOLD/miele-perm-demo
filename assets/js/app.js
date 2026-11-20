@@ -167,7 +167,9 @@
       if (cat === SETS) { grid.innerHTML = kits.map(kitCard).join('') + kitGoods.map(card).join(''); return; }
       var all = inCat(cat);
       var shown = all.filter(function (p) { return !only || S.status(p).level > 0; });
-      if (SORT[sort]) shown = shown.map(function (p, i) { return [p, i]; }).sort(function (a, b) { return SORT[sort](a[0], b[0]) || a[1] - b[1]; }).map(function (x) { return x[0]; });
+      /* «Духовые шкафы» по умолчанию от дешёвых к дорогим (просьба владельца 20.11) */
+      var mode = sort === 'default' && cat === 'Духовые шкафы' ? 'price-asc' : sort;
+      if (SORT[mode]) shown = shown.map(function (p, i) { return [p, i]; }).sort(function (a, b) { return SORT[mode](a[0], b[0]) || a[1] - b[1]; }).map(function (x) { return x[0]; });
       $('#count').textContent = shown.length + ' ' + S.plural(shown.length, 'товар', 'товара', 'товаров');
       var none = !all.length
         ? (cat === SALE ? 'Сейчас акционных предложений нет. О новых акциях расскажут консультанты шоурума.' : SHOW.test(cat) ? 'Сейчас выставочных образцов в продаже нет. О новых предложениях расскажут консультанты шоурума.' : 'В этом разделе товары скоро появятся на сайте. Нужную модель привезём под заказ' + lead + ' — позвоните или напишите нам.')
@@ -395,7 +397,7 @@
         '<div class="offer__top"><div class="offer__co"><b>Шоурум Miele</b><span>' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span><span>' + esc(cfg.hours) + '</span></div>' +
           '<img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co offer__co--r">' + offerPhones() + '</div></div>' +
         '<h1>Коммерческое предложение <span class="offer__date">от ' + today + '</span></h1>' +
-        '<table class="offer__tbl' + (cut ? ' offer__tbl--cut' : '') + '"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th>' + (cut ? '<th>Со скидкой</th>' : '') + '<th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
+        '<table class="offer__tbl' + (cut ? ' offer__tbl--cut' : '') + '"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th>' + (cut ? '<th>Цена со %</th>' : '') + '<th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
           return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td>' + (cut ? '<td class="offer__cut">' + (r.sum === null ? '—' : money(r.unit2)) + '</td>' : '') + '<td>' + (r.sum === null ? 'по запросу' : money(cut ? r.sum2 : r.sum)) + '</td></tr>';
         }).join('') + '</tbody></table>' +
