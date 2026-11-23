@@ -1,0 +1,29 @@
+name: Connect showroom consultant
+on: workflow_dispatch
+permissions: {}
+jobs:
+  connect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Connect verified showroom endpoint
+        env:
+          BOT: ${{ secrets.SHOWROOM_DEMO_BOT }}
+          SIGNATURE: ${{ secrets.SHOWROOM_DEMO_SIGNATURE }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          url = "https://miele-perm.ru/api/consultant.php"
+          def call(method, payload):
+              request = urllib.request.Request("https://api.telegram.org/bot" + os.environ["BOT"] + "/" + method,
+                  data=json.dumps(payload).encode(), headers={"Content-Type":"application/json"})
+              with urllib.request.urlopen(request, timeout=15) as response:
+                  result = json.load(response)
+              assert result["ok"]
+              return result["result"]
+          name = call("getMe", {})["username"]
+          assert call("getWebhookInfo", {})["url"] in ("",url), "Existing integration detected"
+          assert call("setWebhook", {"url":url,"secret_token":os.environ["SIGNATURE"],"allowed_updates":["message"]})
+          assert call("getWebhookInfo", {})["url"] == url
+          print("Connected bot @" + name)
+          PY
