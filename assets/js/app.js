@@ -313,8 +313,22 @@
       '</div></div></div>' +
       '<section class="sec sec--soft"><div class="wrap pd__more"><div><h2>Описание</h2><p>' + esc(p.description) + '</p></div>' +
         (specs.length ? '<div><h2>Характеристики</h2><table class="specs"><tbody>' + specs.map(function (s) { return s[1] ? '<tr><th scope="row">' + esc(s[0]) + '</th><td>' + esc(s[1]) + '</td></tr>' : '<tr><td colspan="2">' + esc(s[0]) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '') +
-      '</div>' + ((p.schemes || []).length ? '<div class="wrap pd__sch"><h2>Схемы встройки</h2><div class="sch">' + p.schemes.map(function (src, i) { return '<a href="' + esc(src) + '" target="_blank" rel="noopener"><img src="' + esc(src) + '" alt="Схема встройки ' + (i + 1) + ': ' + esc(p.title) + '" loading="lazy"></a>'; }).join('') + '</div></div>' : '') + '</section>' +
+      '</div>' + ((p.schemes || []).length ? '<div class="wrap pd__sch"><div class="pd__schh"><h2>Схемы встройки</h2><span>Нажмите на схему, чтобы увеличить</span></div><div class="sch">' + p.schemes.map(function (src, i) { return '<a href="' + esc(src) + '" data-sch="' + i + '"><span class="sch__img"><img src="' + esc(src) + '" alt="Схема встройки ' + (i + 1) + ': ' + esc(p.title) + '" loading="lazy"></span><span class="sch__cap">Схема ' + (i + 1) + '</span></a>'; }).join('') + '</div></div>' : '') + '</section>' +
       '<section class="sec" id="ask"><div class="wrap ask"><div><p class="eyebrow">Заявка</p><h2>Узнать о наличии и заказать</h2><p class="lead">Оставьте телефон — консультант подтвердит наличие, расскажет об условиях доставки и установки.</p></div><div id="lead"></div></div></section>';
+    /* Схемы встройки (25.11): плитки одного размера, по нажатию — просмотр крупно с листанием */
+    var schs = p.schemes || [];
+    if (schs.length) {
+      var lb = document.createElement('dialog'), cur = 0; lb.className = 'lb lb--sch'; lb.setAttribute('aria-label', 'Схемы встройки');
+      lb.innerHTML = '<div class="lb__top"><span class="lb__n"></span><button type="button" class="lb__x" aria-label="Закрыть">×</button></div><div class="lb__stage"><img alt=""><button type="button" class="lb__btn lb__prev" aria-label="Предыдущая схема"' + (schs.length < 2 ? ' hidden' : '') + '>←</button><button type="button" class="lb__btn lb__next" aria-label="Следующая схема"' + (schs.length < 2 ? ' hidden' : '') + '>→</button></div>';
+      document.body.appendChild(lb);
+      var lbShow = function (i) { cur = (i + schs.length) % schs.length; $('.lb__stage img', lb).src = schs[cur]; $('.lb__n', lb).textContent = 'Схема ' + (cur + 1) + ' из ' + schs.length; };
+      root.addEventListener('click', function (e) { var a = e.target.closest('[data-sch]'); if (!a || typeof lb.showModal !== 'function') return; e.preventDefault(); lbShow(+a.dataset.sch); lb.showModal(); });
+      lb.addEventListener('click', function (e) {
+        if (e.target.closest('.lb__x') || e.target.classList.contains('lb__stage')) return lb.close();
+        if (e.target.closest('.lb__prev')) lbShow(cur - 1); else if (e.target.closest('.lb__next')) lbShow(cur + 1);
+      });
+      lb.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') lbShow(cur - 1); else if (e.key === 'ArrowRight') lbShow(cur + 1); });
+    }
     var main = $('#gal-main'), wrapEl = main.parentNode;
     /* Фото товара всегда целиком (правка 18.11): широкие снимки — с меньшими полями, без обрезки */
     function fit() { wrapEl.classList.remove('cover'); wrapEl.classList.toggle('wide', main.naturalWidth > main.naturalHeight * 1.25); }
