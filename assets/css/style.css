@@ -841,3 +841,16 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .offer__schg, .offer__schg--2 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3mm; }
   .offer__schg img { width: 100%; max-width: none; height: 32mm; }
 }
+
+/* 25.11, ночь: КП компактнее, чтобы итог помещался на первый лист; схемы идут сразу за КП без пустого листа */
+@media print {
+  .offer__tbl td { padding-top: 2pt; padding-bottom: 2pt; font-size: 9.5pt; line-height: 1.25; }
+  .offer__tbl small { font-size: 7.5pt; line-height: 1.2; }
+  .offer__pic img { width: 42pt; height: 42pt; }
+  .offer__pic { width: 48pt; }
+  .offer h1 { margin: 6pt 0 4pt; }
+  .offer table.offer__sum { margin-top: 4pt; }
+  .offer__terms { margin-top: 6pt; }
+  body.print-sch .offer__sch { break-before: auto; margin-top: 10mm; }
+  .offer__schtop { break-after: avoid; }
+}

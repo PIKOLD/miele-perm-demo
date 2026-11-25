@@ -1005,7 +1005,7 @@
         r.unit2 = (pct || ppct) ? Math.floor(base / r.qty * kf / 100) * 100 : Math.round(base / r.qty); r.sum2 = r.unit2 * r.qty;
       });
       var total = (pct || ppct || setOff) ? rows.reduce(function (a, r) { return a + (r.sum2 || 0); }, 0) : sum, discount = sum - total;
-      var volDisc = ppct ? Math.round(sum * pct / 100) : discount, promoDisc = ppct ? discount - volDisc : 0;
+      var volDisc = ppct ? Math.round(sum * pct / 10000) * 100 : discount, promoDisc = ppct ? discount - volDisc : 0;
       return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, volDisc: volDisc, promoDisc: promoDisc, total: total, next: next, tiers: tiers, promo: promo };
     },
     /* Заявка посетителя. На сервере возвращает обещание: true — принята, false — не отправилась */

@@ -69,7 +69,10 @@
   var schUp = null;
   function renderSchemes() {
     var q = ($('#sch-q').value || '').trim().toLowerCase(), only = $('#sch-only').checked;
-    var list = S.products().filter(function (p) { return (!q || (p.title + ' ' + (p.model || '')).toLowerCase().indexOf(q) >= 0) && (!only || (p.schemes || []).length); });
+    /* только техника, которую встраивают или ставят в колонну (25.11): без кофе, химии, аксессуаров, сувениров, пылесосов */
+    var SCH_CATS = ['Варочные поверхности', 'Духовые шкафы', 'Микроволновые печи', 'Посудомоечные машины', 'Вытяжки', 'Стиральные машины', 'Сушильные машины', 'Распродажа выставочных образцов'];
+    var fits = function (p) { return (p.schemes || []).length || SCH_CATS.indexOf(p.category) >= 0 || (p.category === 'Кофемашины' && /встраива/i.test(p.title)); };
+    var list = S.products().filter(function (p) { return fits(p) && (!q || (p.title + ' ' + (p.model || '')).toLowerCase().indexOf(q) >= 0) && (!only || (p.schemes || []).length); });
     var th = function (arr, kind) { return arr.map(function (src, i) { return '<div class="pic"><img src="' + esc(src) + '" alt="" loading="lazy">' + (kind === 'schemes' ? '<button type="button" data-x="' + i + '" aria-label="Удалить схему">×</button>' : '') + '<button type="button" class="pic__mv" data-m="' + kind + '" data-i="' + i + '">' + (kind === 'images' ? 'В схемы' : 'В фото') + '</button></div>'; }).join(''); };
     $('#sch-list').innerHTML = list.length ? list.map(function (p) {
       var n = (p.schemes || []).length;
