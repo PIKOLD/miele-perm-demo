@@ -854,3 +854,5 @@ button.salon__pic:hover img { transform: scale(1.03); }
   body.print-sch .offer__sch { break-before: auto; margin-top: 10mm; }
   .offer__schtop { break-after: avoid; }
 }
+/* 25.11, ночь: фото в КП на ~25% крупнее — место на листе есть */
+@media print { .offer__pic img { width: 52pt; height: 52pt; } .offer__pic { width: 58pt; } }
