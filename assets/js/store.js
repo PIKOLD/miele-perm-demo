@@ -671,7 +671,7 @@
   SEED.forEach(function (p) { p.visible = true; p.orderable = true; p.showroom = p.stock > 0; });
 
   var DEFAULTS = {
-    rev: 5,                   // версия настроек (2 — «Гладильные системы» перед «Пылесосами», 3 — скидка 7% от 1 300 000 ₽, 4 — срок под заказ от 30 дней, 5 — снова от 5 дней)
+    rev: 6,                   // версия настроек (2 — «Гладильные системы» перед «Пылесосами», 3 — скидка 7% от 1 300 000 ₽, 4 — срок под заказ от 30 дней, 5 — снова от 5 дней)
     showCount: true,         // показывать покупателям «2 шт.», когда осталось мало
     lowDefault: 2,            // порог «мало» для новых товаров
     highDefault: 5,           // порог «много» для новых товаров
@@ -687,7 +687,8 @@
     /* Картинки папок каталога. Если для раздела картинки нет, берётся фото первого товара раздела */
     catImages: { 'Гладильные системы': 'assets/img/cats/ironing.webp', 'Микроволновые печи': 'assets/img/cats/microwave.webp', 'Вытяжки': 'assets/img/cats/hood.webp', 'Кофемашины': 'assets/img/cats/coffee.webp', 'Пылесосы': 'assets/img/cats/vacuum.webp', 'Бытовая химия': 'assets/img/cats/chem.webp', 'Сувенирная продукция': 'assets/img/cats/souvenir.webp', 'Распродажа выставочных образцов': 'assets/img/mood/m4.webp' },
     /* Скидка за объём заказа в корзине: от суммы — процент */
-    discounts: [{ from: 700000, pct: 3 }, { from: 1000000, pct: 5 }, { from: 1300000, pct: 7 }],
+    discounts: [],          // скидка за объём выключена (25.11): скидку даёт промокод
+    promos: [{ code: 'VATEKS3', pct: 3 }, { code: 'VATEKS5', pct: 5 }, { code: 'VATEKS7', pct: 7 }],
     gis: 'https://2gis.ru/perm/firm/70000001026549959',
     ymaps: 'https://yandex.ru/maps/org/miele/121722485798/',
     sets: [
@@ -848,7 +849,8 @@
       if (!(s.rev >= 3) && Array.isArray(s.discounts) && !s.discounts.some(function (t) { return +t.from >= 1300000 || +t.pct >= 7; })) {
         s.discounts = s.discounts.concat([{ from: 1300000, pct: 7 }]);
       }
-      if (!(s.rev >= 5) && s.leadTime === 'от 30 дней') delete s.leadTime;   // 17.11: общий срок снова «от 5 дней»
+      if (!(s.rev >= 5) && s.leadTime === 'от 30 дней') delete s.leadTime;
+      if (!(s.rev >= 6)) s.discounts = [];   // 25.11: вместо скидки за объём — промокоды (владелец может вернуть пороги в кабинете)   // 17.11: общий срок снова «от 5 дней»
       Object.keys(s).forEach(function (k) { out[k] = s[k]; });
       out.rev = DEFAULTS.rev;
       /* Комплекты: состав задан в коде, цены владелец меняет в кабинете (хранятся в kits по названию комплекта) */
@@ -938,6 +940,20 @@
     /* Корзина покупателя: { id товара: количество } */
     cart: function () { var c = read(CKEY, {}); return c && typeof c === 'object' ? c : {}; },
     saveCart: function (c) { return write(CKEY, c); },
+    promo: function () {
+      var code = ''; try { code = localStorage.getItem('mp.promo') || ''; } catch (e) {}
+      return Store.findPromo(code);
+    },
+    findPromo: function (code) {
+      code = String(code || '').trim().toUpperCase(); if (!code) return null;
+      var f = (Store.settings().promos || []).filter(function (x) { return String(x.code).toUpperCase() === code && +x.pct > 0; })[0];
+      return f ? { code: String(f.code).toUpperCase(), pct: +f.pct } : null;
+    },
+    setPromo: function (code) {
+      var f = Store.findPromo(code);
+      try { if (f) localStorage.setItem('mp.promo', f.code); else localStorage.removeItem('mp.promo'); } catch (e) {}
+      return f;
+    },
     cartSet: function (id, qty) { var c = Store.cart(); qty = Math.min(99, Math.max(0, parseInt(qty, 10) || 0)); if (qty) c[id] = qty; else delete c[id]; Store.saveCart(c); return qty; },
     cartAdd: function (id) { return Store.cartSet(id, (Store.cart()[id] || 0) + 1); },
     cartCount: function () { return Store.cartCalc().count; },
@@ -974,6 +990,8 @@
       var tiers = (Store.settings().discounts || []).filter(function (t) { return t.from > 0 && t.pct > 0; }).sort(function (a, b) { return a.from - b.from; });
       var pct = 0, next = null;
       tiers.forEach(function (t) { if (sum >= t.from) pct = t.pct; else if (!next) next = { pct: t.pct, need: t.from - sum }; });
+      /* Промокод (25.11): VATEKS3/5/7 и другие из настроек; берётся бо́льшая из скидок */
+      var promo = Store.promo(); if (promo && promo.pct > pct) { pct = promo.pct; next = null; } else promo = null;
       /* Цена со скидкой у каждой строки (просьба владельца 18.11): приборы из комплекта — по цене комплекта, затем скидка за объём.
          Итог — сумма этих строк, чтобы цифры в предложении сходились до рубля */
       rows.forEach(function (r) {
@@ -983,7 +1001,7 @@
         r.unit2 = pct ? Math.floor(base / r.qty * (1 - pct / 100) / 100) * 100 : Math.round(base / r.qty); r.sum2 = r.unit2 * r.qty;
       });
       var total = (pct || setOff) ? rows.reduce(function (a, r) { return a + (r.sum2 || 0); }, 0) : sum, discount = sum - total;
-      return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: total, next: next, tiers: tiers };
+      return { rows: rows, count: count, ask: ask, goods: goods, kits: kits, setOff: setOff, sum: sum, pct: pct, discount: discount, total: total, next: next, tiers: tiers, promo: promo };
     },
     /* Заявка посетителя. На сервере возвращает обещание: true — принята, false — не отправилась */
     addLead: function (lead) {

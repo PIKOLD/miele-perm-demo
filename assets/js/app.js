@@ -312,8 +312,8 @@
         (p.features && p.features.length ? '<ul class="feat">' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>' : '') +
       '</div></div></div>' +
       '<section class="sec sec--soft"><div class="wrap pd__more"><div><h2>Описание</h2><p>' + esc(p.description) + '</p></div>' +
-        (specs.length ? '<div><h2>Характеристики</h2><table class="specs"><tbody>' + specs.map(function (s) { return '<tr><th scope="row">' + esc(s[0]) + '</th><td>' + esc(s[1]) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '') +
-      '</div></section>' +
+        (specs.length ? '<div><h2>Характеристики</h2><table class="specs"><tbody>' + specs.map(function (s) { return s[1] ? '<tr><th scope="row">' + esc(s[0]) + '</th><td>' + esc(s[1]) + '</td></tr>' : '<tr><td colspan="2">' + esc(s[0]) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '') +
+      '</div>' + ((p.schemes || []).length ? '<div class="wrap pd__sch"><h2>Схемы встройки</h2><div class="sch">' + p.schemes.map(function (src, i) { return '<a href="' + esc(src) + '" target="_blank" rel="noopener"><img src="' + esc(src) + '" alt="Схема встройки ' + (i + 1) + ': ' + esc(p.title) + '" loading="lazy"></a>'; }).join('') + '</div></div>' : '') + '</section>' +
       '<section class="sec" id="ask"><div class="wrap ask"><div><p class="eyebrow">Заявка</p><h2>Узнать о наличии и заказать</h2><p class="lead">Оставьте телефон — консультант подтвердит наличие, расскажет об условиях доставки и установки.</p></div><div id="lead"></div></div></section>';
     var main = $('#gal-main'), wrapEl = main.parentNode;
     /* Фото товара всегда целиком (правка 18.11): широкие снимки — с меньшими полями, без обрезки */
@@ -349,7 +349,7 @@
     function orderText() {
       var c = S.cartCalc();
       return c.rows.map(function (r) { return r.p.title + ' × ' + r.qty + (r.sum === null ? ' (цена по запросу)' : ' — ' + money(r.sum)); }).join('; ') +
-        '. Итого: ' + money(c.total) + (c.setOff ? ' (цена комплекта: −' + money(c.setOff) + ')' : '') + (c.pct ? ' (скидка за объём ' + c.pct + '%)' : '');
+        '. Итого: ' + money(c.total) + (c.setOff ? ' (цена комплекта: −' + money(c.setOff) + ')' : '') + (c.pct ? (c.promo ? ' (промокод ' + c.promo.code + ', скидка ' + c.pct + '%)' : ' (скидка за объём ' + c.pct + '%)') : '');
     }
     /* Состав заказа для кабинета: строки с фото, ценой и суммой и итоги — как в печатном предложении, на момент отправки заявки */
     function orderData() {
@@ -380,12 +380,16 @@
       '<aside class="sum"><h2>Ваш заказ</h2><dl>' +
         '<div><dt>Товары, ' + c.count + ' шт.</dt><dd>' + money(c.goods) + '</dd></div>' +
         c.kits.map(function (k) { return '<div class="sum__disc"><dt>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</dt><dd>−' + money(k.off) + '</dd></div>'; }).join('') +
-        (c.pct ? '<div class="sum__disc"><dt>Скидка за объём ' + c.pct + '%</dt><dd>−' + money(c.discount) + '</dd></div>' : '') +
+        (c.pct ? '<div class="sum__disc"><dt>' + (c.promo ? 'Скидка по промокоду ' + esc(c.promo.code) + ' — ' : 'Скидка за объём ') + c.pct + '%</dt><dd>−' + money(c.discount) + '</dd></div>' : '') +
         '<div class="sum__total"><dt>Итого</dt><dd>' + money(c.total) + '</dd></div></dl>' +
+        '<div class="promo">' + (c.promo
+          ? '<p class="promo__ok">Промокод <b>' + esc(c.promo.code) + '</b> применён <button type="button" id="promo-x">убрать</button></p>'
+          : '<div class="promo__row"><input id="promo-in" type="text" placeholder="Промокод" aria-label="Промокод" autocomplete="off" spellcheck="false"><button type="button" class="btn btn--line" id="promo-go">Применить</button></div><p class="promo__err" id="promo-err" hidden>Такого промокода нет</p>') + '</div>' +
         (c.ask ? '<p class="sum__note">Товары с ценой по запросу (' + c.ask + ' шт.) в сумму не входят — цену назовёт консультант.</p>' : '') +
-        (c.tiers.length ? '<p class="sum__next">' + (c.next ? 'До скидки ' + c.next.pct + '% не хватает ' + money(c.next.need) + '.' : 'Применена максимальная скидка за объём.') + '</p><p class="sum__note">Скидка за объём заказа: ' + tiersText(c) + '.</p>' : '') +
+        (c.tiers.length && !c.promo ? '<p class="sum__next">' + (c.next ? 'До скидки ' + c.next.pct + '% не хватает ' + money(c.next.need) + '.' : 'Применена максимальная скидка за объём.') + '</p><p class="sum__note">Скидка за объём заказа: ' + tiersText(c) + '.</p>' : '') +
         '<a class="btn btn--wide" href="#ask">Оформить заявку</a>' +
         '<button type="button" class="btn btn--line btn--wide" id="print">Предложение в PDF</button>' +
+        (c.rows.some(function (r) { return (r.p.schemes || []).length; }) ? '<button type="button" class="btn btn--line btn--wide" id="print-sch">Предложение со схемами встройки</button>' : '') +
         '<p class="sum__note">Откроется окно печати: выберите «Сохранить как PDF» или сразу распечатайте.</p>' +
       '</aside></div>';
 
@@ -403,18 +407,23 @@
         }).join('') + '</tbody></table>' +
         '<table class="offer__sum"><tbody>' + (cut ? '<tr><th>Итого</th><td>' + money(c.goods) + '</td></tr>' : '') +
           c.kits.map(function (k) { return '<tr><th>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</th><td>−' + money(k.off) + '</td></tr>'; }).join('') +
-          (c.pct ? '<tr><th>Скидка за объём заказа ' + c.pct + '%</th><td>−' + money(c.discount) + '</td></tr>' : '') +
+          (c.pct ? '<tr><th>' + (c.promo ? 'Скидка ' : 'Скидка за объём заказа ') + c.pct + '%</th><td>−' + money(c.discount) + '</td></tr>' : '') +
           '<tr class="offer__total"><th>' + (cut ? 'Итого со скидкой' : 'Итого') + '</th><td>' + money(c.total) + '</td></tr></tbody></table>' +
         (c.ask ? '<p class="offer__p">Позиции с ценой по запросу в сумму не включены — стоимость уточнит консультант.</p>' : '') +
         '<div class="offer__terms"><p>Доставка, погрузочно-разгрузочные работы оплачиваются дополнительно.</p><p>Подключение бытовой техники оплачивается согласно прайс-листу.</p><p>Бесплатное хранение товара на складе Поставщика — 2 месяца.</p></div>' +
         '<p class="offer__legal">Предложение сформировано на сайте ' + today + ', носит информационный характер и не является публичной офертой (ст. 437 ГК РФ). Цены и наличие действительны на дату формирования — уточняйте у консультантов шоурума.</p>' +
+        c.rows.filter(function (r) { return (r.p.schemes || []).length; }).map(function (r) { var p = r.p; return '<section class="offer__sch"><div class="offer__schtop"><img src="assets/img/miele-logo.svg" alt="Miele"><span>Схемы встройки</span></div><h2>' + esc(p.title) + '</h2>' + (p.model ? '<p class="offer__schm">Модель ' + esc(p.model) + '</p>' : '') + '<div class="offer__schg' + (p.schemes.length > 1 ? ' offer__schg--2' : '') + '">' + p.schemes.map(function (src) { return '<img src="' + esc(src) + '" alt="">'; }).join('') + '</div></section>'; }).join('') +
         '</td></tr></tbody></table>';
     }
     body.addEventListener('click', function (e) {
-      if (e.target.id === 'print') {
-        var t = document.title; document.title = 'Предложение Miele Пермь от ' + new Date().toLocaleDateString('ru-RU');
+      if (e.target.id === 'print' || e.target.id === 'print-sch') {
+        var sch = e.target.id === 'print-sch', t = document.title;
+        document.title = 'Предложение Miele Пермь' + (sch ? ' со схемами встройки' : '') + ' от ' + new Date().toLocaleDateString('ru-RU');
+        document.body.classList.toggle('print-sch', sch);
         window.print(); document.title = t; return;
       }
+      if (e.target.id === 'promo-go') return applyPromo();
+      if (e.target.id === 'promo-x') { S.setPromo(''); return draw(); }
       var row = e.target.closest('.ci'); if (!row) return;
       var id = row.dataset.id, step = e.target.closest('[data-q]');
       if (step) { S.cartSet(id, Math.max(1, (S.cart()[id] || 1) + +step.dataset.q)); return draw(); }
@@ -424,6 +433,13 @@
       var row = e.target.closest('.ci'); if (!row || !e.target.matches('.qty input')) return;
       S.cartSet(row.dataset.id, Math.max(1, parseInt(e.target.value, 10) || 1)); draw();
     });
+    function applyPromo() {
+      var inp = $('#promo-in'); if (!inp) return;
+      if (S.setPromo(inp.value)) return draw();
+      var er = $('#promo-err'); if (er) er.hidden = !inp.value.trim(); inp.focus();
+    }
+    body.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.id === 'promo-in') { e.preventDefault(); applyPromo(); } });
+    window.addEventListener('afterprint', function () { document.body.classList.remove('print-sch'); });
     window.addEventListener('storage', draw);
     draw();
     leadForm($('#lead'), null, orderText, orderData);

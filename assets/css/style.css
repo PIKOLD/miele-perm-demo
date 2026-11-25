@@ -770,3 +770,36 @@ button.salon__pic:hover img { transform: scale(1.03); }
 /* 20.11, вечер: пункты меню тем же шрифтом, что телефон справа; логотип в КП на 20% крупнее */
 .nav a { font-size: 15px; font-weight: 600; color: #fff; }
 @media print { .offer__top img { height: 34pt; } }
+
+/* 25.11: ровные чёрточки в списке особенностей (символ вместо полоски дробной толщины) */
+.feat li::before { content: "—"; top: 0; width: auto; height: auto; background: none; color: var(--red); font-weight: 400; line-height: inherit; }
+
+/* 25.11: промокод в корзине */
+.promo { margin: 14px 0 4px; }
+.promo__row { display: flex; gap: 8px; }
+.promo__row input { flex: 1; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid var(--line); font: inherit; text-transform: uppercase; }
+.promo__row .btn { min-height: 44px; padding: 0 16px; }
+.promo__err { margin: 6px 0 0; color: var(--red); font-size: 14px; }
+.promo__ok { margin: 0; font-size: 14px; }
+.promo__ok button { margin-left: 8px; padding: 0; border: 0; background: none; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; }
+
+/* 25.11: схемы встройки на странице товара */
+.pd__sch { margin-top: clamp(32px, 4vw, 48px); }
+.pd__sch h2 { margin-bottom: 16px; }
+.sch { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+.sch a { display: block; background: #fff; border: 1px solid var(--line); padding: 12px; }
+.sch img { display: block; width: 100%; height: auto; }
+
+/* 25.11: второе предложение — страницы со схемами встройки (только при печати «со схемами») */
+.offer__sch { display: none; }
+@media print {
+  body.print-sch .offer__sch { display: block; break-before: page; }
+  .offer__schtop { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8pt; border-bottom: 1.5pt solid #000; }
+  .offer__schtop img { height: 34pt; width: auto; }
+  .offer__schtop span { font-size: 10pt; text-transform: uppercase; letter-spacing: .08em; color: #555; }
+  .offer__sch h2 { font-size: 14pt; margin: 12pt 0 2pt; }
+  .offer__schm { margin: 0 0 10pt; font-size: 9.5pt; color: #555; }
+  .offer__schg { display: grid; gap: 10pt; }
+  .offer__schg--2 { grid-template-columns: 1fr 1fr; }
+  .offer__schg img { width: 100%; max-height: 220mm; object-fit: contain; break-inside: avoid; }
+}

@@ -6,8 +6,8 @@
 <title>Кабинет шоурума — Miele Пермь</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css?v=41">
-<link rel="stylesheet" href="assets/css/admin.css?v=41">
+<link rel="stylesheet" href="assets/css/style.css?v=42">
+<link rel="stylesheet" href="assets/css/admin.css?v=42">
 </head>
 <body class="adm">
 
@@ -85,6 +85,8 @@
           </div>
           <label class="chk"><input type="checkbox" name="showCount"><span>Показывать покупателям точное количество, когда осталось мало («Осталось мало · 2 шт.»)</span></label>
           <div><label for="s-lead">Срок поставки под заказ</label><input id="s-lead" name="leadTime" type="text"><p class="hint">Показывается у товаров с остатком 0. Например: от 5 дней. Свой срок у товара — галочкой в его карточке.</p></div>
+          <div><h2 style="margin-top:8px">Промокоды</h2><p>Покупатель вводит промокод в корзине и получает скидку. Каждый с новой строки: «КОД = %», например VATEKS5 = 5.</p></div>
+          <div><label for="s-promos">Промокоды</label><textarea id="s-promos" name="promos" rows="3" spellcheck="false"></textarea></div>
           <div><h2 style="margin-top:8px">Скидка за объём заказа в корзине</h2><p>Если сумма корзины не меньше порога, покупатель видит скидку. Оставьте поля пустыми, чтобы отключить ступень.</p></div>
           <div class="row">
             <div><label for="s-d1f">Первая ступень: от суммы, ₽</label><input id="s-d1f" name="d1from" type="number" min="0" step="1000" inputmode="numeric"></div>
@@ -185,7 +187,13 @@
       <fieldset class="fs"><legend>Фотографии</legend>
         <div class="pics" id="e-pics"></div>
         <div class="btnrow" style="margin-top:12px"><button class="abtn" type="button" id="e-upload">Загрузить фото</button><input type="file" id="e-file" accept="image/*" multiple hidden></div>
-        <p class="hint">Первое фото — главное. Лучше на белом фоне.</p>
+        <p class="hint">Первое фото — главное. Лучше на белом фоне. Чертёж с размерами переносите кнопкой «В схемы».</p>
+      </fieldset>
+
+      <fieldset class="fs"><legend>Схемы встройки</legend>
+        <div class="pics" id="e-sch"></div>
+        <div class="btnrow" style="margin-top:12px"><button class="abtn" type="button" id="e-sch-upload">Загрузить схему</button></div>
+        <p class="hint">Чертежи с размерами для встраивания. На сайте — отдельным блоком под товаром, в корзине — во втором предложении «со схемами встройки». Схем может не быть или быть несколько.</p>
       </fieldset>
 
       <fieldset class="fs"><legend>Описание</legend>
@@ -205,7 +213,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="api/state.php"></script>
-<script src="assets/js/store.js?v=41"></script>
-<script src="assets/js/admin.js?v=41"></script>
+<script src="assets/js/store.js?v=42"></script>
+<script src="assets/js/admin.js?v=42"></script>
 </body>
 </html>

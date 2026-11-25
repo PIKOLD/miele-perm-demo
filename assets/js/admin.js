@@ -165,11 +165,15 @@
 
   /* ---------- Редактор ---------- */
   var ed = $('#editor'), ef = $('form', ed), editing = null, pics = [], KITS = 'Комплекты';
-  function drawPics() {
-    $('#e-pics').innerHTML = pics.length ? pics.map(function (src, i) {
-      return '<div class="pic"><img src="' + esc(src) + '" alt=""><button type="button" data-rm="' + i + '" aria-label="Убрать фото ' + (i + 1) + '">×</button></div>';
-    }).join('') : '<p class="hint" style="margin:0">Фото пока нет.</p>';
+  /* Фото и схемы встройки (25.11): два отдельных списка, кадр можно перенести из одного в другой */
+  var schemes = [], upTarget = 'pics';
+  function drawList(box, arr, kind) {
+    $(box).innerHTML = arr.length ? arr.map(function (src, i) {
+      return '<div class="pic"><img src="' + esc(src) + '" alt=""><button type="button" data-rm="' + i + '" data-k="' + kind + '" aria-label="Убрать ' + (i + 1) + '">×</button>' +
+        '<button type="button" class="pic__mv" data-mv="' + i + '" data-k="' + kind + '">' + (kind === 'pics' ? 'В схемы' : 'В фото') + '</button></div>';
+    }).join('') : '<p class="hint" style="margin:0">' + (kind === 'pics' ? 'Фото пока нет.' : 'Схем нет — блок на сайте не показывается.') + '</p>';
   }
+  function drawPics() { drawList('#e-pics', pics, 'pics'); drawList('#e-sch', schemes, 'schemes'); }
   function drawNow() {
     var st = S.status({ stock: ef.elements.stock.value, low: ef.elements.low.value, high: ef.elements.high.value, orderable: ef.elements.orderable.checked });
     $('#e-now').innerHTML = 'На сайте сейчас: ' + '<span class="stock stock--' + st.key + '"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>' + esc(st.label) + '</span><span style="color:var(--muted)">(' + esc(st.admin.toLowerCase()) + ')</span>';
@@ -177,7 +181,7 @@
   function edit(id, cat) {
     var cfg = S.settings();
     var p = id ? S.product(id) : { title: '', model: '', sku: '', category: cat || '', country: '', price: null, stock: 0, low: cfg.lowDefault, high: cfg.highDefault, orderable: true, visible: true, showroom: false, images: [], description: '', features: [], specs: [] };
-    editing = id; pics = (p.images || []).slice();
+    editing = id; pics = (p.images || []).slice(); schemes = (p.schemes || []).slice();
     $('#ed-title').textContent = id ? 'Изменить товар' : 'Новый товар';
     var el = ef.elements;
     el.title.value = p.title; el.model.value = p.model || ''; el.sku.value = p.sku || ''; el.category.value = p.category || ''; el.country.value = p.country || '';
@@ -187,7 +191,7 @@
     el.lead5.checked = p.lead === 'от 5 дней'; el.lead30.checked = p.lead === 'от 30 дней';
     el.description.value = p.description || '';
     el.features.value = (p.features || []).join('\n');
-    el.specs.value = (p.specs || []).map(function (s) { return s[0] + ': ' + s[1]; }).join('\n');
+    el.specs.value = (p.specs || []).map(function (s) { return s[1] ? s[0] + ': ' + s[1] : s[0]; }).join('\n');
     $('#cats').innerHTML = S.cats().map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
     /* Дополнительные разделы товара (по просьбе владельца 15.11): стиральные и сушильные машины, «Комплекты» и распродажа образцов.
        Раздел, в котором товар уже отмечен, тоже показывается, чтобы отметка не пропала при сохранении */
@@ -206,18 +210,26 @@
   ef.elements.category.addEventListener('input', function () { if (this.value.trim()) $('#w-cat').classList.remove('bad'); });
   ef.elements.oldPrice.addEventListener('input', function () { $('#w-old').classList.remove('bad'); });
   $$('[data-close]', ed).forEach(function (b) { b.addEventListener('click', function () { ed.close(); }); });
-  $('#e-pics').addEventListener('click', function (e) { var b = e.target.closest('[data-rm]'); if (b) { pics.splice(+b.dataset.rm, 1); drawPics(); } });
-  $('#e-upload').addEventListener('click', function () { $('#e-file').click(); });
+  ['#e-pics', '#e-sch'].forEach(function (box) { $(box).addEventListener('click', function (e) {
+    var b = e.target.closest('[data-rm],[data-mv]'); if (!b) return;
+    var from = b.dataset.k === 'pics' ? pics : schemes, to = from === pics ? schemes : pics;
+    var item = from.splice(+(b.dataset.rm || b.dataset.mv), 1)[0];
+    if (b.hasAttribute('data-mv')) to.push(item);
+    drawPics();
+  }); });
+  $('#e-upload').addEventListener('click', function () { upTarget = 'pics'; $('#e-file').click(); });
+  $('#e-sch-upload').addEventListener('click', function () { upTarget = 'schemes'; $('#e-file').click(); });
   $('#e-file').addEventListener('change', function (e) {
+    var tgt = upTarget;
     Array.prototype.forEach.call(e.target.files, function (file) {
       var img = new Image(), url = URL.createObjectURL(file);
       img.onload = function () {
-        var k = Math.min(1, 1000 / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+        var k = Math.min(1, (tgt === 'schemes' ? 1800 : 1000) / Math.max(img.width, img.height)), cv = document.createElement('canvas');
         cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
         var ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0, cv.width, cv.height);
         var data = cv.toDataURL('image/webp', .82); if (data.indexOf('data:image/webp') !== 0) data = cv.toDataURL('image/jpeg', .85);
         URL.revokeObjectURL(url);
-        S.upload(data).then(function (src) { pics.push(src); drawPics(); }, function (er) { toast('Фото «' + file.name + '» не загрузилось: ' + (er && er.message || 'ошибка'), true); });
+        S.upload(data).then(function (src) { (tgt === 'schemes' ? schemes : pics).push(src); drawPics(); }, function (er) { toast('Фото «' + file.name + '» не загрузилось: ' + (er && er.message || 'ошибка'), true); });
       };
       img.onerror = function () { toast('Файл «' + file.name + '» не похож на изображение', true); URL.revokeObjectURL(url); };
       img.src = url;
@@ -240,11 +252,11 @@
       also: Array.prototype.map.call(document.querySelectorAll('#e-also input:checked'), function (i) { return i.value; }).filter(function (c) { return c !== cat; }),
       price: price, oldPrice: old, saleUntil: old !== null ? el.saleUntil.value : '',
       stock: Math.max(0, parseInt(el.stock.value, 10) || 0), low: low, high: Math.max(low + 1, parseInt(el.high.value, 10) || low + 1),
-      orderable: el.orderable.checked, visible: el.visible.checked, showroom: el.showroom.checked, images: pics.slice(),
+      orderable: el.orderable.checked, visible: el.visible.checked, showroom: el.showroom.checked, images: pics.slice(), schemes: schemes.slice(),
       lead: el.lead5.checked ? 'от 5 дней' : el.lead30.checked ? 'от 30 дней' : '',
       description: el.description.value.trim(),
       features: el.features.value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
-      specs: el.specs.value.split('\n').map(function (s) { var i = s.indexOf(':'); return i > 0 ? [s.slice(0, i).trim(), s.slice(i + 1).trim()] : null; }).filter(function (s) { return s && s[0] && s[1]; })
+      specs: el.specs.value.split('\n').map(function (s) { s = s.trim(); if (!s) return null; var i = s.indexOf(':'); return i > 0 && s.slice(i + 1).trim() ? [s.slice(0, i).trim(), s.slice(i + 1).trim()] : [s.replace(/:$/, ''), '']; }).filter(Boolean)
     };
     var list = S.products();
     if (editing) list = list.map(function (p) { if (p.id !== editing) return p; data.id = p.id; return data; });
@@ -425,6 +437,7 @@
     var d = c.discounts || [];
     [1, 2, 3].forEach(function (n) { el['d' + n + 'from'].value = d[n - 1] ? d[n - 1].from : ''; el['d' + n + 'pct'].value = d[n - 1] ? d[n - 1].pct : ''; });
     el.cats.value = (c.cats || []).join('\n');
+    el.promos.value = (c.promos || []).map(function (x) { return x.code + ' = ' + x.pct; }).join('\n');
     el.showCount.checked = !!c.showCount;
   }
   sf.addEventListener('submit', function (e) {
@@ -433,6 +446,7 @@
     c.lowDefault = Math.max(1, parseInt(el.lowDefault.value, 10) || 1);
     c.highDefault = Math.max(c.lowDefault + 1, parseInt(el.highDefault.value, 10) || c.lowDefault + 1);
     c.showCount = el.showCount.checked;
+    c.promos = el.promos.value.split('\n').map(function (l) { var m = l.match(/^\s*([A-Za-zА-Яа-яЁё0-9_-]+)\s*[=:\s]\s*(\d+(?:[.,]\d+)?)\s*%?\s*$/); return m ? { code: m[1].toUpperCase(), pct: Math.min(90, parseFloat(m[2].replace(',', '.'))) } : null; }).filter(Boolean);
     ['leadTime', 'phone', 'phone2', 'address', 'hours'].forEach(function (k) { c[k] = el[k].value.trim(); });
     c.telegram = el.telegram.value.trim().replace(/^(https?:\/\/)?t\.me\//, '').replace(/^[@+]/, '');
     c.discounts = [[el.d1from, el.d1pct], [el.d2from, el.d2pct], [el.d3from, el.d3pct]].map(function (x) { return { from: Math.round(+x[0].value) || 0, pct: Math.min(90, +x[1].value || 0) }; })
