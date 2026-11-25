@@ -59,10 +59,55 @@
 
   function openTab(name) {
     $$('.tab').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'); });
-    ['products', 'kits', 'leads', 'settings', 'users'].forEach(function (n) { $('#tab-' + n).hidden = n !== name; });
+    ['products', 'schemes', 'kits', 'leads', 'settings', 'users'].forEach(function (n) { $('#tab-' + n).hidden = n !== name; });
+    if (name === 'schemes') renderSchemes();
     if (name === 'kits' && !kdirty) { kitsLoad(); renderKits(); }
   }
   $$('.tab').forEach(function (b) { b.addEventListener('click', function () { openTab(b.dataset.tab); }); });
+
+  /* ---------- Схемы встройки (вкладка, 25.11) ---------- */
+  var schUp = null;
+  function renderSchemes() {
+    var q = ($('#sch-q').value || '').trim().toLowerCase(), only = $('#sch-only').checked;
+    var list = S.products().filter(function (p) { return (!q || (p.title + ' ' + (p.model || '')).toLowerCase().indexOf(q) >= 0) && (!only || (p.schemes || []).length); });
+    var th = function (arr, kind) { return arr.map(function (src, i) { return '<div class="pic"><img src="' + esc(src) + '" alt="" loading="lazy">' + (kind === 'schemes' ? '<button type="button" data-x="' + i + '" aria-label="Удалить схему">×</button>' : '') + '<button type="button" class="pic__mv" data-m="' + kind + '" data-i="' + i + '">' + (kind === 'images' ? 'В схемы' : 'В фото') + '</button></div>'; }).join(''); };
+    $('#sch-list').innerHTML = list.length ? list.map(function (p) {
+      var n = (p.schemes || []).length;
+      return '<div class="schrow" data-id="' + esc(p.id) + '"><div class="schrow__h"><b>' + esc(p.title) + '</b>' + (p.model ? '<span>' + esc(p.model) + '</span>' : '') + '<span class="schrow__n' + (n ? ' on' : '') + '">' + (n ? 'схем: ' + n : 'схем нет') + '</span></div>' +
+        '<div class="schrow__c"><div><p class="schrow__l">Фото товара</p><div class="pics">' + (th(p.images || [], 'images') || '<p class="hint" style="margin:0">Фото нет.</p>') + '</div></div>' +
+        '<div><p class="schrow__l">Схемы встройки</p><div class="pics">' + (th(p.schemes || [], 'schemes') || '<p class="hint" style="margin:0">Схем нет.</p>') + '</div><button class="abtn" type="button" data-up style="margin-top:10px">Загрузить схему</button></div></div></div>';
+    }).join('') : '<p class="hint">Ничего не найдено.</p>';
+  }
+  function schChange(id, fn) {
+    var list = S.products(), p = list.filter(function (x) { return x.id === id; })[0]; if (!p) return;
+    p.images = (p.images || []).slice(); p.schemes = (p.schemes || []).slice(); fn(p);
+    if (save(list)) toast('Сохранено'); var y = window.scrollY; renderSchemes(); window.scrollTo(0, y);
+  }
+  $('#sch-q').addEventListener('input', renderSchemes);
+  $('#sch-only').addEventListener('change', renderSchemes);
+  $('#sch-list').addEventListener('click', function (e) {
+    var row = e.target.closest('.schrow'); if (!row) return; var id = row.dataset.id, b;
+    if ((b = e.target.closest('[data-m]'))) return schChange(id, function (p) { var from = b.dataset.m === 'images' ? p.images : p.schemes, to = from === p.images ? p.schemes : p.images; to.push(from.splice(+b.dataset.i, 1)[0]); });
+    if ((b = e.target.closest('[data-x]'))) return confirmBox('Удалить схему?', 'Схема пропадёт с сайта и из предложения.', 'Удалить', function () { schChange(id, function (p) { p.schemes.splice(+b.dataset.x, 1); }); });
+    if (e.target.closest('[data-up]')) { schUp = id; $('#sch-file').click(); }
+  });
+  $('#sch-file').addEventListener('change', function (e) {
+    var id = schUp;
+    Array.prototype.forEach.call(e.target.files, function (file) {
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var k = Math.min(1, 1800 / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+        var ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        var data = cv.toDataURL('image/webp', .85); if (data.indexOf('data:image/webp') !== 0) data = cv.toDataURL('image/jpeg', .88);
+        URL.revokeObjectURL(url);
+        S.upload(data).then(function (src) { schChange(id, function (p) { p.schemes.push(src); }); }, function (er) { toast('Схема «' + file.name + '» не загрузилась: ' + (er && er.message || 'ошибка'), true); });
+      };
+      img.onerror = function () { toast('Файл «' + file.name + '» не похож на изображение', true); URL.revokeObjectURL(url); };
+      img.src = url;
+    });
+    e.target.value = '';
+  });
 
   /* ---------- Товары ---------- */
   var filter = 'all', query = '', asort = 'default', acat = '', closed = {};
