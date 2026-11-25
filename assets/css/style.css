@@ -821,3 +821,23 @@ button.salon__pic:hover img { transform: scale(1.03); }
 .lb--sch .lb__btn:hover { background: var(--ink); color: #fff; }
 .lb .lb__btn[hidden] { display: none; }
 .sch { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+
+/* 25.11, ночь: блок «Ваш заказ» — длинные кнопки переносят текст и не вылезают за плашку */
+.sum { min-width: 0; }
+.sum .btn { white-space: normal; text-align: center; height: auto; min-height: 48px; padding: 12px 16px; line-height: 1.3; }
+.promo__row input { width: 100%; }
+
+/* 25.11, ночь: схемы встройки в PDF — компактно, строка на товар, всё на 1–2 листа */
+@media print {
+  body.print-sch .offer__sch { display: block; break-before: page; }
+  .offer__schr { display: grid; grid-template-columns: 44mm minmax(0, 1fr); gap: 4mm; padding: 2.5mm 0; border-bottom: .5pt solid #bbb; break-inside: avoid; }
+  .offer__schn b { display: block; font-size: 9pt; line-height: 1.3; font-weight: 600; }
+  .offer__schn span { display: block; margin-top: 1pt; font-size: 8pt; color: #555; }
+  .offer__schg, .offer__schg--2 { display: flex; flex-wrap: wrap; gap: 3mm; grid-template-columns: none; }
+  .offer__schg img { width: auto; height: 34mm; max-width: 44mm; max-height: none; object-fit: contain; }
+  .offer__schtop { margin-bottom: 2mm; }
+}
+@media print {
+  .offer__schg, .offer__schg--2 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3mm; }
+  .offer__schg img { width: 100%; max-width: none; height: 32mm; }
+}

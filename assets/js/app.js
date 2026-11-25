@@ -363,7 +363,7 @@
     function orderText() {
       var c = S.cartCalc();
       return c.rows.map(function (r) { return r.p.title + ' × ' + r.qty + (r.sum === null ? ' (цена по запросу)' : ' — ' + money(r.sum)); }).join('; ') +
-        '. Итого: ' + money(c.total) + (c.setOff ? ' (цена комплекта: −' + money(c.setOff) + ')' : '') + (c.pct ? (c.promo ? ' (промокод ' + c.promo.code + ', скидка ' + c.pct + '%)' : ' (скидка за объём ' + c.pct + '%)') : '');
+        '. Итого: ' + money(c.total) + (c.setOff ? ' (цена комплекта: −' + money(c.setOff) + ')' : '') + (c.pct ? ' (скидка за объём ' + c.pct + '%)' : '') + (c.promo ? ' (промокод ' + c.promo.code + ', ещё ' + c.promo.pct + '%)' : '');
     }
     /* Состав заказа для кабинета: строки с фото, ценой и суммой и итоги — как в печатном предложении, на момент отправки заявки */
     function orderData() {
@@ -394,13 +394,14 @@
       '<aside class="sum"><h2>Ваш заказ</h2><dl>' +
         '<div><dt>Товары, ' + c.count + ' шт.</dt><dd>' + money(c.goods) + '</dd></div>' +
         c.kits.map(function (k) { return '<div class="sum__disc"><dt>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</dt><dd>−' + money(k.off) + '</dd></div>'; }).join('') +
-        (c.pct ? '<div class="sum__disc"><dt>' + (c.promo ? 'Скидка по промокоду ' + esc(c.promo.code) + ' — ' : 'Скидка за объём ') + c.pct + '%</dt><dd>−' + money(c.discount) + '</dd></div>' : '') +
+        (c.pct ? '<div class="sum__disc"><dt>Скидка за объём ' + c.pct + '%</dt><dd>−' + money(c.volDisc) + '</dd></div>' : '') +
+        (c.promo ? '<div class="sum__disc"><dt>Промокод ' + esc(c.promo.code) + ' — ' + c.promo.pct + '%</dt><dd>−' + money(c.promoDisc) + '</dd></div>' : '') +
         '<div class="sum__total"><dt>Итого</dt><dd>' + money(c.total) + '</dd></div></dl>' +
         '<div class="promo">' + (c.promo
           ? '<p class="promo__ok">Промокод <b>' + esc(c.promo.code) + '</b> применён <button type="button" id="promo-x">убрать</button></p>'
           : '<div class="promo__row"><input id="promo-in" type="text" placeholder="Промокод" aria-label="Промокод" autocomplete="off" spellcheck="false"><button type="button" class="btn btn--line" id="promo-go">Применить</button></div><p class="promo__err" id="promo-err" hidden>Такого промокода нет</p>') + '</div>' +
         (c.ask ? '<p class="sum__note">Товары с ценой по запросу (' + c.ask + ' шт.) в сумму не входят — цену назовёт консультант.</p>' : '') +
-        (c.tiers.length && !c.promo ? '<p class="sum__next">' + (c.next ? 'До скидки ' + c.next.pct + '% не хватает ' + money(c.next.need) + '.' : 'Применена максимальная скидка за объём.') + '</p><p class="sum__note">Скидка за объём заказа: ' + tiersText(c) + '.</p>' : '') +
+        (c.tiers.length ? '<p class="sum__next">' + (c.next ? 'До скидки ' + c.next.pct + '% не хватает ' + money(c.next.need) + '.' : 'Применена максимальная скидка за объём.') + '</p><p class="sum__note">Скидка за объём заказа: ' + tiersText(c) + '.</p>' : '') +
         '<a class="btn btn--wide" href="#ask">Оформить заявку</a>' +
         '<button type="button" class="btn btn--line btn--wide" id="print">Предложение в PDF</button>' +
         (c.rows.some(function (r) { return (r.p.schemes || []).length; }) ? '<button type="button" class="btn btn--line btn--wide" id="print-sch">Предложение со схемами встройки</button>' : '') +
@@ -410,7 +411,7 @@
       var today = new Date().toLocaleDateString('ru-RU');
       /* Поля страницы заданы пустыми строками таблицы (шапка и подвал повторяются на каждом листе): у самой страницы поля нулевые,
          поэтому браузер не печатает свои колонтитулы с датой и адресом сайта */
-      var cut = c.kits.length || c.pct;
+      var cut = c.kits.length || c.pct || c.promo;
       offer.innerHTML = '<table class="offer__page"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>' +
         '<div class="offer__top"><div class="offer__co"><b>Шоурум Miele</b><span>' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span><span>' + esc(cfg.hours) + '</span></div>' +
           '<img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co offer__co--r">' + offerPhones() + '</div></div>' +
@@ -421,12 +422,16 @@
         }).join('') + '</tbody></table>' +
         '<table class="offer__sum"><tbody>' + (cut ? '<tr><th>Итого</th><td>' + money(c.goods) + '</td></tr>' : '') +
           c.kits.map(function (k) { return '<tr><th>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</th><td>−' + money(k.off) + '</td></tr>'; }).join('') +
-          (c.pct ? '<tr><th>' + (c.promo ? 'Скидка ' : 'Скидка за объём заказа ') + c.pct + '%</th><td>−' + money(c.discount) + '</td></tr>' : '') +
+          (c.pct ? '<tr><th>Скидка за объём заказа ' + c.pct + '%</th><td>−' + money(c.volDisc) + '</td></tr>' : '') +
+          (c.promo ? '<tr><th>Дополнительная скидка ' + c.promo.pct + '%</th><td>−' + money(c.promoDisc) + '</td></tr>' : '') +
           '<tr class="offer__total"><th>' + (cut ? 'Итого со скидкой' : 'Итого') + '</th><td>' + money(c.total) + '</td></tr></tbody></table>' +
         (c.ask ? '<p class="offer__p">Позиции с ценой по запросу в сумму не включены — стоимость уточнит консультант.</p>' : '') +
         '<div class="offer__terms"><p>Доставка, погрузочно-разгрузочные работы оплачиваются дополнительно.</p><p>Подключение бытовой техники оплачивается согласно прайс-листу.</p><p>Бесплатное хранение товара на складе Поставщика — 2 месяца.</p></div>' +
         '<p class="offer__legal">Предложение сформировано на сайте ' + today + ', носит информационный характер и не является публичной офертой (ст. 437 ГК РФ). Цены и наличие действительны на дату формирования — уточняйте у консультантов шоурума.</p>' +
-        c.rows.filter(function (r) { return (r.p.schemes || []).length; }).map(function (r) { var p = r.p; return '<section class="offer__sch"><div class="offer__schtop"><img src="assets/img/miele-logo.svg" alt="Miele"><span>Схемы встройки</span></div><h2>' + esc(p.title) + '</h2>' + (p.model ? '<p class="offer__schm">Модель ' + esc(p.model) + '</p>' : '') + '<div class="offer__schg' + (p.schemes.length > 1 ? ' offer__schg--2' : '') + '">' + p.schemes.map(function (src) { return '<img src="' + esc(src) + '" alt="">'; }).join('') + '</div></section>'; }).join('') +
+        (function () { var rs = c.rows.filter(function (r) { return (r.p.schemes || []).length; }); if (!rs.length) return '';
+          return '<section class="offer__sch"><div class="offer__schtop"><img src="assets/img/miele-logo.svg" alt="Miele"><span>Схемы встройки</span></div>' + rs.map(function (r) { var p = r.p;
+            return '<div class="offer__schr"><div class="offer__schn"><b>' + esc(p.title) + '</b>' + (p.model ? '<span>Модель ' + esc(p.model) + '</span>' : '') + '</div><div class="offer__schg">' + p.schemes.map(function (src) { return '<img src="' + esc(src) + '" alt="">'; }).join('') + '</div></div>';
+          }).join('') + '</section>'; })() +
         '</td></tr></tbody></table>';
     }
     body.addEventListener('click', function (e) {
