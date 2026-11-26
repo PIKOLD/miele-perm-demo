@@ -16,7 +16,8 @@
   function stockHtml(p) {
     var st = S.status(p), text = st.label;
     if (st.key === 'low' && cfg.showCount) text += ' · ' + p.stock + ' шт.';
-    if (st.key === 'order' && S.leadOf(p)) text += ' · ' + S.leadOf(p);
+    if (st.supply) text += ' · ' + S.supplyText(p);
+    else if (st.key === 'order' && S.leadOf(p)) text += ' · ' + S.leadOf(p);
     return '<span class="stock stock--' + st.key + '"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>' + esc(text) + '</span>';
   }
   /* Цена. Если задана старая цена — она зачёркнута, новая выделена */
@@ -308,7 +309,7 @@
           '<p class="pd__go"' + (S.cart()[p.id] ? '' : ' hidden') + '><a href="cart.html">Перейти в корзину</a></p>' +
           '<p class="pd__msg">Написать: <a target="_blank" rel="noopener" href="' + wa(ask) + '">WhatsApp</a>' + (tg ? '<a target="_blank" rel="noopener" href="' + esc(tg) + '">Telegram</a>' : '') + '</p>' +
           '<p class="pd__hint">' + [p.showroom ? 'Товар можно посмотреть в шоуруме: ' + esc(cfg.address) + '.' : st.level > 0 ? 'Товар в наличии. Адрес шоурума: ' + esc(cfg.address) + '.' : '',
-            st.level > 0 ? '' : 'Привезём под заказ' + esc(S.leadOf(p) ? ' ' + S.leadOf(p) : '') + '. Точный срок назовёт консультант.'].filter(Boolean).join(' ') + '</p></div>' +
+            st.level > 0 ? '' : st.supply ? 'Поставка ожидается ' + esc(S.supplyText(p)) + '. Можно оформить заявку заранее — консультант подтвердит срок.' : 'Привезём под заказ' + esc(S.leadOf(p) ? ' ' + S.leadOf(p) : '') + '. Точный срок назовёт консультант.'].filter(Boolean).join(' ') + '</p></div>' +
         (p.features && p.features.length ? '<ul class="feat">' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>' : '') +
       '</div></div></div>' +
       '<section class="sec sec--soft"><div class="wrap pd__more"><div><h2>Описание</h2><p>' + esc(p.description) + '</p></div>' +
@@ -404,7 +405,7 @@
         (c.tiers.length ? '<p class="sum__next">' + (c.next ? 'До скидки ' + c.next.pct + '% не хватает ' + money(c.next.need) + '.' : 'Применена максимальная скидка за объём.') + '</p><p class="sum__note">Скидка за объём заказа: ' + tiersText(c) + '.</p>' : '') +
         '<a class="btn btn--wide" href="#ask">Оформить заявку</a>' +
         '<button type="button" class="btn btn--line btn--wide" id="print">Предложение в PDF</button>' +
-        (c.rows.some(function (r) { return (r.p.schemes || []).length; }) ? '<button type="button" class="btn btn--line btn--wide" id="print-sch">Предложение со схемами встройки</button>' : '') +
+        (c.rows.some(function (r) { return (r.p.schemes || []).length; }) ? '<button type="button" class="btn btn--line btn--wide" id="print-sch">Предложение со схемами</button>' : '') +
         '<p class="sum__note">Откроется окно печати: выберите «Сохранить как PDF» или сразу распечатайте.</p>' +
       '</aside></div>';
 
@@ -429,7 +430,7 @@
         '<div class="offer__terms"><p>Доставка, погрузочно-разгрузочные работы оплачиваются дополнительно.</p><p>Подключение бытовой техники оплачивается согласно прайс-листу.</p><p>Бесплатное хранение товара на складе Поставщика — 2 месяца.</p></div>' +
         '<p class="offer__legal">Предложение сформировано на сайте ' + today + ', носит информационный характер и не является публичной офертой (ст. 437 ГК РФ). Цены и наличие действительны на дату формирования — уточняйте у консультантов шоурума.</p>' +
         (function () { var rs = c.rows.filter(function (r) { return (r.p.schemes || []).length; }); if (!rs.length) return '';
-          return '<section class="offer__sch"><div class="offer__schtop"><img src="assets/img/miele-logo.svg" alt="Miele"><span>Схемы встройки</span></div>' + rs.map(function (r) { var p = r.p;
+          return '<section class="offer__sch"><div class="offer__schtop"><img src="assets/img/miele-logo.svg" alt="Miele"><span>Схемы для встраивания</span></div>' + rs.map(function (r) { var p = r.p;
             return '<div class="offer__schr"><div class="offer__schn"><b>' + esc(p.title) + '</b>' + (p.model ? '<span>Модель ' + esc(p.model) + '</span>' : '') + '</div><div class="offer__schg">' + p.schemes.map(function (src) { return '<img src="' + esc(src) + '" alt="">'; }).join('') + '</div></div>';
           }).join('') + '</section>'; })() +
         '</td></tr></tbody></table>';

@@ -856,3 +856,25 @@ button.salon__pic:hover img { transform: scale(1.03); }
 }
 /* 25.11, ночь: фото в КП на ~25% крупнее — место на листе есть */
 @media print { .offer__pic img { width: 52pt; height: 52pt; } .offer__pic { width: 58pt; } }
+
+/* 26.11: промокод — поле и кнопка одной высоты и одной рамкой, текст по центру */
+.promo__row { align-items: stretch; }
+.promo__row input, .sum .promo__row .btn { box-sizing: border-box; height: 48px; min-height: 48px; border: 1px solid var(--ink); }
+.sum .promo__row .btn { padding: 0 18px; white-space: nowrap; }
+.promo__row input { text-align: center; letter-spacing: .06em; }
+.promo__row input::placeholder { text-align: center; }
+/* 26.11: «Ожидается поставка» — поле даты в редакторе */
+.f input.supdate { min-height: 38px; padding: 6px 10px; border: 1px solid #BDB9B4; background: #fff; font: inherit; }
+.f input.supdate:disabled { opacity: .45; }
+
+/* 26.11: схемы в PDF — с новой страницы, логотип по центру, подпись справа, схемы на 30% крупнее */
+@media print {
+  body.print-sch .offer__sch { break-before: page; margin-top: 0; }
+  .offer__schtop { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+  .offer__schtop::before { content: ""; }
+  .offer__schtop img { justify-self: center; }
+  .offer__schtop span { justify-self: end; text-align: right; }
+  .offer__schr { grid-template-columns: 40mm minmax(0, 1fr); }
+  .offer__schg, .offer__schg--2 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4mm; }
+  .offer__schg img { height: 42mm; }
+}

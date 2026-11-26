@@ -919,6 +919,13 @@
       var d = p.saleUntil.split('-'), M = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
       return 'Акция до ' + (+d[2]) + ' ' + M[+d[1] - 1] + (+d[0] !== new Date().getFullYear() ? ' ' + d[0] : '');
     },
+    /* «Ожидается поставка» (просьба владельца 26.11): дата из карточки товара; после неё метка пропадает сама */
+    supplyText: function (p) {
+      var s = p && p.supply;
+      if (!/^\d{4}-\d\d-\d\d$/.test(s || '') || s < today()) return '';
+      var d = s.split('-'), M = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+      return (+d[2]) + ' ' + M[+d[1] - 1] + (+d[0] !== new Date().getFullYear() ? ' ' + d[0] : '');
+    },
     onSale: function (p) { return typeof p.price === 'number' && typeof p.oldPrice === 'number' && p.oldPrice > p.price; },
     tgLink: function () { var t = String(Store.settings().telegram || '').replace(/^@|\s/g, ''); return t ? 'https://t.me/' + (/^\d+$/.test(t) ? '+' : '') + t : ''; },
     /* Комплекты колонн. У прибора в комплекте своя цена (sets[].prices); если в каталоге он стоит дешевле, берётся цена каталога.
@@ -1027,6 +1034,7 @@
       var n = Math.max(0, parseInt(p.stock, 10) || 0);
       var low = Math.max(1, parseInt(p.low, 10) || 1);
       var high = Math.max(low + 1, parseInt(p.high, 10) || low + 1);
+      if (n === 0 && Store.supplyText(p)) return { key: 'order', level: 0, label: 'Ожидается поставка', admin: 'Поставка', supply: true };
       if (n === 0) return p.orderable === false
         ? { key: 'out', level: 0, label: 'Нет в наличии', admin: 'Нет' }
         : { key: 'order', level: 0, label: 'Под заказ', admin: 'Под заказ' };

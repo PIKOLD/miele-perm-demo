@@ -223,7 +223,7 @@
   }
   function drawPics() { drawList('#e-pics', pics, 'pics'); drawList('#e-sch', schemes, 'schemes'); }
   function drawNow() {
-    var st = S.status({ stock: ef.elements.stock.value, low: ef.elements.low.value, high: ef.elements.high.value, orderable: ef.elements.orderable.checked });
+    var st = S.status({ stock: ef.elements.stock.value, low: ef.elements.low.value, high: ef.elements.high.value, orderable: ef.elements.orderable.checked, supply: ef.elements.supplyOn.checked ? ef.elements.supply.value : '' });
     $('#e-now').innerHTML = 'На сайте сейчас: ' + '<span class="stock stock--' + st.key + '"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>' + esc(st.label) + '</span><span style="color:var(--muted)">(' + esc(st.admin.toLowerCase()) + ')</span>';
   }
   function edit(id, cat) {
@@ -236,6 +236,7 @@
     el.price.value = typeof p.price === 'number' ? p.price : ''; el.oldPrice.value = typeof p.oldPrice === 'number' ? p.oldPrice : ''; el.saleUntil.value = p.saleUntil || '';
     el.stock.value = parseInt(p.stock, 10) || 0; el.low.value = p.low || cfg.lowDefault; el.high.value = p.high || cfg.highDefault;
     el.orderable.checked = p.orderable !== false; el.visible.checked = p.visible !== false; el.showroom.checked = !!p.showroom;
+    el.supplyOn.checked = !!p.supply; el.supply.value = p.supply || ''; el.supply.disabled = !p.supply;
     el.lead5.checked = p.lead === 'от 5 дней'; el.lead30.checked = p.lead === 'от 30 дней';
     el.description.value = p.description || '';
     el.features.value = (p.features || []).join('\n');
@@ -252,6 +253,9 @@
   }
   ['stock', 'low', 'high'].forEach(function (n) { ef.elements[n].addEventListener('input', drawNow); });
   ef.elements.orderable.addEventListener('change', drawNow);
+  /* Ожидается поставка: галочка включает поле даты */
+  ef.elements.supplyOn.addEventListener('change', function () { var d = ef.elements.supply; d.disabled = !this.checked; if (this.checked && !d.value) { var t = new Date(Date.now() + 7 * 864e5); d.value = t.getFullYear() + '-' + ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2); } if (this.checked) d.focus(); drawNow(); });
+  ef.elements.supply.addEventListener('input', drawNow);
   /* Срок под заказ: две галочки, отмечена может быть только одна */
   ['lead5', 'lead30'].forEach(function (n, i, all) { ef.elements[n].addEventListener('change', function () { if (this.checked) ef.elements[all[1 - i]].checked = false; }); });
   ef.elements.title.addEventListener('input', function () { if (this.value.trim()) $('#w-title').classList.remove('bad'); });
@@ -301,6 +305,7 @@
       price: price, oldPrice: old, saleUntil: old !== null ? el.saleUntil.value : '',
       stock: Math.max(0, parseInt(el.stock.value, 10) || 0), low: low, high: Math.max(low + 1, parseInt(el.high.value, 10) || low + 1),
       orderable: el.orderable.checked, visible: el.visible.checked, showroom: el.showroom.checked, images: pics.slice(), schemes: schemes.slice(),
+      supply: el.supplyOn.checked && el.supply.value ? el.supply.value : '',
       lead: el.lead5.checked ? 'от 5 дней' : el.lead30.checked ? 'от 30 дней' : '',
       description: el.description.value.trim(),
       features: el.features.value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
