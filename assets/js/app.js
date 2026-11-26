@@ -413,9 +413,9 @@
       /* Поля страницы заданы пустыми строками таблицы (шапка и подвал повторяются на каждом листе): у самой страницы поля нулевые,
          поэтому браузер не печатает свои колонтитулы с датой и адресом сайта */
       var cut = c.kits.length || c.pct || c.promo;
-      offer.innerHTML = '<table class="offer__page"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>' +
-        '<div class="offer__top"><div class="offer__co"><b>Шоурум Miele</b><span>' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span><span>' + esc(cfg.hours) + '</span></div>' +
-          '<img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co offer__co--r">' + offerPhones() + '</div></div>' +
+      var top = '<div class="offer__top"><div class="offer__co"><b>Шоурум Miele</b><span>' + esc(String(cfg.address).replace(/^Шоурум Miele,?\s*/i, '')) + '</span><span>' + esc(cfg.hours) + '</span></div>' +
+          '<img src="assets/img/miele-logo.svg" alt="Miele" width="130" height="50"><div class="offer__co offer__co--r">' + offerPhones() + '</div></div>';
+      offer.innerHTML = '<table class="offer__page"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>' + top +
         '<h1>Коммерческое предложение <span class="offer__date">от ' + today + '</span></h1>' +
         '<table class="offer__tbl' + (cut ? ' offer__tbl--cut' : '') + '"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th>' + (cut ? '<th>Цена со %</th>' : '') + '<th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
@@ -430,7 +430,7 @@
         '<div class="offer__terms"><p>Доставка, погрузочно-разгрузочные работы оплачиваются дополнительно.</p><p>Подключение бытовой техники оплачивается согласно прайс-листу.</p><p>Бесплатное хранение товара на складе Поставщика — 2 месяца.</p></div>' +
         '<p class="offer__legal">Предложение сформировано на сайте ' + today + ', носит информационный характер и не является публичной офертой (ст. 437 ГК РФ). Цены и наличие действительны на дату формирования — уточняйте у консультантов шоурума.</p>' +
         (function () { var rs = c.rows.filter(function (r) { return (r.p.schemes || []).length; }); if (!rs.length) return '';
-          return '<section class="offer__sch"><div class="offer__schtop"><img src="assets/img/miele-logo.svg" alt="Miele"><span>Схемы для встраивания</span></div>' + rs.map(function (r) { var p = r.p;
+          return '<section class="offer__sch">' + top + '<h2 class="offer__schh">Схемы для встраивания</h2>' + rs.map(function (r) { var p = r.p;
             return '<div class="offer__schr"><div class="offer__schn"><b>' + esc(p.title) + '</b>' + (p.model ? '<span>Модель ' + esc(p.model) + '</span>' : '') + '</div><div class="offer__schg">' + p.schemes.map(function (src) { return '<img src="' + esc(src) + '" alt="">'; }).join('') + '</div></div>';
           }).join('') + '</section>'; })() +
         '</td></tr></tbody></table>';

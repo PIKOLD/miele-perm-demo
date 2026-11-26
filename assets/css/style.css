@@ -878,3 +878,5 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .offer__schg, .offer__schg--2 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4mm; }
   .offer__schg img { height: 42mm; }
 }
+/* 26.11: лист схем начинается с той же шапки, что и предложение */
+@media print { .offer__sch h2.offer__schh { margin: 8mm 0 2mm; font-size: 13pt; text-transform: uppercase; letter-spacing: .06em; } }
