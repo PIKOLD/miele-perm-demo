@@ -6,8 +6,8 @@
 <title>Кабинет шоурума — Miele Пермь</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css?v=49">
-<link rel="stylesheet" href="assets/css/admin.css?v=49">
+<link rel="stylesheet" href="assets/css/style.css?v=50">
+<link rel="stylesheet" href="assets/css/admin.css?v=50">
 </head>
 <body class="adm">
 
@@ -35,6 +35,7 @@
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="products" aria-selected="true">Товары</button>
       <button class="tab" role="tab" data-tab="schemes" aria-selected="false">Схемы встройки</button>
+      <button class="tab" role="tab" data-tab="hero" aria-selected="false">Главная</button>
       <button class="tab" role="tab" data-tab="kits" aria-selected="false">Комплекты</button>
       <button class="tab" role="tab" data-tab="leads" aria-selected="false">Заявки <span class="badge" id="lead-badge" hidden></span></button>
       <button class="tab" role="tab" data-tab="settings" aria-selected="false">Настройки</button>
@@ -66,6 +67,14 @@
       <div class="schbar"><input id="sch-q" type="search" placeholder="Поиск по названию или модели" aria-label="Поиск товара"><label class="chk"><input type="checkbox" id="sch-only"><span>Только товары со схемами</span></label></div>
       <div id="sch-list"></div>
       <input type="file" id="sch-file" accept="image/*" multiple hidden>
+    </section>
+
+    <section id="tab-hero" hidden>
+      <div class="ahead"><h1>Первый экран главной</h1><div class="hbtns"><button class="abtn" type="button" id="hero-addimg">+ Фото</button><button class="abtn abtn--pri" type="button" id="hero-addvid">+ Видео</button></div></div>
+      <p class="khint">Фото и видео вверху главной страницы сменяют друг друга в порядке списка. Фото показывается 6 секунд, видео — до конца, без звука; у покупателя есть кнопка «Включить звук». Фото — горизонтальное, от 1600 px в ширину. Видео — MP4, горизонтальное (1280×720 или 1920×1080), лучше до 15 МБ: чем больше файл, тем дольше открывается сайт на телефоне. Всё сохраняется сразу.</p>
+      <p class="hprog" id="hero-prog" hidden></p>
+      <div id="hero-list"></div>
+      <input type="file" id="hero-img" accept="image/*" hidden><input type="file" id="hero-vid" accept="video/mp4,video/webm" hidden>
     </section>
 
     <section id="tab-kits" hidden>
@@ -224,7 +233,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="api/state.php"></script>
-<script src="assets/js/store.js?v=49"></script>
-<script src="assets/js/admin.js?v=49"></script>
+<script src="assets/js/store.js?v=50"></script>
+<script src="assets/js/admin.js?v=50"></script>
 </body>
 </html>

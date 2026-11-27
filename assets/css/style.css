@@ -880,3 +880,23 @@ button.salon__pic:hover img { transform: scale(1.03); }
 }
 /* 26.11: лист схем начинается с той же шапки, что и предложение */
 @media print { .offer__sch h2.offer__schh { margin: 8mm 0 2mm; font-size: 13pt; text-transform: uppercase; letter-spacing: .06em; } }
+
+/* 27.11: видео на первом экране — без «наезда», полоска идёт столько, сколько длится ролик; кнопка звука */
+.hero__slides video.hero__img { background: #1b1714; }
+.hero__slides video.hero__img.on { animation: none; transform: none; }
+.hero__dots .on i::after { animation-duration: var(--hd, 6s); }
+.hero__snd { pointer-events: auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border: 1px solid rgba(255, 255, 255, .55); background: rgba(0, 0, 0, .35); color: #fff; font: inherit; font-size: 13px; letter-spacing: .04em; cursor: pointer; backdrop-filter: blur(4px); }
+.hero__snd:hover { background: rgba(0, 0, 0, .55); border-color: #fff; }
+.hero__snd[hidden] { display: none; }
+.hero__snd .i-on { display: none; }
+.hero__snd[aria-pressed="true"] .i-on { display: inline; }
+.hero__snd[aria-pressed="true"] .i-off { display: none; }
+@media (max-width: 640px) { .hero__snd { min-height: 32px; padding: 0 10px; font-size: 12px; } }
+
+/* 27.11: КП — фото товаров крупнее, под названием несколько характеристик */
+.offer__spec { display: none; }
+@media print {
+  .offer__pic img { width: 78pt; height: 78pt; }
+  .offer__pic { width: 84pt; }
+  .offer__spec { display: block; margin-top: 2pt; font-size: 7.5pt; line-height: 1.35; color: #555; }
+}

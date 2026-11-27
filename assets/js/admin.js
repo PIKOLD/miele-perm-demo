@@ -59,11 +59,96 @@
 
   function openTab(name) {
     $$('.tab').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'); });
-    ['products', 'schemes', 'kits', 'leads', 'settings', 'users'].forEach(function (n) { $('#tab-' + n).hidden = n !== name; });
+    ['products', 'schemes', 'hero', 'kits', 'leads', 'settings', 'users'].forEach(function (n) { $('#tab-' + n).hidden = n !== name; });
     if (name === 'schemes') renderSchemes();
+    if (name === 'hero') renderHero();
     if (name === 'kits' && !kdirty) { kitsLoad(); renderKits(); }
   }
   $$('.tab').forEach(function (b) { b.addEventListener('click', function () { openTab(b.dataset.tab); }); });
+
+  /* ---------- Первый экран главной (вкладка, 27.11): фото и видео, порядок, подписи ---------- */
+  function heroList() { return (S.settings().hero || []).filter(function (h) { return h && h.src; }).map(function (h) { return Object.assign({}, h); }); }
+  function heroSave(list) {
+    var c = S.settings(); c.hero = list;
+    if (S.saveSettings(c) === false) return toast('Не сохранилось', true);
+    toast('Сохранено'); renderHero();
+  }
+  function renderHero() {
+    var list = heroList();
+    $('#hero-list').innerHTML = list.map(function (h, i) {
+      var v = h.type === 'video';
+      return '<div class="hrow" data-i="' + i + '"><div class="hrow__m">' + (v
+        ? '<video src="' + esc(h.src) + '"' + (h.poster ? ' poster="' + esc(h.poster) + '"' : '') + ' muted playsinline preload="metadata" controls></video>'
+        : '<img src="' + esc(h.src) + '" alt="" loading="lazy">') + '<span class="hrow__t">' + (v ? 'Видео' : 'Фото') + ' ' + (i + 1) + '</span></div>' +
+        '<div class="hrow__f"><label>Подпись внизу экрана<input type="text" data-lbl value="' + esc(h.label || '') + '" maxlength="60" placeholder="Например: Встраиваемая кухня"></label></div>' +
+        '<div class="hrow__b"><button class="abtn" type="button" data-up' + (i ? '' : ' disabled') + ' aria-label="Выше">↑</button><button class="abtn" type="button" data-dn' + (i < list.length - 1 ? '' : ' disabled') + ' aria-label="Ниже">↓</button><button class="abtn abtn--del" type="button" data-del>Удалить</button></div></div>';
+    }).join('') || '<p class="hint">Слайдов нет — на сайте показываются стандартные фото.</p>';
+  }
+  $('#hero-list').addEventListener('click', function (e) {
+    var row = e.target.closest('.hrow'); if (!row) return;
+    var i = +row.dataset.i, list = heroList(), b;
+    if ((b = e.target.closest('[data-up]')) && i > 0) { list.splice(i - 1, 0, list.splice(i, 1)[0]); return heroSave(list); }
+    if ((b = e.target.closest('[data-dn]')) && i < list.length - 1) { list.splice(i + 1, 0, list.splice(i, 1)[0]); return heroSave(list); }
+    if (e.target.closest('[data-del]')) {
+      if (list.length < 2) return toast('Должен остаться хотя бы один слайд', true);
+      confirmBox('Удалить слайд?', 'Он пропадёт с главной страницы.', 'Удалить', function () { list.splice(i, 1); heroSave(list); });
+    }
+  });
+  $('#hero-list').addEventListener('change', function (e) {
+    if (!e.target.matches('[data-lbl]')) return;
+    var i = +e.target.closest('.hrow').dataset.i, list = heroList(); list[i].label = e.target.value.trim(); heroSave(list);
+  });
+  function heroProg(text) { var p = $('#hero-prog'); p.hidden = !text; p.textContent = text || ''; }
+  function heroAdd(item) { var list = heroList(); list.push(item); heroSave(list); }
+  $('#hero-addimg').addEventListener('click', function () { $('#hero-img').click(); });
+  $('#hero-addvid').addEventListener('click', function () { $('#hero-vid').click(); });
+  $('#hero-img').addEventListener('change', function (e) {
+    var file = e.target.files[0]; e.target.value = ''; if (!file) return;
+    var img = new Image(), url = URL.createObjectURL(file);
+    img.onload = function () {
+      var k = Math.min(1, 2400 / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
+      var data = cv.toDataURL('image/webp', .85); if (data.indexOf('data:image/webp') !== 0) data = cv.toDataURL('image/jpeg', .88);
+      heroProg('Загружаю фото…');
+      S.upload(data).then(function (src) { heroProg(''); heroAdd({ type: 'image', src: src, label: '' }); }, function (er) { heroProg(''); toast('Фото не загрузилось: ' + (er && er.message || 'ошибка'), true); });
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); toast('Файл не похож на изображение', true); };
+    img.src = url;
+  });
+  /* Обложка видео — кадр с 0,5 с: показывается, пока видео грузится */
+  function videoPoster(file) {
+    return new Promise(function (res) {
+      var v = document.createElement('video'), url = URL.createObjectURL(file), done = function (x) { URL.revokeObjectURL(url); res(x); };
+      v.muted = true; v.playsInline = true; v.preload = 'auto';
+      v.onloadeddata = function () { try { v.currentTime = Math.min(.5, (v.duration || 1) / 2); } catch (e) { done(''); } };
+      v.onseeked = function () {
+        try {
+          var k = Math.min(1, 1280 / v.videoWidth), cv = document.createElement('canvas');
+          cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
+          cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height);
+          var d = cv.toDataURL('image/webp', .8); if (d.indexOf('data:image/webp') !== 0) d = cv.toDataURL('image/jpeg', .85);
+          done(d);
+        } catch (e) { done(''); }
+      };
+      v.onerror = function () { done(null); };
+      setTimeout(function () { done(''); }, 15000);
+      v.src = url;
+    });
+  }
+  $('#hero-vid').addEventListener('change', function (e) {
+    var file = e.target.files[0]; e.target.value = ''; if (!file) return;
+    if (file.size > 60e6) return toast('Видео больше 60 МБ — сожмите его и загрузите снова', true);
+    heroProg('Готовлю видео…');
+    videoPoster(file).then(function (poster) {
+      if (poster === null) { heroProg(''); return toast('Браузер не может показать это видео. Нужен MP4 (H.264) или WebM.', true); }
+      var pp = poster ? S.upload(poster).catch(function () { return ''; }) : Promise.resolve('');
+      return pp.then(function (posterSrc) {
+        return S.uploadVideo(file, function (f) { heroProg('Загружаю видео… ' + Math.round(f * 100) + '%'); })
+          .then(function (src) { heroProg(''); heroAdd({ type: 'video', src: src, poster: posterSrc || '', label: '' }); });
+      });
+    }).catch(function (er) { heroProg(''); toast('Видео не загрузилось: ' + (er && er.message || 'ошибка'), true); });
+  });
 
   /* ---------- Схемы встройки (вкладка, 25.11) ---------- */
   var schUp = null;

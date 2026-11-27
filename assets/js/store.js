@@ -689,6 +689,15 @@
     /* Скидка за объём заказа в корзине: от суммы — процент */
     discounts: [{ from: 700000, pct: 3 }, { from: 1000000, pct: 5 }, { from: 1300000, pct: 7 }],   // скидка за объём; промокод — сверху (25.11)
     promos: [{ code: 'VATEKS3', pct: 3 }, { code: 'VATEKS5', pct: 5 }, { code: 'VATEKS7', pct: 7 }],
+    /* Первый экран главной (27.11): фото и видео по очереди, меняются в кабинете на вкладке «Главная» */
+    hero: [
+      { type: 'video', src: 'assets/video/ny.mp4', poster: 'assets/video/ny.webp', label: 'С Новым годом!' },
+      { type: 'image', src: 'assets/img/mood/hero.webp', label: 'Прачечное оборудование', pos: '68% 18%' },
+      { type: 'image', src: 'assets/img/mood/h-kitchen.webp', label: 'Встраиваемая кухня', pos: '70% 55%' },
+      { type: 'image', src: 'assets/img/mood/h-ovens.webp', label: 'Духовые шкафы', pos: '78% 45%' },
+      { type: 'image', src: 'assets/img/mood/h-built.webp', label: 'Встраиваемая техника', pos: '75% 50%' },
+      { type: 'image', src: 'assets/img/mood/h-laundry.webp', label: 'Стиральные и сушильные машины', pos: '55% 55%' }
+    ],
     gis: 'https://2gis.ru/perm/firm/70000001026549959',
     ymaps: 'https://yandex.ru/maps/org/miele/121722485798/',
     sets: [
@@ -904,6 +913,19 @@
     upload: function (dataUrl) {
       if (!SRV) return Promise.resolve(dataUrl);
       return api('upload', { data: dataUrl }).then(function (d) { if (d.ok && d.url) return d.url; throw new Error(d.error || 'Не удалось загрузить фото'); });
+    },
+    /* Видео для первого экрана: уходит на сервер частями по 2 МБ (предел одного запроса — 4 МБ) */
+    uploadVideo: function (file, prog) {
+      if (!SRV) return Promise.reject(new Error('видео загружается только на рабочем сайте'));
+      if (file.size > 60e6) return Promise.reject(new Error('файл больше 60 МБ'));
+      var CH = 2000000, n = Math.max(1, Math.ceil(file.size / CH)), id = '';
+      for (var k = 0; k < 16; k++) id += '0123456789abcdef'[Math.floor(Math.random() * 16)];
+      function part(i) {
+        return new Promise(function (res, rej) { var fr = new FileReader(); fr.onload = function () { res(String(fr.result).split(',')[1] || ''); }; fr.onerror = function () { rej(new Error('файл не читается')); }; fr.readAsDataURL(file.slice(i * CH, (i + 1) * CH)); })
+          .then(function (b64) { return api('upload_video', { id: id, part: i, last: i === n - 1, data: b64 }); })
+          .then(function (d) { if (!d.ok) throw new Error(d.error || 'ошибка сервера'); if (prog) prog((i + 1) / n); return i === n - 1 ? d.url : part(i + 1); });
+      }
+      return part(0);
     },
     /* Разделы каталога: список из настроек + разделы, которые есть у товаров, но не внесены в список */
     cats: function () {

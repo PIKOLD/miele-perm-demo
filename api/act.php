@@ -140,6 +140,32 @@ switch ($do) {
         if (file_put_contents($dir . '/' . $name, $bin, LOCK_EX) === false) mp_fail(500, 'Не удалось сохранить фото');
         mp_ok(['url' => 'uploads/' . $name]);
 
+    /* ---------- Видео для первого экрана (27.11): приходит частями по 2 МБ, складывается во временный файл ---------- */
+    case 'upload_video':
+        mp_need_admin();
+        $id = (string)($in['id'] ?? '');
+        $part = (int)($in['part'] ?? -1);
+        if (!preg_match('/^[a-f0-9]{16}$/', $id) || $part < 0 || $part > 40) mp_fail(400, 'Неверная часть файла');
+        $bin = base64_decode(is_string($in['data'] ?? null) ? $in['data'] : '', true);
+        if ($bin === false || $bin === '' || strlen($bin) > 2000000) mp_fail(400, 'Неверная часть файла');
+        $dir = dirname(__DIR__) . '/uploads';
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true)) mp_fail(500, 'Нет папки для файлов');
+        if (!is_file($dir . '/.htaccess')) file_put_contents($dir . '/.htaccess', "Options -Indexes\n<FilesMatch \"\\.(php\\d?|phtml|phar|cgi|pl|py|sh)$\">\n  Require all denied\n</FilesMatch>\n");
+        $tmp = $dir . '/.part-' . $id;
+        clearstatcache();
+        if ($part === 0) {
+            foreach (glob($dir . '/.part-*') ?: [] as $old) { if (is_file($old) && filemtime($old) < time() - 3600) @unlink($old); }
+            if (file_put_contents($tmp, '') === false) mp_fail(500, 'Не удалось сохранить видео');
+        } elseif (!is_file($tmp) || filesize($tmp) !== $part * 2000000) mp_fail(400, 'Части файла пришли не по порядку, загрузите видео ещё раз');
+        if (file_put_contents($tmp, $bin, FILE_APPEND | LOCK_EX) === false) mp_fail(500, 'Не удалось сохранить видео');
+        if (empty($in['last'])) mp_ok();
+        $head = (string)file_get_contents($tmp, false, null, 0, 12);
+        $ext = substr($head, 4, 4) === 'ftyp' ? 'mp4' : (substr($head, 0, 4) === "\x1A\x45\xDF\xA3" ? 'webm' : '');
+        if ($ext === '') { @unlink($tmp); mp_fail(400, 'Нужен файл видео MP4 или WebM'); }
+        $name = date('Ymd') . '-' . bin2hex(random_bytes(8)) . '.' . $ext;
+        if (!@rename($tmp, $dir . '/' . $name)) mp_fail(500, 'Не удалось сохранить видео');
+        mp_ok(['url' => 'uploads/' . $name]);
+
     /* ---------- Смена пароля кабинета ---------- */
     case 'passwd':
         mp_need_admin();

@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="assets/css/style.css?v=49">
+<link rel="stylesheet" href="assets/css/style.css?v=50">
 </head>
 <body data-page="home">
 <div id="hdr"></div>
@@ -17,7 +17,8 @@
 <main id="main">
   <section class="hero">
     <div class="hero__slides" aria-hidden="true">
-      <img class="hero__img on" src="assets/img/mood/hero.webp" alt="Стиральная машина Miele в интерьере" data-label="Прачечное оборудование" style="--mp:68% 18%" fetchpriority="high">
+      <video class="hero__img on" src="assets/video/ny.mp4" poster="assets/video/ny.webp" data-label="С Новым годом!" muted playsinline preload="auto"></video>
+      <img class="hero__img" src="assets/img/mood/hero.webp" alt="Стиральная машина Miele в интерьере" data-label="Прачечное оборудование" style="--mp:68% 18%">
       <img class="hero__img" src="assets/img/mood/h-kitchen.webp" alt="Кухня со встроенной техникой Miele" data-label="Встраиваемая кухня" style="--mp:70% 55%">
       <img class="hero__img" src="assets/img/mood/h-ovens.webp" alt="Духовые шкафы Miele в кухне с деревянными фасадами" data-label="Духовые шкафы" style="--mp:78% 45%">
       <img class="hero__img" src="assets/img/mood/h-built.webp" alt="Встраиваемая техника Miele цвета графит" data-label="Встраиваемая техника" style="--mp:75% 50%">
@@ -32,7 +33,7 @@
         <a class="btn btn--white" href="#showroom">Приехать в шоурум</a>
       </div>
     </div>
-    <div class="hero__bar wrap"><span class="hero__lbl"><b>01</b> Прачечное оборудование</span><span class="hero__dots"><button type="button" data-h="0" aria-label="Фото 1"><i></i></button><button type="button" data-h="1" aria-label="Фото 2"><i></i></button><button type="button" data-h="2" aria-label="Фото 3"><i></i></button><button type="button" data-h="3" aria-label="Фото 4"><i></i></button><button type="button" data-h="4" aria-label="Фото 5"><i></i></button></span></div>
+    <div class="hero__bar wrap"><button type="button" class="hero__snd" aria-pressed="false" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="i-on" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="i-off" d="M16.5 9.5l5 5m0-5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Включить звук</span></button><span class="hero__lbl"><b>01</b> С Новым годом!</span><span class="hero__dots"><button type="button" data-h="0" aria-label="Слайд 1"><i></i></button><button type="button" data-h="1" aria-label="Слайд 2"><i></i></button><button type="button" data-h="2" aria-label="Слайд 3"><i></i></button><button type="button" data-h="3" aria-label="Слайд 4"><i></i></button><button type="button" data-h="4" aria-label="Слайд 5"><i></i></button><button type="button" data-h="5" aria-label="Слайд 6"><i></i></button></span></div>
   </section>
 
   <div class="facts"><div class="wrap facts__in">
@@ -146,7 +147,7 @@
 
 <div id="ftr"></div>
 <script src="api/state.php"></script>
-<script src="assets/js/store.js?v=49"></script>
-<script src="assets/js/app.js?v=49"></script>
+<script src="assets/js/store.js?v=50"></script>
+<script src="assets/js/app.js?v=50"></script>
 </body>
 </html>

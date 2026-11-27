@@ -419,7 +419,7 @@
         '<h1>Коммерческое предложение <span class="offer__date">от ' + today + '</span></h1>' +
         '<table class="offer__tbl' + (cut ? ' offer__tbl--cut' : '') + '"><thead><tr><th>№</th><th></th><th>Наименование</th><th>Кол-во</th><th>Цена</th>' + (cut ? '<th>Цена со %</th>' : '') + '<th>Сумма</th></tr></thead><tbody>' + c.rows.map(function (r, i) {
           var p = r.p, sub = [p.model && 'Модель ' + p.model, p.sku && 'арт. ' + p.sku, p.country && 'страна-производитель: ' + p.country].filter(Boolean).join(', ');
-          return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td>' + (cut ? '<td class="offer__cut">' + (r.sum === null ? '—' : money(r.unit2)) + '</td>' : '') + '<td>' + (r.sum === null ? 'по запросу' : money(cut ? r.sum2 : r.sum)) + '</td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td class="offer__pic">' + ((p.images || [])[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '') + '</td><td>' + esc(p.title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + offerSpecs(p) + '</td><td>' + r.qty + '</td><td>' + (r.sum === null ? 'по запросу' : (S.onSale(p) ? '<s>' + money(p.oldPrice) + '</s> ' : '') + money(p.price)) + '</td>' + (cut ? '<td class="offer__cut">' + (r.sum === null ? '—' : money(r.unit2)) + '</td>' : '') + '<td>' + (r.sum === null ? 'по запросу' : money(cut ? r.sum2 : r.sum)) + '</td></tr>';
         }).join('') + '</tbody></table>' +
         '<table class="offer__sum"><tbody>' + (cut ? '<tr><th>Итого</th><td>' + money(c.goods) + '</td></tr>' : '') +
           c.kits.map(function (k) { return '<tr><th>Цена комплекта: ' + esc(k.title) + (k.n > 1 ? ' × ' + k.n : '') + '</th><td>−' + money(k.off) + '</td></tr>'; }).join('') +
@@ -534,19 +534,62 @@
   }
 
   /* Первый экран (20.11): фото сменяются сами каждые 6 с, полоски внизу показывают прогресс и переключают кадр */
+  /* Характеристики товара в КП (27.11): до 4 строк из «Характеристик», без страны; если их нет — главные особенности */
+  function offerSpecs(p) {
+    var sp = (p.specs || []).filter(function (x) { return x && x[1] && !/страна/i.test(x[0]); }).slice(0, 4).map(function (x) { return x[0] + ': ' + x[1]; });
+    if (sp.length < 2) sp = (p.features || []).slice(0, 3);
+    return sp.length ? '<span class="offer__spec">' + sp.map(esc).join('<br>') + '</span>' : '';
+  }
+  /* Первый экран (27.11): фото и видео из настроек кабинета. Фото — 6 секунд, видео — до конца, без звука; кнопка «Звук» */
   function heroSlides() {
     var box = $('.hero__slides'); if (!box) return;
-    var im = box.querySelectorAll('img'), dots = document.querySelectorAll('.hero__dots button'), lbl = $('.hero__lbl'), N = im.length, cur = 0, t;
-    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    function show(i) {
-      cur = (i + N) % N;
-      im.forEach(function (x, k) { x.classList.toggle('on', k === cur); });
-      dots.forEach(function (d, k) { d.classList.toggle('on', k === cur); d.classList.toggle('done', k < cur); });
-      if (lbl) lbl.innerHTML = '<b>0' + (cur + 1) + '</b> ' + esc(im[cur].dataset.label || '');
+    var dotsBox = $('.hero__dots'), lbl = $('.hero__lbl'), snd = $('.hero__snd');
+    var list = (cfg.hero || []).filter(function (h) { return h && h.src; });
+    if (list.length) {
+      var was = Array.prototype.map.call(box.children, function (x) { return x.getAttribute('src'); }).join('|');
+      if (was !== list.map(function (h) { return h.src; }).join('|')) {
+        box.innerHTML = list.map(function (h) {
+          var st = h.pos ? ' style="--mp:' + esc(h.pos) + '"' : '';
+          return h.type === 'video'
+            ? '<video class="hero__img" src="' + esc(h.src) + '"' + (h.poster ? ' poster="' + esc(h.poster) + '"' : '') + st + ' muted playsinline preload="auto"></video>'
+            : '<img class="hero__img" src="' + esc(h.src) + '" alt="' + esc(h.label || '') + '"' + st + '>';
+        }).join('');
+        if (dotsBox) dotsBox.innerHTML = list.map(function (h, i) { return '<button type="button" data-h="' + i + '" aria-label="Слайд ' + (i + 1) + '"><i></i></button>'; }).join('');
+      }
+      Array.prototype.forEach.call(box.children, function (x, i) { x.dataset.label = list[i].label || ''; });
     }
-    function restart() { clearTimeout(t); if (!still) t = setTimeout(function () { if (!document.hidden) show(cur + 1); restart(); }, 6000); }
-    dots.forEach(function (d) { d.addEventListener('click', function () { show(+d.dataset.h); restart(); }); });
-    show(0); restart();
+    var im = Array.prototype.slice.call(box.children), dots = Array.prototype.slice.call(document.querySelectorAll('.hero__dots button')), N = im.length, cur = 0, t;
+    if (!N) return;
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches, loud = false;
+    function isV(x) { return x && x.tagName === 'VIDEO'; }
+    function barTime(sec) { var d = dots[cur]; if (d) d.style.setProperty('--hd', (sec > 0 && isFinite(sec) ? sec : 6) + 's'); }
+    function later(ms) { clearTimeout(t); if (!still && N > 1) t = setTimeout(function () { if (document.hidden) return later(ms); show(cur + 1); }, ms); }
+    function show(i) {
+      cur = (i + N) % N; clearTimeout(t);
+      im.forEach(function (x, k) { x.classList.toggle('on', k === cur); if (isV(x) && k !== cur) x.pause(); });
+      dots.forEach(function (d, k) { d.classList.remove('on'); void d.offsetWidth; d.classList.toggle('on', k === cur); d.classList.toggle('done', k < cur); });
+      if (lbl) lbl.innerHTML = '<b>' + (cur < 9 ? '0' : '') + (cur + 1) + '</b> ' + esc(im[cur].dataset.label || '');
+      var v = im[cur];
+      if (snd) snd.hidden = !isV(v);
+      if (!isV(v)) { barTime(6); return later(6000); }
+      v.muted = !loud; v.loop = N === 1;
+      try { v.currentTime = 0; } catch (e) {}
+      barTime(v.duration || 30);
+      if (still && !loud) return;
+      var p = v.play(); if (p && p.catch) p.catch(function () { barTime(6); later(6000); });
+    }
+    im.forEach(function (x) {
+      if (!isV(x)) return;
+      x.addEventListener('loadedmetadata', function () { if (im[cur] === x) barTime(x.duration); });
+      x.addEventListener('ended', function () { if (im[cur] === x && N > 1) show(cur + 1); });
+    });
+    if (snd) snd.addEventListener('click', function () {
+      loud = !loud; var v = im[cur];
+      snd.setAttribute('aria-pressed', loud ? 'true' : 'false'); snd.querySelector('span').textContent = loud ? 'Выключить звук' : 'Включить звук';
+      if (isV(v)) { v.muted = !loud; if (v.paused) v.play().catch(function () {}); }
+    });
+    dots.forEach(function (d) { d.addEventListener('click', function () { show(+d.dataset.h); }); });
+    show(0);
   }
 
   layout(); catalog(); sets(); contacts(); productPage(); cartPage(); showroomGallery(); showroomRail(); heroSlides();
