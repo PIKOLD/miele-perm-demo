@@ -92,7 +92,7 @@
   }
   function catalog() {
     var grid = $('#grid'); if (!grid) return;
-    var list = visible(), cats = S.cats(), only = false, sort = 'default';
+    var list = visible(), cats = S.cats(), only = false, sort = 'price-asc';
     var folders = $('#folders'), tools = $('#cat-tools'), title = $('#cat-title'), back = $('#cat-back');
     var num = function (p) { return typeof p.price === 'number'; };
     var kits = S.kits();
@@ -119,8 +119,8 @@
       'price-desc': function (a, b) { return num(a) && num(b) ? b.price - a.price : num(b) - num(a); },
       name: function (a, b) { return a.title.localeCompare(b.title, 'ru'); }
     };
-    try { sort = sessionStorage.getItem('mp.sort') || 'default'; } catch (e) {}
-    if (!SORT[sort]) sort = 'default';
+    try { sort = sessionStorage.getItem('mp.sort') || 'price-asc'; } catch (e) {}
+    if (!SORT[sort]) sort = 'price-asc';
     $('#sort').value = sort;
 
     /* Порядок папок: акции, разделы, комплекты — сразу после стиральных и сушильных машин */
@@ -168,9 +168,7 @@
       if (cat === SETS) { grid.innerHTML = kits.map(kitCard).join('') + kitGoods.map(card).join(''); return; }
       var all = inCat(cat);
       var shown = all.filter(function (p) { return !only || S.status(p).level > 0; });
-      /* «Духовые шкафы» по умолчанию от дешёвых к дорогим (просьба владельца 20.11) */
-      var mode = sort === 'default' && cat === 'Духовые шкафы' ? 'price-asc' : sort;
-      if (SORT[mode]) shown = shown.map(function (p, i) { return [p, i]; }).sort(function (a, b) { return SORT[mode](a[0], b[0]) || a[1] - b[1]; }).map(function (x) { return x[0]; });
+      if (SORT[sort]) shown = shown.map(function (p, i) { return [p, i]; }).sort(function (a, b) { return SORT[sort](a[0], b[0]) || a[1] - b[1]; }).map(function (x) { return x[0]; });
       $('#count').textContent = shown.length + ' ' + S.plural(shown.length, 'товар', 'товара', 'товаров');
       var none = !all.length
         ? (cat === SALE ? 'Сейчас акционных предложений нет. О новых акциях расскажут консультанты шоурума.' : SHOW.test(cat) ? 'Сейчас выставочных образцов в продаже нет. О новых предложениях расскажут консультанты шоурума.' : 'В этом разделе товары скоро появятся на сайте. Нужную модель привезём под заказ' + lead + ' — позвоните или напишите нам.')
