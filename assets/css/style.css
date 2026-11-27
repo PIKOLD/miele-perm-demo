@@ -900,3 +900,15 @@ button.salon__pic:hover img { transform: scale(1.03); }
   .offer__pic { width: 84pt; }
   .offer__spec { display: block; margin-top: 2pt; font-size: 7.5pt; line-height: 1.35; color: #555; }
 }
+
+/* 28.11: КП — «Кол-во» уже, «Цена», «Цена со %» и «Сумма» одинаковой ширины */
+@media print {
+  .offer__tbl { table-layout: fixed; width: 100%; }
+  .offer__tbl th:nth-child(1) { width: 16pt; }
+  .offer__tbl th:nth-child(2) { width: 84pt; }
+  .offer__tbl th:nth-child(4) { width: 40pt; white-space: nowrap !important; letter-spacing: .02em; }
+  .offer__tbl th:nth-child(n+5) { width: 66pt; }
+  .offer__tbl th:nth-child(n+4) { white-space: normal; padding-left: 3pt; padding-right: 3pt; }
+  .offer__tbl td:nth-child(n+4) { padding-left: 3pt; padding-right: 3pt; }
+  .offer__tbl td:nth-child(5) s { display: block; }
+}

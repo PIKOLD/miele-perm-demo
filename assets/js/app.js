@@ -49,8 +49,8 @@
       '<header class="hdr"><div class="wrap hdr__in">' +
         '<div><button class="burger" aria-expanded="false" aria-controls="mnav" aria-label="Меню"><span></span></button><nav class="nav" aria-label="Основная навигация">' + nav + '</nav></div>' +
         '<a class="logo" href="index.html" aria-label="Miele Пермь — на главную"><img class="logo__img" src="assets/img/miele-logo.svg" alt="Miele" width="104" height="40"></a>' +
-        '<div class="hdr__right"><a class="hdr__tel" href="tel:' + tel + '">' + esc(cfg.phone) + '</a>' +
-          '<a class="hdr__icon" href="tel:' + tel + '" aria-label="Позвонить: ' + esc(cfg.phone) + '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></a>' +
+        '<div class="hdr__right"><a class="hdr__tel" href="tel:' + (tel2 || tel) + '">' + esc(tel2 ? cfg.phone2 : cfg.phone) + '</a>' +
+          '<a class="hdr__icon" href="tel:' + (tel2 || tel) + '" aria-label="Позвонить: ' + esc(tel2 ? cfg.phone2 : cfg.phone) + '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></a>' +
           '<a class="hdr__cart" href="cart.html" aria-label="Корзина">' + bag + '<span class="hdr__n" data-cart-n hidden></span></a>' +
           '<a class="hdr__cta" href="' + home + '#ask">Оставить заявку</a></div>' +
       '</div></header>' +
