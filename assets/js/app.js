@@ -138,7 +138,8 @@
         cls = ' folder--duo';
         pic = (kits[0] ? kits[0].items.slice(0, 2) : kitGoods.slice(0, 2)).map(function (p) { return '<img src="' + esc((p.images || [])[0] || '') + '" alt="">'; }).join('');
       } else {
-        var src = (cfg.catImages || {})[c] || ((inCat(c)[0] || {}).images || [])[0];
+        var cover = inCat(c).filter(function (p) { return p.images && p.images[0]; }).sort(SORT['price-desc'])[0];
+        var src = cover && cover.images[0];
         pic = src ? '<img src="' + esc(src) + '" alt="">' : '<img class="folder__logo" src="assets/img/miele-logo.svg" alt="">';
         if (src && src.indexOf('/mood/') >= 0) cls = ' folder--cover';
       }
