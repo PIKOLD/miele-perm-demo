@@ -129,6 +129,9 @@
       if (kits.length + kitGoods.length) out.splice(at, 0, SETS);
       return [SALE].concat(out);
     }
+    function categoryPage(c) {
+      return ['Стиральные машины', 'Сушильные машины', 'Варочные поверхности'].indexOf(c) >= 0;
+    }
     function folder(c) {
       var n = c === SETS ? kits.length + kitGoods.length : inCat(c).length, pic, cls = '';
       var count = c === SETS ? n + ' ' + S.plural(n, 'комплект', 'комплекта', 'комплектов')
@@ -143,7 +146,7 @@
         pic = src ? '<img src="' + esc(src) + '" alt="">' : '<img class="folder__logo" src="assets/img/miele-logo.svg" alt="">';
         if (src && src.indexOf('/mood/') >= 0) cls = ' folder--cover';
       }
-      return '<a class="folder' + cls + '" href="index.html?cat=' + encodeURIComponent(c) + '#catalog" data-cat="' + esc(c) + '"><span class="folder__pic">' + pic + '</span>' +
+      return '<a class="folder' + cls + '" href="' + (categoryPage(c) ? 'category.php' : 'index.html') + '?cat=' + encodeURIComponent(c) + '#catalog" data-cat="' + esc(c) + '"><span class="folder__pic">' + pic + '</span>' +
         '<span class="folder__name">' + esc(NAMES[c] || c) + '</span><span class="folder__n">' + count + '</span></a>';
     }
     function kitCard(k) {
@@ -185,6 +188,10 @@
     }
     /* Открыть папку (или вернуться к списку папок). Кнопка «Назад» в браузере возвращает к папкам */
     function go(c, push) {
+      if (push && (categoryPage(c) || location.pathname.endsWith('/category.php'))) {
+        location.href = (categoryPage(c) ? 'category.php' : 'index.html') + (c ? '?cat=' + encodeURIComponent(c) : '') + '#catalog';
+        return;
+      }
       cat = valid(c) ? c : ''; only = false; $('#only').checked = false;
       if (push) { try { history.pushState(null, '', (cat ? '?cat=' + encodeURIComponent(cat) : location.pathname) + '#catalog'); } catch (e) {} }
       draw();
