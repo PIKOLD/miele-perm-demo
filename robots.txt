@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /kabinet.html
+Disallow: /cart.html
+
+Sitemap: https://miele-perm.ru/sitemap.xml
